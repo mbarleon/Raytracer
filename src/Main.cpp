@@ -6,8 +6,13 @@
 */
 
 #include "Error.hpp"
+#include "Logger.hpp"
 
 int main(void)
 {
-    throw raytracer::exception::Error("main", "hello world");
+    try {
+        throw raytracer::exception::Error("main", "hello world");
+    } catch (raytracer::exception::Error &e) {
+        raytracer::logger::error(e);
+    }
 }

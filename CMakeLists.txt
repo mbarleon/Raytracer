@@ -28,6 +28,9 @@ file(GLOB CORE_SOURCE
 )
 
 add_executable(raytracer ${CORE_SOURCE} ${UTILS_SOURCE})
+
 ########################################
+
+target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 ########################################

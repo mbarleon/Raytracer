@@ -47,5 +47,10 @@ coding-style-reports.log
 tiled/
 temp/
 
+# clangd LSP
+compile_commands.json
+.cache/
+
+# CMakeLists.txt
 build/
 !CMakeLists.txt

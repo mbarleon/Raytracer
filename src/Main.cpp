@@ -5,10 +5,9 @@
 ** Main.cpp
 */
 
-#include <iostream>
+#include "Error.hpp"
 
 int main(void)
 {
-    std::cout << "salut monde" << std::endl;
-    return 0;
+    throw raytracer::exception::Error("main", "hello world");
 }

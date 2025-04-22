@@ -7,6 +7,7 @@
 
 #include "Error.hpp"
 #include "Logger.hpp"
+#include "Macro.hpp"
 
 int main(void)
 {
@@ -14,5 +15,7 @@ int main(void)
         throw raytracer::exception::Error("main", "hello world");
     } catch (raytracer::exception::Error &e) {
         raytracer::logger::error(e);
+        return ERROR;
     }
+    return SUCCESS;
 }

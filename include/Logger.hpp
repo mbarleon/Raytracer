@@ -10,19 +10,18 @@
 #include "Error.hpp"
 
 #ifdef DEBUG
-#include <iostream>
+    #include <iostream>
 #else
 #endif
 
-namespace raytracer::logger
-{
+namespace raytracer::logger {
 
-constexpr const char* GRAY = "\033[38;5;8m";
-constexpr const char* RED_BOLD = "\033[1;31m";
-constexpr const char* YELLOW = "\033[1;33m";
-constexpr const char* RESET = "\033[0m";
+constexpr const char *GRAY = "\033[38;5;8m";
+constexpr const char *RED_BOLD = "\033[1;31m";
+constexpr const char *YELLOW = "\033[1;33m";
+constexpr const char *RESET = "\033[0m";
 
-void error(const raytracer::exception::Error& e);
+void error(const raytracer::exception::Error &e);
 
 /**
  * @brief logger::debug
@@ -34,7 +33,8 @@ void error(const raytracer::exception::Error& e);
  *
  * @return void
  */
-template <typename... Args> void debug(__attribute_maybe_unused__ Args&&... args)
+template<typename... Args>
+void debug(__attribute_maybe_unused__ Args &&...args)
 {
 #ifdef DEBUG
     std::ostringstream oss;
@@ -44,4 +44,4 @@ template <typename... Args> void debug(__attribute_maybe_unused__ Args&&... args
 #endif
 }
 
-} // namespace raytracer::logger
+}// namespace raytracer::logger

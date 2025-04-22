@@ -14,7 +14,7 @@
  * the Error, where was it raised and why
  * @return void
  */
-void raytracer::logger::error(const raytracer::exception::Error& e)
+void raytracer::logger::error(const raytracer::exception::Error &e)
 {
     std::cerr << RED_BOLD << "╔════════════════════════════════╗" << RESET << std::endl;
     std::cerr << RED_BOLD << "║       ⚠ ERROR OCCURRED ⚠       ║" << RESET << std::endl;

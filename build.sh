@@ -29,7 +29,7 @@ function _all()
     # INFO: Epitech's moulinette does: `cmake --build .` but this is slow as fuck
     make -j$(nproc)
     if [[ $? -eq 0 ]]; then
-        _success "compiled raytracer, games, graphicals"
+        _success "compiled raytracer"
         exit 0
     fi
     _error "compilation error" "failed to compile raytracer"

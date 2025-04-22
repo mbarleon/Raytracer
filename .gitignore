@@ -46,6 +46,7 @@ coding-style-reports.log
 # other files
 tiled/
 temp/
+!LICENSE
 
 # clangd LSP
 compile_commands.json

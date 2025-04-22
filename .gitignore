@@ -47,3 +47,11 @@ coding-style-reports.log
 tiled/
 temp/
 !LICENSE
+
+# clangd LSP
+compile_commands.json
+.cache/
+
+# CMakeLists.txt
+build/
+!CMakeLists.txt

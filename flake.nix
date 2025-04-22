@@ -18,6 +18,7 @@
             gnumake
             cmake
             gcc
+            bear
           ];
 
           shellHook = ''

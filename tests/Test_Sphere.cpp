@@ -9,8 +9,6 @@
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 
-using namespace raytracer::shape;
-
 Test(sphere, intersection_exists)
 {
     const raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);

@@ -25,6 +25,8 @@ file(GLOB UTILS_SOURCE "src/Utils/*.cpp")
 file(GLOB CORE_SOURCE
     "src/*.cpp"
     "src/Core/*.cpp"
+    "src/Maths/*.cpp"
+    "src/RayTracer/*.cpp"
 )
 
 add_executable(raytracer ${CORE_SOURCE} ${UTILS_SOURCE})

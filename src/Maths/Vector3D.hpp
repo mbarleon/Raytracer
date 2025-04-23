@@ -15,32 +15,32 @@ class Vector3D
         double _y;
         double _z;
 
-        constexpr explicit Vector3D() = default;
-        constexpr explicit Vector3D(const double x, const double y, const double z);
+        explicit Vector3D();
+        explicit Vector3D(const double x, const double y, const double z);
 
-        constexpr double length() const;
+        double length() const;
 
-        constexpr Vector3D operator+(const Vector3D &other) const;
-        constexpr Vector3D &operator+=(const Vector3D &other);
+        Vector3D operator+(const Vector3D &other) const;
+        Vector3D &operator+=(const Vector3D &other);
 
-        constexpr Vector3D operator-(const Vector3D &other) const;
-        constexpr Vector3D &operator-=(const Vector3D &other);
+        Vector3D operator-(const Vector3D &other) const;
+        Vector3D &operator-=(const Vector3D &other);
 
-        constexpr Vector3D operator*(const Vector3D &other) const;
-        constexpr Vector3D &operator*=(const Vector3D &other);
+        Vector3D operator*(const Vector3D &other) const;
+        Vector3D &operator*=(const Vector3D &other);
 
-        constexpr Vector3D operator/(const Vector3D &other) const;
-        constexpr Vector3D &operator/=(const Vector3D &other);
+        Vector3D operator/(const Vector3D &other) const;
+        Vector3D &operator/=(const Vector3D &other);
 
         Vector3D operator*(const double scalar) const;
-        constexpr Vector3D &operator*=(const double scalar);
+        Vector3D &operator*=(const double scalar);
 
-        constexpr Vector3D operator/(const double scalar) const;
-        constexpr Vector3D &operator/=(const double scalar);
+        Vector3D operator/(const double scalar) const;
+        Vector3D &operator/=(const double scalar);
 
-        constexpr double dot(const Vector3D &other) const;
-        constexpr Vector3D normalize() const;
-        constexpr Vector3D cross(const Vector3D &other) const;
+        double dot(const Vector3D &other) const;
+        Vector3D normalize() const;
+        Vector3D cross(const Vector3D &other) const;
 };
 
 /**
@@ -48,7 +48,7 @@ class Vector3D
  * @details this operator is inline because you cannot overload it in the class !
  * @return the result (vector)
  */
-inline constexpr Vector3D operator*(const double scalar, const Vector3D &vector)
+inline Vector3D operator*(const double scalar, const Vector3D &vector)
 {
     return vector * scalar;
 }

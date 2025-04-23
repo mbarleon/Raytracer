@@ -36,6 +36,14 @@ function _all()
     exit 84
 }
 
+function _tests_run()
+{
+    ./unit_tests
+    gcovr -r . --exclude tests/ > code_coverage.txt
+    gcovr --txt-metric=branch > branch_coverage.txt
+    cat code_coverage.txt && cat branch_coverage.txt
+}
+
 function _clean()
 {
     rm -rf build
@@ -44,7 +52,7 @@ function _clean()
 function _fclean()
 {
     _clean
-    rm -rf lib raytracer
+    rm -rf raytracer unit_tests plugins code_coverage.txt branch_coverage.txt
 }
 
 for args in "$@"
@@ -59,6 +67,7 @@ ARGUMENTS:
       $0 [-h|--help]    displays this message
       $0 [-c|--clean]   clean the project
       $0 [-f|--fclean]  fclean the project
+      $0 [-t|--tests]   run unit tests
 EOF
         exit 0
         ;;
@@ -68,6 +77,10 @@ EOF
         ;;
     -f|--fclean)
         _fclean
+        exit 0
+        ;;
+    -t|--tests)
+        _tests_run
         exit 0
         ;;
     -r|--re)

@@ -40,8 +40,7 @@ function _tests_run()
 {
     ./unit_tests
     gcovr -r . --exclude tests/ > code_coverage.txt
-    gcovr --txt-metric=branch > branch_coverage.txt
-    cat code_coverage.txt && cat branch_coverage.txt
+    cat code_coverage.txt
 }
 
 function _clean()
@@ -52,7 +51,7 @@ function _clean()
 function _fclean()
 {
     _clean
-    rm -rf raytracer unit_tests plugins code_coverage.txt branch_coverage.txt
+    rm -rf raytracer unit_tests plugins code_coverage.txt
 }
 
 for args in "$@"

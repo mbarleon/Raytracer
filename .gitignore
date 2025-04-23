@@ -29,7 +29,7 @@ mouli/
 .bash_history
 # unit tests
 test/
-tests/
+# tests/
 unit_tests*
 # test and user generated temp files
 test*

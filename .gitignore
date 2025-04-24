@@ -30,7 +30,7 @@ mouli/
 # unit tests
 unit_tests*
 # test and user generated temp files
-example*
+# example*
 *.txt
 # coding style logs
 coding-style-reports.log

@@ -47,9 +47,12 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray) const noexcept
     const math::Point3D hit = ray._origin + t * ray._dir;
     const math::Vector3D v = hit - _origin;
 
-    const double proj_bottom = v.dot(_bottom_side) / _bottom_side.length();
-    const double proj_left = v.dot((_left_side) / _left_side.length());
+    const double bottom_length = _bottom_side.length();
+    const double left_length = _left_side.length();
 
-    return (proj_bottom >= 0 && proj_bottom <= _bottom_side.length())
-        && (proj_left >= 0 && proj_left <= _left_side.length());
+    const double proj_bottom = v.dot(_bottom_side) / bottom_length;
+    const double proj_left = v.dot((_left_side) / left_length);
+
+    return (proj_bottom >= 0 && proj_bottom <= bottom_length)
+        && (proj_left >= 0 && proj_left <= left_length);
 }

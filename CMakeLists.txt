@@ -28,17 +28,20 @@ file (GLOB MAIN_SOURCE
 file(GLOB MATH_SOURCE
     "src/Maths/*.cpp")
 
-file (GLOB SHAPE_SOURCE
-    "src/Shapes/*.cpp")
 
 file(GLOB CORE_SOURCE
     "src/Core/*.cpp")
 
-add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${MAIN_SOURCE})
+add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${MAIN_SOURCE})
 
 ########################################
 
 target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+########################################
+
+file (GLOB SHAPE_SOURCE
+    "src/Shapes/*.cpp")
 
 ########################################
 

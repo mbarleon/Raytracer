@@ -15,7 +15,7 @@ Test(rectangle, intersection_center)
     const math::Ray ray(math::Point3D(0, 0, -5), math::Vector3D(0, 0, 1));
     const bool result = rect.intersect(ray);
 
-    cr_assert(result, "Ray should intersect rectangle center");
+    cr_assert_not(!result, "Ray should intersect rectangle center");
 }
 
 Test(rectangle, intersection_edge)
@@ -24,7 +24,7 @@ Test(rectangle, intersection_edge)
     const math::Ray ray(math::Point3D(1, 1, -5), math::Vector3D(0, 0, 1));
     const bool result = rect.intersect(ray);
 
-    cr_assert(result, "Ray should intersect rectangle edge");
+    cr_assert_not(!result, "Ray should intersect rectangle edge");
 }
 
 Test(rectangle, no_intersection_outside)

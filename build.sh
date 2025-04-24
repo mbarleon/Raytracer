@@ -56,7 +56,7 @@ function _clean()
 function _fclean()
 {
     _clean
-    rm -rf raytracer unit_tests plugins code_coverage.txt
+    rm -rf raytracer unit_tests plugins code_coverage.txt unit_tests-*.profraw
 }
 
 for args in "$@"
@@ -98,4 +98,3 @@ EOF
 done
 
 _all
-

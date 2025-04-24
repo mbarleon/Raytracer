@@ -50,9 +50,17 @@ file(GLOB TEST_SOURCE
 
 add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${TEST_SOURCE})
 
-target_link_libraries(unit_tests PRIVATE criterion gcov)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+    target_compile_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+    target_link_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(unit_tests PRIVATE -fprofile-arcs -ftest-coverage)
+    target_link_options(unit_tests PRIVATE -fprofile-arcs -ftest-coverage)
+endif()
+
+target_link_libraries(unit_tests PRIVATE criterion)
+
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_compile_options(unit_tests PRIVATE --coverage)
 
 enable_testing()
 add_test(NAME unit_tests COMMAND unit_tests)

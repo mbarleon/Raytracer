@@ -15,7 +15,7 @@ Test(sphere, intersection_exists)
     const math::Ray ray(math::Point3D(0, 0, -5), math::Vector3D(0, 0, 1));
     const bool result = sphere.intersect(ray);
 
-    cr_assert(result, "math::Ray should intersect sphere");
+    cr_assert_not(!result, "math::Ray should intersect sphere");
 }
 
 Test(sphere, no_intersection)
@@ -33,7 +33,7 @@ Test(sphere, tangent_intersection)
     const math::Ray ray(math::Point3D(0, 1, -5), math::Vector3D(0, 0, 1));
     const bool result = sphere.intersect(ray);
 
-    cr_assert(result, "math::Ray should be tangent to sphere");
+    cr_assert_not(!result, "math::Ray should be tangent to sphere");
 }
 
 Test(sphere, inside_sphere)
@@ -42,5 +42,5 @@ Test(sphere, inside_sphere)
     const math::Ray ray(math::Point3D(0, 0, 0), math::Vector3D(0, 0, 1));
     const bool result = sphere.intersect(ray);
 
-    cr_assert(result, "math::Ray starting inside sphere should intersect");
+    cr_assert_not(!result, "math::Ray starting inside sphere should intersect");
 }

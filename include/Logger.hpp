@@ -34,7 +34,7 @@ void error(const raytracer::exception::Error &e);
  * @return void
  */
 template<typename... Args>
-void debug(__attribute_maybe_unused__ Args &&...args)
+void debug([[maybe_unused]] Args &&...args)
 {
 #ifdef DEBUG
     std::ostringstream oss;

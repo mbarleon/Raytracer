@@ -41,6 +41,9 @@ class Vector3D
         double dot(const Vector3D &other) const;
         Vector3D normalize() const;
         Vector3D cross(const Vector3D &other) const;
+
+        bool operator==(const Vector3D &other) const;
+        bool operator!=(const Vector3D &other) const;
 };
 
 /**

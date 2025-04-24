@@ -26,12 +26,22 @@ Test(Vector3D, parameterized_constructor)
     cr_assert_eq(v._z, 3.0);
 }
 
-Test(Vector3D, addition_operator)
+Test(Vector3D, general_operations)
 {
     const math::Vector3D a(1.0, 2.0, 3.0);
     const math::Vector3D b(4.0, 5.0, 6.0);
-    const math::Vector3D c = a + b;
+    math::Vector3D c = a + b;
 
+    cr_assert((c += a)._z == 12);
+    cr_assert((c -= a)._y == 7);
+    cr_assert((c *= a)._x == 5);
+    cr_assert((c /= a)._z == 9);
+    c = c * a;
+    c = c / a;
+    c = c * 2;
+    c = c / 2;
+    c *= 2;
+    c /= 2;
     cr_assert_eq(c._x, 5.0);
     cr_assert_eq(c._y, 7.0);
     cr_assert_eq(c._z, 9.0);
@@ -96,4 +106,24 @@ Test(Vector3D, normalize)
     cr_assert_float_eq(n._x, 0.0, 1e-6);
     cr_assert_float_eq(n._y, 0.6, 1e-6);
     cr_assert_float_eq(n._z, 0.8, 1e-6);
+}
+
+Test(Vector3D, equal)
+{
+    const math::Vector3D a(0.0, 3.0, 4.0);
+    const math::Vector3D b(0.0, 3.0, 4.0);
+    const math::Vector3D c(1.0, 3.0, 4.0);
+
+    cr_assert(a == b);
+    cr_assert_eq(a == c, false);
+}
+
+Test(Vector3D, different)
+{
+    const math::Vector3D a(0.0, 3.0, 4.0);
+    const math::Vector3D b(0.0, 3.0, 4.0);
+    const math::Vector3D c(1.0, 3.0, 4.0);
+
+    cr_assert(a != c);
+    cr_assert_eq(a != b, false);
 }

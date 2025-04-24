@@ -121,3 +121,13 @@ math::Vector3D math::Vector3D::cross(const Vector3D &other) const
 {
     return Vector3D(_y * other._z - _z * other._y, _z * other._x - _x * other._z, _x * other._y - _y * other._x);
 }
+
+bool math::Vector3D::operator==(const Vector3D &other) const
+{
+    return (_x == other._x && _y == other._y && _z == other._z);
+}
+
+bool math::Vector3D::operator!=(const Vector3D &other) const
+{
+    return (_x != other._x || _y != other._y || _z != other._z);
+}

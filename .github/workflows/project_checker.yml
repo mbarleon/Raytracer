@@ -43,6 +43,15 @@ jobs:
             fi
           env:
             EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
+        - name: Check unit_tests
+          run: |
+            if ./build.sh && ./build.sh --tests ; then
+              echo "::notice file=build.sh::Unit tests successful (./build.sh --tests)."
+            else
+              echo "::error file=build.sh::/!\\ UNIT TESTS ERROR (./build.sh --tests)/!\\"
+            fi
+          env:
+            EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
 
   push_to_mirror:
     if: github.event_name == 'push'

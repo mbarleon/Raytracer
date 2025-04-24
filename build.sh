@@ -39,6 +39,11 @@ function _all()
 function _tests_run()
 {
     ./unit_tests
+    if [[ $? -ne 0 ]]; then
+        _error "unit tests error" "unit tests failed!"
+        exit 84
+    fi
+    _success "unit tests succeed!"
     gcovr -r . --exclude tests/ > code_coverage.txt
     cat code_coverage.txt
 }

@@ -44,7 +44,12 @@ function _tests_run()
         exit 84
     fi
     _success "unit tests succeed!"
-    gcovr -r . --exclude tests/ > code_coverage.txt
+    if [ $(uname -s) == 'Darwin' ]; then
+        xcrun llvm-profdata merge -sparse unit_tests-*.profraw -o unit_tests.profdata
+        xcrun llvm-cov report ./unit_tests -instr-profile=unit_tests.profdata -ignore-filename-regex='.*/tests/.*' -enable-name-compression > code_coverage.txt
+    else
+        gcovr -r . --exclude tests/ > code_coverage.txt
+    fi
     cat code_coverage.txt
 }
 

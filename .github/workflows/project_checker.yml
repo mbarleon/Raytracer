@@ -41,7 +41,7 @@ jobs:
 
       - name: Run build inside Docker
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace epitechcontent/epitest-docker bash -c '
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace -e EXECUTABLE_PATH=${{ vars.EXECUTABLE_PATH }} epitechcontent/epitest-docker bash -c '
             if [ ! -f "build.sh" ]; then
               echo "::error ::/!\\ WARNING NO build.sh FOUND /!\\"
               exit 1
@@ -71,9 +71,6 @@ jobs:
               exit 1
             fi
           '
-        env:
-          EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
-
 
   push_to_mirror:
     if: github.event_name == 'push'

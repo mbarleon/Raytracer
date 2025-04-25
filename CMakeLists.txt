@@ -28,9 +28,11 @@ file (GLOB MAIN_SOURCE
 file(GLOB MATH_SOURCE
     "src/Maths/*.cpp")
 
-
 file(GLOB CORE_SOURCE
     "src/Core/*.cpp")
+
+file (GLOB PARSER_SOURCE
+    "src/Parser/*.cpp")
 
 add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${MAIN_SOURCE})
 

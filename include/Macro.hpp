@@ -17,3 +17,9 @@
 #else
     #define RESTRICT
 #endif
+
+#if defined(UNIT_TESTS)
+    #define unit_static
+#else
+    #define unit_static static
+#endif

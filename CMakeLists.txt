@@ -60,6 +60,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_options(unit_tests PRIVATE -fprofile-arcs -ftest-coverage)
 endif()
 
+target_compile_definitions(unit_tests PRIVATE UNIT_TESTS=1)
+
 target_link_libraries(unit_tests PRIVATE criterion)
 
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)

@@ -7,27 +7,33 @@
 
 #include "Parser.hpp"
 
-unit_static void raytracer::parser::skipWhitespace(Iterator &it, const Iterator &end)
+#if defined(UNIT_TESTS)
+    namespace raytracer::parser {
+#endif
+
+unit_static void skipWhitespace(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     while (it != end && std::isspace(*it))
         ++it;
 }
 
-unit_static char raytracer::parser::get(Iterator &it, const Iterator &end)
+unit_static char get(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     if (it == end)
         throw raytracer::exception::Error("raytracer::parser::get", "Unexpected end of input");
     return *it++;
 }
 
-unit_static char raytracer::parser::peek(Iterator it, const Iterator &end)
+unit_static char peek(raytracer::parser::Iterator it, const raytracer::parser::Iterator &end)
 {
     if (it == end)
         throw raytracer::exception::Error("raytracer::parser::peek", "Unexpected end of input");
     return *it;
 }
 
-unit_static void raytracer::parser::expect(Iterator &it, const Iterator &end, char expected)
+unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end, char expected)
 {
     const char c = get(it, end);
 
@@ -35,7 +41,8 @@ unit_static void raytracer::parser::expect(Iterator &it, const Iterator &end, ch
         throw raytracer::exception::Error("raytracer::parser::expect", "Expected '", expected, "', got '", c, "'");
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseNull(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue  parseNull(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     if (std::distance(it, end) >= 4 && std::string(it, it + 4) == "null") {
         std::advance(it, 4);
@@ -44,7 +51,8 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseNull(Iterator &
     throw raytracer::exception::Error("raytracer::parser::parseNull", "Expected 'null'");
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseBool(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue  parseBool(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     if (std::distance(it, end) >= 4 && std::string(it, it + 4) == "true") {
         std::advance(it, 4);
@@ -56,9 +64,10 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseBool(Iterator &
     throw raytracer::exception::Error("raytracer::parser::parseBool", "Expected 'true' or 'false'");
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseNumber(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
-    const Iterator start = it;
+    const raytracer::parser::Iterator start = it;
     bool isFloat = false;
 
     if (*it == '-')
@@ -82,8 +91,8 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseNumber(Iterator
     }
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseString(Iterator &it,
-    const Iterator &end)
+unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     std::string result;
     bool terminated = false;
@@ -115,7 +124,11 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseString(Iterator
     return result;
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseArray(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end);
+
+unit_static raytracer::parser::JsonValue parseArray(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     std::vector<raytracer::parser::JsonProto> array;
 
@@ -138,7 +151,8 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseArray(Iterator 
     return array;
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseObject(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue parseObject(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     std::unordered_map<std::string, raytracer::parser::JsonProto> object;
 
@@ -150,7 +164,7 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseObject(Iterator
     }
     while (true) {
         skipWhitespace(it, end);
-        raytracer::parser::JsonValue key = raytracer::parser::parseString(it, end);
+        raytracer::parser::JsonValue key = parseString(it, end);
         if (std::get<std::string>(key).size() == 0)
             throw raytracer::exception::Error("raytracer::parser::parseObject", "Expected string key");
         skipWhitespace(it, end);
@@ -167,7 +181,8 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseObject(Iterator
     return object;
 }
 
-unit_static raytracer::parser::JsonValue raytracer::parser::parseValue(Iterator &it, const Iterator &end)
+unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator &it,
+    const raytracer::parser::Iterator &end)
 {
     skipWhitespace(it, end);
     char c = peek(it, end);
@@ -191,6 +206,10 @@ unit_static raytracer::parser::JsonValue raytracer::parser::parseValue(Iterator 
     }
 }
 
+#if defined(UNIT_TESTS)
+    };
+#endif
+
 raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT filepath)
 {
     std::stringstream ss;
@@ -200,8 +219,8 @@ raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT f
         throw exception::Error("raytracer::parser::parseJson", "Could not open ", filepath);
     ss << file.rdbuf();
     const std::string content = ss.str();
-    Iterator it = content.begin();
-    const Iterator end = content.end();
+    raytracer::parser::Iterator it = content.begin();
+    const raytracer::parser::Iterator end = content.end();
     const JsonValue result = parseValue(it, end);
     skipWhitespace(it, end);
     if (it != end)

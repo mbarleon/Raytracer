@@ -34,7 +34,7 @@ file(GLOB CORE_SOURCE
 file (GLOB PARSER_SOURCE
     "src/Parser/*.cpp")
 
-add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${MAIN_SOURCE})
+add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${MAIN_SOURCE})
 
 ########################################
 
@@ -50,7 +50,7 @@ file (GLOB SHAPE_SOURCE
 file(GLOB TEST_SOURCE
     "tests/*.cpp")
 
-add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${TEST_SOURCE})
+add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${TEST_SOURCE})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
     target_compile_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)

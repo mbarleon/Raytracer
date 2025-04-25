@@ -14,6 +14,7 @@
 #include <variant>
 #include <fstream>
 #include <cstddef>
+#include <sstream>
 #include <unordered_map>
 
 namespace raytracer::parser {
@@ -29,11 +30,24 @@ using JsonBase = std::variant<
     std::unordered_map<std::string, JsonValue>
 >;
 
-struct JsonProto{
+struct JsonProto {
     using type = JsonBase<JsonProto>;
+    type value;
+
+    constexpr explicit JsonProto() = default;
+
+    template <typename T>
+    JsonProto(T &&val) : value(std::forward<T>(val)) {}
+
+    explicit operator JsonProto::type() const
+    {
+        return value;
+    }
 };
 
 using JsonValue = JsonProto::type;
+
+using Iterator = std::string::const_iterator;
 
 JsonValue parseJson(const char * RESTRICT filepath);
 

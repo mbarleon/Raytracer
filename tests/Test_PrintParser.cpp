@@ -130,7 +130,7 @@ Test(printObject, object_with_values, .init=redirect_all_stdout)
     rewind(stdout_file);
 
     char buffer[1024] = {0};
-    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    (void)fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
 
     cr_assert(strstr(buffer, "{\n") != NULL, "Missing opening object");
     cr_assert(strstr(buffer, "    1\n") != NULL, "Missing 1 int");
@@ -168,7 +168,7 @@ Test(printObject, object_with_values_debug, .init=redirect_all_stdout)
     rewind(stdout_file);
 
     char buffer[1024] = {0};
-    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    (void)fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
 
     cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
     cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
@@ -248,7 +248,7 @@ Test(printValue, object_with_values_debug, .init=redirect_all_stdout)
     rewind(stdout_file);
 
     char buffer[1024] = {0};
-    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    (void)fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
 
     cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
     cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
@@ -328,7 +328,7 @@ Test(printJson, object_with_values_debug, .init=redirect_all_stdout)
     rewind(stdout_file);
 
     char buffer[1024] = {0};
-    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    (void)fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
 
     cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
     cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");

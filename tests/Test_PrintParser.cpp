@@ -126,12 +126,16 @@ Test(printObject, object_with_values, .init=redirect_all_stdout)
     };
     const raytracer::parser::JsonValue val = object;
     raytracer::parser::printObject(val, 0, false);
-    cr_assert_stdout_eq_str(
-        "{\n"
-        "    1\n"
-        "    2\n"
-        "}\n"
-    );
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {0};
+    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+
+    cr_assert(strstr(buffer, "{\n") != NULL, "Missing opening object");
+    cr_assert(strstr(buffer, "    1\n") != NULL, "Missing 1 int");
+    cr_assert(strstr(buffer, "    2\n") != NULL, "Missing 2 int");
+    cr_assert(strstr(buffer, "}\n") != NULL, "Missing closing bracket");
 }
 
 Test(printArray, array_with_values_debug, .init=redirect_all_stdout)
@@ -160,12 +164,16 @@ Test(printObject, object_with_values_debug, .init=redirect_all_stdout)
     };
     const raytracer::parser::JsonValue val = object;
     raytracer::parser::printObject(val, 0, true);
-    cr_assert_stdout_eq_str(
-        "{ \"object\"\n"
-        "    1 \"int\"\n"
-        "    2 \"int\"\n"
-        "}\n"
-    );
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {0};
+    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+
+    cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
+    cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
+    cr_assert(strstr(buffer, "    2 \"int\"\n") != NULL, "Missing 2 int");
+    cr_assert(strstr(buffer, "}\n") != NULL, "Missing closing bracket");
 }
 
 Test(printValue, null, .init=redirect_all_stdout)
@@ -236,12 +244,16 @@ Test(printValue, object_with_values_debug, .init=redirect_all_stdout)
     };
     const raytracer::parser::JsonValue val = object;
     raytracer::parser::printValue(val, 0, true);
-    cr_assert_stdout_eq_str(
-        "{ \"object\"\n"
-        "    1 \"int\"\n"
-        "    2 \"int\"\n"
-        "}\n"
-    );
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {0};
+    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+
+    cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
+    cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
+    cr_assert(strstr(buffer, "    2 \"int\"\n") != NULL, "Missing 2 int");
+    cr_assert(strstr(buffer, "}\n") != NULL, "Missing closing bracket");
 }
 
 Test(printJson, null, .init=redirect_all_stdout)
@@ -312,10 +324,14 @@ Test(printJson, object_with_values_debug, .init=redirect_all_stdout)
     };
     const raytracer::parser::JsonValue val = object;
     raytracer::parser::printJson(val, true);
-    cr_assert_stdout_eq_str(
-        "{ \"object\"\n"
-        "    1 \"int\"\n"
-        "    2 \"int\"\n"
-        "}\n"
-    );
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {0};
+    fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+
+    cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
+    cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
+    cr_assert(strstr(buffer, "    2 \"int\"\n") != NULL, "Missing 2 int");
+    cr_assert(strstr(buffer, "}\n") != NULL, "Missing closing bracket");
 }

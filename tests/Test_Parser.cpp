@@ -5,6 +5,7 @@
 ** Test_Parser
 */
 
+#include "Error.hpp"
 #include "../src/Parser/Parser.hpp"
 #include "criterion/criterion.h"
 #include <fstream>
@@ -12,8 +13,8 @@
 Test(SkipWhitespace, NoWhitespace)
 {
     const std::string test = "abcd";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     raytracer::parser::skipWhitespace(begin, end);
     cr_assert_eq(*begin, 'a');
@@ -22,8 +23,8 @@ Test(SkipWhitespace, NoWhitespace)
 Test(SkipWhitespace, BeginWhitespace)
 {
     const std::string test = "     abcd";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     raytracer::parser::skipWhitespace(begin, end);
     cr_assert_eq(*begin, 'a');
@@ -32,8 +33,8 @@ Test(SkipWhitespace, BeginWhitespace)
 Test(SkipWhitespace, MiddleWhitespace)
 {
     const std::string test = "ab    cd";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     raytracer::parser::skipWhitespace(begin, end);
     cr_assert_eq(*begin, 'a');
@@ -42,8 +43,8 @@ Test(SkipWhitespace, MiddleWhitespace)
 Test(SkipWhitespace, EndWhitespace)
 {
     const std::string test = "abcd    ";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     raytracer::parser::skipWhitespace(begin, end);
     cr_assert_eq(*begin, 'a');
@@ -52,8 +53,8 @@ Test(SkipWhitespace, EndWhitespace)
 Test(SkipWhitespace, OnlyWhitespace)
 {
     const std::string test = "                 ";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     raytracer::parser::skipWhitespace(begin, end);
     cr_assert_eq(begin, end);
@@ -62,8 +63,8 @@ Test(SkipWhitespace, OnlyWhitespace)
 Test(get, normal)
 {
     const std::string test = "a";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
     const char ret = raytracer::parser::get(begin, end);
 
     cr_assert_eq(ret, 'a');
@@ -72,9 +73,9 @@ Test(get, normal)
 
 Test(get, end)
 {
-    const std::string test = "";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    const std::string test;
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         raytracer::parser::get(begin, end);
@@ -90,8 +91,8 @@ Test(get, end)
 Test(peek, normal)
 {
     const std::string test = "a";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
     const char ret = raytracer::parser::peek(begin, end);
 
     cr_assert_eq(ret, 'a');
@@ -100,9 +101,9 @@ Test(peek, normal)
 
 Test(peek, end)
 {
-    const std::string test = "";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    const std::string test;
+    const auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         raytracer::parser::peek(begin, end);
@@ -118,10 +119,10 @@ Test(peek, end)
 Test(expect, normal)
 {
     const std::string test = "a";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
-    const char expected = 'a';
+    auto begin = test.begin();
+    const auto end = test.end();
     try {
+        constexpr char expected = 'a';
         raytracer::parser::expect(begin, end, expected);
         cr_assert(true);
     } catch (...) {
@@ -132,10 +133,10 @@ Test(expect, normal)
 Test(expect, wrongChar)
 {
     const std::string test = "a";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
-    const char expected = 'b';
+    auto begin = test.begin();
+    const auto end = test.end();
     try {
+        constexpr char expected = 'b';
         raytracer::parser::expect(begin, end, expected);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
@@ -148,12 +149,12 @@ Test(expect, wrongChar)
 
 Test(expect, end)
 {
-    const std::string test = "";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
-    const char expected = 'a';
+    const std::string test;
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
+        constexpr char expected = 'a';
         raytracer::parser::expect(begin, end, expected);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
@@ -167,8 +168,8 @@ Test(expect, end)
 Test(parseNull, null)
 {
     const std::string test = "null";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseNull(begin, end);
@@ -182,8 +183,8 @@ Test(parseNull, null)
 Test(parseNull, null_too_small)
 {
     const std::string test = "nul";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseNull(begin, end);
@@ -199,8 +200,8 @@ Test(parseNull, null_too_small)
 Test(parseBool, True)
 {
     const std::string test = "true";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
@@ -215,8 +216,8 @@ Test(parseBool, True)
 Test(parseBool, Fasle)
 {
     const std::string test = "false";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
@@ -231,8 +232,8 @@ Test(parseBool, Fasle)
 Test(parseBool, Wrong_false)
 {
     const std::string test = "fffff";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
@@ -248,8 +249,8 @@ Test(parseBool, Wrong_false)
 Test(parseBool, Wrong_true)
 {
     const std::string test = "tttt";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
@@ -265,8 +266,8 @@ Test(parseBool, Wrong_true)
 Test(parseBool, too_small)
 {
     const std::string test = "aa";
-    std::string::const_iterator begin = test.begin();
-    const std::string::const_iterator end = test.end();
+    auto begin = test.begin();
+    const auto end = test.end();
 
     try {
         const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
@@ -360,7 +361,7 @@ Test(parseString, simple_string)
 
 Test(parseString, string_with_escape)
 {
-    const std::string test = "\"line\\n\\\\\\b\\f\\r\\tbreak\"";
+    const std::string test = R"("line\n\\\b\f\r\tbreak")";
     auto begin = test.begin();
     auto end = test.end();
 
@@ -375,9 +376,9 @@ Test(parseString, string_with_escape)
 
 Test(parseString, invalid_escape)
 {
-    const std::string test = "\"unterminat\\ked\"";
+    const std::string test = R"("unterminat\ked")";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseString(begin, end);
@@ -394,7 +395,7 @@ Test(parseString, unterminated_string)
 {
     const std::string test = "\"unterminated";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseString(begin, end);
@@ -464,7 +465,7 @@ Test(parseObject, simple_key_value)
         const bool alt = std::holds_alternative<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
         cr_assert(alt);
         auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(obj.find("key") != obj.end());
+        cr_assert(obj.contains("key"));
         cr_assert(std::holds_alternative<int>(obj["key"].value));
         cr_assert_eq(std::get<int>(obj["key"].value), 123);
     } catch (...) {
@@ -491,9 +492,9 @@ Test(parseObject, non_string_key_should_throw)
 
 Test(parseObject, empty_string_key_should_throw)
 {
-    const std::string test = "{\"\": \"value\"}";
+    const std::string test = R"({"": "value"})";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseObject(begin, end);
@@ -631,9 +632,9 @@ Test(parseValue, value_invalid)
 
 Test(parseJson, valid_json_file)
 {
-    const char* filename = "test_valid.json";
+    const auto filename = "test_valid.json";
     std::ofstream file(filename);
-    file << "{\"name\": \"Mathieu\", \"value\": 10}";
+    file << R"({"name": "Mathieu", "value": 10})";
     file.close();
 
     try {
@@ -641,8 +642,8 @@ Test(parseJson, valid_json_file)
         const bool alt = std::holds_alternative<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
         cr_assert(alt);
         auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(obj.find("name") != obj.end());
-        cr_assert(obj.find("value") != obj.end());
+        cr_assert(obj.contains("name"));
+        cr_assert(obj.contains("value"));
     } catch (...) {
         cr_assert_fail("Unexpected exception while parsing valid JSON");
     }
@@ -652,9 +653,8 @@ Test(parseJson, valid_json_file)
 
 Test(parseJson, file_not_found)
 {
-    const char* filename = "nonexistent_file.json";
-
     try {
+        const auto filename = "nonexistent_file.json";
         raytracer::parser::parseJson(filename);
         cr_assert_fail("Expected exception for file not found");
     } catch (const raytracer::exception::Error &e) {

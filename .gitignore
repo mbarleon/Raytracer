@@ -44,6 +44,7 @@ coding-style-reports.log
 tiled/
 temp/
 !LICENSE
+coverage-report/
 
 # clangd LSP
 compile_commands.json
@@ -52,3 +53,4 @@ compile_commands.json
 # CMakeLists.txt
 build/
 !CMakeLists.txt
+cmake-build-debug/

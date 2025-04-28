@@ -10,675 +10,342 @@
 #include "criterion/criterion.h"
 #include <fstream>
 
-Test(SkipWhitespace, NoWhitespace)
-{
-    const std::string test = "abcd";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    raytracer::parser::skipWhitespace(begin, end);
-    cr_assert_eq(*begin, 'a');
-}
-
-Test(SkipWhitespace, BeginWhitespace)
-{
-    const std::string test = "     abcd";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    raytracer::parser::skipWhitespace(begin, end);
-    cr_assert_eq(*begin, 'a');
-}
-
-Test(SkipWhitespace, MiddleWhitespace)
-{
-    const std::string test = "ab    cd";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    raytracer::parser::skipWhitespace(begin, end);
-    cr_assert_eq(*begin, 'a');
-}
-
-Test(SkipWhitespace, EndWhitespace)
-{
-    const std::string test = "abcd    ";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    raytracer::parser::skipWhitespace(begin, end);
-    cr_assert_eq(*begin, 'a');
-}
-
-Test(SkipWhitespace, OnlyWhitespace)
-{
-    const std::string test = "                 ";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    raytracer::parser::skipWhitespace(begin, end);
-    cr_assert_eq(begin, end);
-}
-
-Test(get, normal)
-{
-    const std::string test = "a";
-    auto begin = test.begin();
-    const auto end = test.end();
-    const char ret = raytracer::parser::get(begin, end);
-
-    cr_assert_eq(ret, 'a');
-    cr_assert_eq(begin, end);
-}
-
-Test(get, end)
-{
-    const std::string test;
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::get(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::get");
-        cr_assert_str_eq(e.what(), "Unexpected end of input");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
+#define ASSERT_THROW_ERROR(statement, expected_where, expected_what)   \
+    try {                                                              \
+        statement;                                                     \
+        cr_assert_fail("Expected exception but none thrown");          \
+    } catch (const raytracer::exception::Error &e) {                    \
+        cr_assert_str_eq(e.where(), expected_where);                   \
+        cr_assert_str_eq(e.what(), expected_what);                     \
     }
-}
 
-Test(peek, normal)
+TestSuite(SkipWhitespace);
+
+Test(SkipWhitespace, no_whitespace)
 {
-    const std::string test = "a";
-    const auto begin = test.begin();
-    const auto end = test.end();
-    const char ret = raytracer::parser::peek(begin, end);
-
-    cr_assert_eq(ret, 'a');
-    cr_assert_eq(begin, test.begin());
+    const std::string s = "abcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(peek, end)
+Test(SkipWhitespace, leading_whitespace)
 {
-    const std::string test;
-    const auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::peek(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::peek");
-        cr_assert_str_eq(e.what(), "Unexpected end of input");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "    abcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(expect, normal)
+Test(SkipWhitespace, only_whitespace)
 {
-    const std::string test = "a";
-    auto begin = test.begin();
-    const auto end = test.end();
-    try {
-        constexpr char expected = 'a';
-        raytracer::parser::expect(begin, end, expected);
-        cr_assert(true);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "    ";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(it, s.end());
 }
 
-Test(expect, wrongChar)
+Test(SkipWhitespace, single_line_comment)
 {
-    const std::string test = "a";
-    auto begin = test.begin();
-    const auto end = test.end();
-    try {
-        constexpr char expected = 'b';
-        raytracer::parser::expect(begin, end, expected);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::expect");
-        cr_assert_str_eq(e.what(), "Expected 'b', got 'a'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "// this is a comment\nabcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(expect, end)
+Test(SkipWhitespace, single_line_comment_eof)
 {
-    const std::string test;
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        constexpr char expected = 'a';
-        raytracer::parser::expect(begin, end, expected);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::get");
-        cr_assert_str_eq(e.what(), "Unexpected end of input");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "// comment without newline";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, '\0');
 }
 
-Test(parseNull, null)
+Test(SkipWhitespace, multi_line_comment)
 {
-    const std::string test = "null";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseNull(begin, end);
-        cr_assert(std::holds_alternative<std::nullptr_t>(ret));
-        cr_assert_eq(begin, test.begin() + 4);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "/* this is a\nmulti-line comment */abcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(parseNull, null_too_small)
+Test(SkipWhitespace, multi_line_comment_eof)
 {
-    const std::string test = "nul";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseNull(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseNull");
-        cr_assert_str_eq(e.what(), "Expected 'null'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "/* unterminated comment";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(it, s.end());
 }
 
-Test(parseBool, True)
+Test(SkipWhitespace, leading_spaces_and_comments)
 {
-    const std::string test = "true";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
-        cr_assert(std::holds_alternative<bool>(ret));
-        cr_assert_eq(std::get<bool>(ret), true);
-        cr_assert_eq(begin, test.begin() + 4);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "   // comment\n   /* another comment */    abcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(parseBool, Fasle)
+Test(SkipWhitespace, mixed_comments_and_text)
 {
-    const std::string test = "false";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
-        cr_assert(std::holds_alternative<bool>(ret));
-        cr_assert_eq(std::get<bool>(ret), false);
-        cr_assert_eq(begin, test.begin() + 5);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "/*comment*/ // another\n  /*again*/abcd";
+    auto it = s.begin();
+    raytracer::parser::skipWhitespace(it, s.end());
+    cr_assert_eq(*it, 'a');
 }
 
-Test(parseBool, Wrong_false)
+
+TestSuite(GetPeekExpect);
+
+Test(GetPeekExpect, get_valid)
 {
-    const std::string test = "fffff";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseBool(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");
-        cr_assert_str_eq(e.what(), "Expected 'true' or 'false'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "x";
+    auto it = s.begin();
+    cr_assert_eq(raytracer::parser::get(it, s.end()), 'x');
+    cr_assert_eq(it, s.end());
 }
 
-Test(parseBool, Wrong_true)
+Test(GetPeekExpect, get_empty)
 {
-    const std::string test = "tttt";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseBool(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");
-        cr_assert_str_eq(e.what(), "Expected 'true' or 'false'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s;
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::get(it, s.end()), "raytracer::parser::get", "Unexpected end of input");
 }
 
-Test(parseBool, too_small)
+Test(GetPeekExpect, peek_valid)
 {
-    const std::string test = "aa";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseBool(begin, end);
-        cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");
-        cr_assert_str_eq(e.what(), "Expected 'true' or 'false'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "x";
+    const auto it = s.begin();
+    cr_assert_eq(raytracer::parser::peek(it, s.end()), 'x');
 }
 
-Test(parseNumber, positive_integer)
+Test(GetPeekExpect, peek_empty)
 {
-    const std::string test = "42";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseNumber(begin, end);
-        cr_assert(std::holds_alternative<int>(ret));
-        cr_assert_eq(std::get<int>(ret), 42);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s;
+    const auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::peek(it, s.end()), "raytracer::parser::peek", "Unexpected end of input");
 }
 
-Test(parseNumber, negative_float)
+Test(GetPeekExpect, expect_correct)
 {
-    const std::string test = "-3.14";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseNumber(begin, end);
-        cr_assert(std::holds_alternative<double>(ret));
-        cr_assert_float_eq(std::get<double>(ret), -3.14, 0.0001);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "x";
+    auto it = s.begin();
+    raytracer::parser::expect(it, s.end(), 'x');
 }
 
-Test(parseNumber, invalid_number)
+Test(GetPeekExpect, expect_wrong_char)
 {
-    const std::string test = "abc";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseNumber(begin, end);
-        cr_assert_fail("Expected exception for invalid number");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseNumber");
-        cr_assert_str_eq(e.what(), "Invalid number");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "x";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::expect(it, s.end(), 'y'), "raytracer::parser::expect", "Expected 'y', got 'x'");
 }
 
-Test(parseNumber, number_out_of_range)
+Test(GetPeekExpect, expect_empty)
 {
-    const std::string test = "99999999999999999999999999999999";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseNumber(begin, end);
-        cr_assert_fail("Expected exception for invalid number");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseNumber");
-        cr_assert_str_eq(e.what(), "Invalid number");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s;
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::expect(it, s.end(), 'x'), "raytracer::parser::get", "Unexpected end of input");
 }
 
-Test(parseString, simple_string)
+TestSuite(ParseBasic);
+
+Test(ParseBasic, parse_null_success)
 {
-    const std::string test = "\"hello\"";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseString(begin, end);
-        cr_assert(std::holds_alternative<std::string>(ret));
-        cr_assert_str_eq(std::get<std::string>(ret).c_str(), "hello");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "null";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseNull(it, s.end());
+    cr_assert(std::holds_alternative<std::nullptr_t>(result));
 }
 
-Test(parseString, string_with_escape)
+Test(ParseBasic, parse_null_fail)
 {
-    const std::string test = R"("line\n\\\b\f\r\tbreak")";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseString(begin, end);
-        cr_assert(std::holds_alternative<std::string>(ret));
-        cr_assert_str_eq(std::get<std::string>(ret).c_str(), "line\n\\\b\f\r\tbreak");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "nul";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseNull(it, s.end()), "raytracer::parser::parseNull", "Expected 'null'");
 }
 
-Test(parseString, invalid_escape)
+Test(ParseBasic, parse_bool_true)
 {
-    const std::string test = R"("unterminat\ked")";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseString(begin, end);
-        cr_assert_fail("Expected exception for unterminated string");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseString");
-        cr_assert_str_eq(e.what(), "Invalid escape sequence");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "true";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseBool(it, s.end());
+    cr_assert(std::holds_alternative<bool>(result));
+    cr_assert(std::get<bool>(result));
 }
 
-Test(parseString, unterminated_string)
+Test(ParseBasic, parse_bool_false)
 {
-    const std::string test = "\"unterminated";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseString(begin, end);
-        cr_assert_fail("Expected exception for unterminated string");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseString");
-        cr_assert_str_eq(e.what(), "Unterminated string");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "false";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseBool(it, s.end());
+    cr_assert(std::holds_alternative<bool>(result));
+    cr_assert(!std::get<bool>(result));
 }
 
-Test(parseArray, empty_array)
+Test(ParseBasic, parse_bool_invalid)
 {
-    const std::string test = "[]";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const auto ret = raytracer::parser::parseArray(begin, end);
-        cr_assert(std::holds_alternative<std::nullptr_t>(ret));
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "tttt";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseBool(it, s.end()), "raytracer::parser::parseBool", "Expected 'true' or 'false'");
 }
 
-Test(parseArray, array_of_numbers)
+TestSuite(ParseNumber);
+
+Test(ParseNumber, parse_integer)
 {
-    const std::string test = "[1, 2, 3]";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseArray(begin, end);
-        cr_assert(std::holds_alternative<std::vector<raytracer::parser::JsonProto>>(ret));
-        auto vec = std::get<std::vector<raytracer::parser::JsonProto>>(ret);
-        cr_assert_eq(vec.size(), 3);
-        cr_assert(std::holds_alternative<int>(vec[0].value));
-        cr_assert_eq(std::get<int>(vec[0].value), 1);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "42,";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseNumber(it, s.end());
+    cr_assert(std::holds_alternative<int>(result));
+    cr_assert_eq(std::get<int>(result), 42);
 }
 
-Test(parseObject, empty_object)
+Test(ParseNumber, parse_negative_float)
 {
-    const std::string test = "{}";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const auto ret = raytracer::parser::parseObject(begin, end);
-        cr_assert(std::holds_alternative<std::nullptr_t>(ret));
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "-3.14";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseNumber(it, s.end());
+    cr_assert(std::holds_alternative<double>(result));
+    cr_assert_float_eq(std::get<double>(result), -3.14, 0.0001);
 }
 
-Test(parseObject, simple_key_value)
+Test(ParseNumber, parse_negative_integer)
 {
-    const std::string test = "{\"key\": 123}";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseObject(begin, end);
-        const bool alt = std::holds_alternative<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(alt);
-        auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(obj.contains("key"));
-        cr_assert(std::holds_alternative<int>(obj["key"].value));
-        cr_assert_eq(std::get<int>(obj["key"].value), 123);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "-42,";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseNumber(it, s.end());
+    cr_assert(std::holds_alternative<int>(result));
+    cr_assert_eq(std::get<int>(result), -42);
 }
 
-Test(parseObject, non_string_key_should_throw)
+Test(ParseNumber, parse_float)
 {
-    const std::string test = "{123: \"value\"}";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseObject(begin, end);
-        cr_assert_fail("Expected exception due to non-string key");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::expect");
-        cr_assert_str_eq(e.what(), "Expected '\"', got '1'");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type");
-    }
+    const std::string s = "3.14,";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseNumber(it, s.end());
+    cr_assert(std::holds_alternative<double>(result));
+    cr_assert_float_eq(std::get<double>(result), 3.14, 0.0001);
 }
 
-Test(parseObject, empty_string_key_should_throw)
+Test(ParseNumber, parse_invalid_number)
 {
-    const std::string test = R"({"": "value"})";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseObject(begin, end);
-        cr_assert_fail("Expected exception due to non-string key");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseObject");
-        cr_assert_str_eq(e.what(), "Expected string key");
-    }catch (...) {
-        cr_assert_fail("Unexpected exception type");
-    }
+    const std::string s = "abc";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseNumber(it, s.end()), "raytracer::parser::parseNumber", "Invalid number");
 }
 
-Test(parseValue, value_string)
+Test(ParseNumber, parse_out_of_range_number)
 {
-    const std::string test = "\"hello\"";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<std::string>(ret));
-        cr_assert_str_eq(std::get<std::string>(ret).c_str(), "hello");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "99999999999999999999999999999999999999";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseNumber(it, s.end()), "raytracer::parser::parseNumber", "Invalid number");
 }
 
-Test(parseValue, value_number)
+TestSuite(ParseString);
+
+Test(ParseString, simple_string)
 {
-    const std::string test = "100";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<int>(ret));
-        cr_assert_eq(std::get<int>(ret), 100);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "\"hello\"";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseString(it, s.end());
+    cr_assert(std::holds_alternative<std::string>(result));
+    cr_assert_str_eq(std::get<std::string>(result).c_str(), "hello");
 }
 
-Test(parseValue, value_negative_number)
+Test(ParseString, string_with_escapes)
 {
-    const std::string test = "-100";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<int>(ret));
-        cr_assert_eq(std::get<int>(ret), -100);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = R"("line\n\\\b\f\r\tend")";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseString(it, s.end());
+    cr_assert(std::holds_alternative<std::string>(result));
+    cr_assert_str_eq(std::get<std::string>(result).c_str(), "line\n\\\b\f\r\tend");
 }
 
-Test(parseValue, value_null)
+Test(ParseString, unterminated_string)
 {
-    const std::string test = "null";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        const auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<std::nullptr_t>(ret));
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "\"unterminated";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseString(it, s.end()), "raytracer::parser::parseString", "Unterminated string");
 }
 
-Test(parseValue, value_true)
+Test(ParseString, invalid_escape)
 {
-    const std::string test = "true";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<bool>(ret));
-        cr_assert(std::get<bool>(ret) == true);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = R"("bad\q")";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseString(it, s.end()), "raytracer::parser::parseString", "Invalid escape sequence");
 }
 
-Test(parseValue, value_false)
+TestSuite(ParseComplex);
+
+Test(ParseComplex, parse_empty_array)
 {
-    const std::string test = "false";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<bool>(ret));
-        cr_assert(std::get<bool>(ret) == false);
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "[]";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseArray(it, s.end());
+    cr_assert(std::holds_alternative<std::nullptr_t>(result));
 }
 
-Test(parseValue, value_array)
+Test(ParseComplex, parse_array_of_numbers)
 {
-    const std::string test = "[\"x\", 2]";
-    auto begin = test.begin();
-    auto end = test.end();
-
-    try {
-        auto ret = raytracer::parser::parseValue(begin, end);
-        cr_assert(std::holds_alternative<std::vector<raytracer::parser::JsonProto>>(ret));
-        auto vec = std::get<std::vector<raytracer::parser::JsonProto>>(ret);
-        cr_assert_eq(vec.size(), 2);
-        cr_assert(std::holds_alternative<std::string>(vec[0].value));
-        cr_assert_str_eq(std::get<std::string>(vec[0].value).c_str(), "x");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "[1, 2,]";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseArray(it, s.end());
+    const auto array = std::get<std::vector<raytracer::parser::JsonProto>>(result);
+    cr_assert_eq(array.size(), 2);
 }
 
-Test(parseValue, value_invalid)
+Test(ParseComplex, parse_empty_object)
 {
-    const std::string test = "@oops";
-    auto begin = test.begin();
-    const auto end = test.end();
-
-    try {
-        raytracer::parser::parseValue(begin, end);
-        cr_assert_fail("Expected exception for unknown value");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "parseValue");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    const std::string s = "{}";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseObject(it, s.end());
+    cr_assert(std::holds_alternative<std::nullptr_t>(result));
 }
 
-Test(parseJson, valid_json_file)
+Test(ParseComplex, parse_simple_object)
+{
+    const std::string s = "{\"key\": 42,}";
+    auto it = s.begin();
+    const auto result = raytracer::parser::parseObject(it, s.end());
+    const auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(result);
+    cr_assert(obj.contains("key"));
+}
+
+Test(ParseComplex, parseObject_non_string_key)
+{
+    const std::string s = "{123: \"value\"}";
+    auto it = s.begin();
+    ASSERT_THROW_ERROR(raytracer::parser::parseObject(it, s.end()), "raytracer::parser::expect", "Expected '\"', got '1'");
+}
+
+TestSuite(FileTests);
+
+Test(FileTests, parse_valid_json_file)
 {
     const auto filename = "test_valid.json";
     std::ofstream file(filename);
-    file << R"({"name": "Mathieu", "value": 10})";
+    file << R"({"name": "Mathieu",},)";
     file.close();
 
-    try {
-        auto ret = raytracer::parser::parseJson(filename);
-        const bool alt = std::holds_alternative<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(alt);
-        auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(ret);
-        cr_assert(obj.contains("name"));
-        cr_assert(obj.contains("value"));
-    } catch (...) {
-        cr_assert_fail("Unexpected exception while parsing valid JSON");
-    }
+    auto result = raytracer::parser::parseJson(filename);
+    auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(result);
+    cr_assert(obj.contains("name"));
 
     std::remove(filename);
 }
 
-Test(parseJson, file_not_found)
+Test(FileTests, file_not_found)
 {
-    try {
-        const auto filename = "nonexistent_file.json";
-        raytracer::parser::parseJson(filename);
-        cr_assert_fail("Expected exception for file not found");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseJson");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    ASSERT_THROW_ERROR(raytracer::parser::parseJson("nonexistent.json"), "raytracer::parser::parseJson", "Could not open nonexistent.json");
 }
 
-Test(parseJson, file_with_trailing_data)
+Test(FileTests, file_with_trailing_data)
 {
     const auto filename = "test_trailing.json";
     std::ofstream file(filename);
-    file << "123 true";
+    file << R"({ "key": "value", }, trailing_data)";
     file.close();
 
-    try {
-        raytracer::parser::parseJson(filename);
-        cr_assert_fail("Expected exception due to trailing data");
-    } catch (const raytracer::exception::Error &e) {
-        cr_assert_str_eq(e.where(), "raytracer::parser::parseJson");
-    } catch (...) {
-        cr_assert_fail("Unexpected exception type thrown");
-    }
+    ASSERT_THROW_ERROR(raytracer::parser::parseJson(filename), "raytracer::parser::parseJson", "Unexpected trailing data in test_trailing.json");
 
     std::remove(filename);
 }

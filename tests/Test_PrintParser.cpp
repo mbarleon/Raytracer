@@ -16,326 +16,452 @@ static void redirect_all_stdout()
     cr_redirect_stderr();
 }
 
-Test(printNull, print_without_debug, .init=redirect_all_stdout)
+Test(printJson, null_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = nullptr;
-    printNull(val, 2, false);
-    cr_assert_stdout_eq_str("        null\n");
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "null \"std::nullptr_t\"\n") != nullptr, "Missing null with debug type");
 }
 
-Test(printNull, print_with_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = nullptr;
-    printNull(val, 1, true);
-    cr_assert_stdout_eq_str("    null \"std::nullptr_t\"\n");
-}
-
-Test(printString, print_without_debug, .init=redirect_all_stdout)
+Test(printJson, string_debug, .init=redirect_all_stdout)
 {
     const raytracer::parser::JsonValue val = std::string("hello");
-    printString(val, 0, false);
-    cr_assert_stdout_eq_str("hello\n");
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "hello \"std::string\"\n") != nullptr, "Missing string with debug type");
 }
 
-Test(printString, print_with_debug, .init=redirect_all_stdout)
-{
-    const raytracer::parser::JsonValue val = std::string("world");
-    printString(val, 1, true);
-    cr_assert_stdout_eq_str("    world \"std::string\"\n");
-}
-
-Test(printInt, print_without_debug, .init=redirect_all_stdout)
+Test(printJson, int_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = 42;
-    printInt(val, 1, false);
-    cr_assert_stdout_eq_str("    42\n");
-}
-
-Test(printInt, print_with_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = -1337;
-    printInt(val, 0, true);
-    cr_assert_stdout_eq_str("-1337 \"int\"\n");
-}
-
-Test(printDouble, print_without_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = 3.14;
-    printDouble(val, 2, false);
-    cr_assert_stdout_eq_str("        3.14\n");
-}
-
-Test(printDouble, print_with_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = -0.5;
-    printDouble(val, 0, true);
-    cr_assert_stdout_eq_str("-0.5 \"double\"\n");
-}
-
-Test(printBool, print_true_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = true;
-    printBool(val, 1, true);
-    cr_assert_stdout_eq_str("    true \"bool\"\n");
-}
-
-Test(printBool, print_false_no_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = false;
-    printBool(val, 0, false);
-    cr_assert_stdout_eq_str("false\n");
-}
-
-Test(printBool, print_false_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = false;
-    printBool(val, 1, true);
-    cr_assert_stdout_eq_str("    false \"bool\"\n");
-}
-
-Test(printBool, print_true_no_debug, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = true;
-    printBool(val, 0, false);
-    cr_assert_stdout_eq_str("true\n");
-}
-
-Test(printArray, array_with_values, .init=redirect_all_stdout)
-{
-    const std::vector array = {
-        raytracer::parser::JsonProto(nullptr),
-        raytracer::parser::JsonProto(123),
-        raytracer::parser::JsonProto(4.5)
-    };
-    const raytracer::parser::JsonValue val = array;
-    printArray(val, 0, false);
-    cr_assert_stdout_eq_str(
-        "[\n"
-        "    null\n"
-        "    123\n"
-        "    4.5\n"
-        "]\n"
-    );
-}
-
-Test(printObject, object_with_values, .init=redirect_all_stdout)
-{
-    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {
-        {"key1", raytracer::parser::JsonProto(1)},
-        {"key2", raytracer::parser::JsonProto(2)}
-    };
-    const raytracer::parser::JsonValue val = object;
-    printObject(val, 0, false);
+    printJson(val, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
     char buffer[1024] = {};
-    const size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
     cr_assert_gt(ret, 1);
 
-    cr_assert(strstr(buffer, "{\n") != nullptr, "Missing opening object");
-    cr_assert(strstr(buffer, "    1\n") != nullptr, "Missing 1 int");
-    cr_assert(strstr(buffer, "    2\n") != nullptr, "Missing 2 int");
-    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket");
+    cr_assert(strstr(buffer, "42 \"int\"\n") != nullptr, "Missing int with debug type");
 }
 
-Test(printArray, array_with_values_debug, .init=redirect_all_stdout)
+Test(printJson, double_debug, .init=redirect_all_stdout)
 {
-    const std::vector array = {
-        raytracer::parser::JsonProto(nullptr),
-        raytracer::parser::JsonProto(123),
-        raytracer::parser::JsonProto(4.5)
-    };
-    const raytracer::parser::JsonValue val = array;
-    printArray(val, 0, true);
-    cr_assert_stdout_eq_str(
-        "[ \"array\"\n"
-        "    null \"std::nullptr_t\"\n"
-        "    123 \"int\"\n"
-        "    4.5 \"double\"\n"
-        "]\n"
-    );
-}
-
-Test(printObject, object_with_values_debug, .init=redirect_all_stdout)
-{
-    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {
-        {"key1", raytracer::parser::JsonProto(1)},
-        {"key2", raytracer::parser::JsonProto(2)}
-    };
-    const raytracer::parser::JsonValue val = object;
-    printObject(val, 0, true);
+    constexpr raytracer::parser::JsonValue val = 3.14159;
+    printJson(val, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
     char buffer[1024] = {};
-    const size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "3.14159 \"double\"\n") != nullptr, "Missing double with debug type");
+}
+
+Test(printJson, bool_true_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = true;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "true \"bool\"\n") != nullptr, "Missing true bool with debug type");
+}
+
+Test(printJson, bool_false_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = false;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "false \"bool\"\n") != nullptr, "Missing false bool with debug type");
+}
+
+Test(printJson, array_of_ints_debug, .init=redirect_all_stdout)
+{
+    const std::vector array = {
+        raytracer::parser::JsonProto(10),
+        raytracer::parser::JsonProto(20),
+        raytracer::parser::JsonProto(30)
+    };
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[2048] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "[ \"array\"\n") != nullptr, "Missing opening array");
+    cr_assert(strstr(buffer, "10 \"int\"\n") != nullptr, "Missing 10 int");
+    cr_assert(strstr(buffer, "20 \"int\"\n") != nullptr, "Missing 20 int");
+    cr_assert(strstr(buffer, "30 \"int\"\n") != nullptr, "Missing 30 int");
+    cr_assert(strstr(buffer, "]\n") != nullptr, "Missing closing bracket for array");
+}
+
+Test(printJson, nested_object_debug, .init=redirect_all_stdout)
+{
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> inner_object = {
+        {"nestedKey", raytracer::parser::JsonProto(std::string("nestedValue"))}
+    };
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> outer_object = {
+        {"outerKey", raytracer::parser::JsonProto(inner_object)}
+    };
+    const raytracer::parser::JsonValue val = outer_object;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[4096] = {};
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
     cr_assert_gt(ret, 1);
 
     cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Missing opening object");
-    cr_assert(strstr(buffer, "    1 \"int\"\n") != nullptr, "Missing 1 int");
-    cr_assert(strstr(buffer, "    2 \"int\"\n") != nullptr, "Missing 2 int");
-    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket");
+    cr_assert(strstr(buffer, "outerKey: { \"object\"\n") != nullptr, "Missing nested object");
+    cr_assert(strstr(buffer, "nestedKey: nestedValue \"std::string\"\n") != nullptr, "Missing nested key-value");
+    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket for object");
 }
 
-Test(printValue, null, .init=redirect_all_stdout)
+Test(printJson, null_no_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = nullptr;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("null \"std::nullptr_t\"\n");
-}
-
-Test(printValue, string, .init=redirect_all_stdout)
-{
-    const raytracer::parser::JsonValue val = std::string("nullptr");
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("nullptr \"std::string\"\n");
-}
-
-Test(printValue, intval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = 100;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("100 \"int\"\n");
-}
-
-Test(printValue, doubleval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = 3.45;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("3.45 \"double\"\n");
-}
-
-Test(printValue, falseval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = false;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("false \"bool\"\n");
-}
-
-Test(printValue, trueval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = true;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str("true \"bool\"\n");
-}
-
-Test(printValue, array_with_values_debug, .init=redirect_all_stdout)
-{
-    const std::vector array = {
-        raytracer::parser::JsonProto(nullptr),
-        raytracer::parser::JsonProto(123),
-        raytracer::parser::JsonProto(4.5)
-    };
-    const raytracer::parser::JsonValue val = array;
-    printValue(val, 0, true);
-    cr_assert_stdout_eq_str(
-        "[ \"array\"\n"
-        "    null \"std::nullptr_t\"\n"
-        "    123 \"int\"\n"
-        "    4.5 \"double\"\n"
-        "]\n"
-    );
-}
-
-Test(printValue, object_with_values_debug, .init=redirect_all_stdout)
-{
-    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {
-        {"key1", raytracer::parser::JsonProto(1)},
-        {"key2", raytracer::parser::JsonProto(2)}
-    };
-    const raytracer::parser::JsonValue val = object;
-    printValue(val, 0, true);
+    printJson(val, false);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
     char buffer[1024] = {};
-    const size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    const std::size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
     cr_assert_gt(ret, 1);
 
-    cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Missing opening object");
-    cr_assert(strstr(buffer, "    1 \"int\"\n") != nullptr, "Missing 1 int");
-    cr_assert(strstr(buffer, "    2 \"int\"\n") != nullptr, "Missing 2 int");
-    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket");
+    cr_assert(strstr(buffer, "null\n") != nullptr, "Missing null without debug");
 }
 
-Test(printJson, null, .init=redirect_all_stdout)
+Test(printJson, string_special_chars, .init=redirect_all_stdout)
 {
-    constexpr raytracer::parser::JsonValue val = nullptr;
+    const raytracer::parser::JsonValue val = std::string("hello world! #$%");
     printJson(val, true);
-    cr_assert_stdout_eq_str("null \"std::nullptr_t\"\n");
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+
+    cr_assert(strstr(buffer, "hello world! #$% \"std::string\"\n") != nullptr, "Missing special characters in string");
 }
 
-Test(printJson, string, .init=redirect_all_stdout)
+Test(printJson, empty_object, .init=redirect_all_stdout)
 {
-    const raytracer::parser::JsonValue val = std::string("nullptr");
-    printJson(val, true);
-    cr_assert_stdout_eq_str("nullptr \"std::string\"\n");
-}
-
-Test(printJson, intval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = 100;
-    printJson(val, true);
-    cr_assert_stdout_eq_str("100 \"int\"\n");
-}
-
-Test(printJson, doubleval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = 3.45;
-    printJson(val, true);
-    cr_assert_stdout_eq_str("3.45 \"double\"\n");
-}
-
-Test(printJson, falseval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = false;
-    printJson(val, true);
-    cr_assert_stdout_eq_str("false \"bool\"\n");
-}
-
-Test(printJson, trueval, .init=redirect_all_stdout)
-{
-    constexpr raytracer::parser::JsonValue val = true;
-    printJson(val, true);
-    cr_assert_stdout_eq_str("true \"bool\"\n");
-}
-
-Test(printJson, array_with_values_debug, .init=redirect_all_stdout)
-{
-    const std::vector array = {
-        raytracer::parser::JsonProto(nullptr),
-        raytracer::parser::JsonProto(123),
-        raytracer::parser::JsonProto(4.5)
-    };
-    const raytracer::parser::JsonValue val = array;
-    printJson(val, true);
-    cr_assert_stdout_eq_str(
-        "[ \"array\"\n"
-        "    null \"std::nullptr_t\"\n"
-        "    123 \"int\"\n"
-        "    4.5 \"double\"\n"
-        "]\n"
-    );
-}
-
-Test(printJson, object_with_values_debug, .init=redirect_all_stdout)
-{
-    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {
-        {"key1", raytracer::parser::JsonProto(1)},
-        {"key2", raytracer::parser::JsonProto(2)}
-    };
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {};
     const raytracer::parser::JsonValue val = object;
     printJson(val, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
     char buffer[1024] = {};
-    const size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
     cr_assert_gt(ret, 1);
 
     cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Missing opening object");
-    cr_assert(strstr(buffer, "    1 \"int\"\n") != nullptr, "Missing 1 int");
-    cr_assert(strstr(buffer, "    2 \"int\"\n") != nullptr, "Missing 2 int");
-    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket");
+    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket for empty object");
+}
+
+Test(printJson, empty_array, .init=redirect_all_stdout)
+{
+    constexpr std::vector<raytracer::parser::JsonProto> array = {};
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[1024] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "[ \"array\"\n") != nullptr, "Missing opening array");
+    cr_assert(strstr(buffer, "]\n") != nullptr, "Missing closing bracket for empty array");
+}
+
+Test(printJson, mixed_array, .init=redirect_all_stdout)
+{
+    const std::vector array = {
+        raytracer::parser::JsonProto(42),
+        raytracer::parser::JsonProto(std::string("text")),
+        raytracer::parser::JsonProto(true)
+    };
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[2048] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "42 \"int\"\n") != nullptr, "Missing int in mixed array");
+    cr_assert(strstr(buffer, "text \"std::string\"\n") != nullptr, "Missing string in mixed array");
+    cr_assert(strstr(buffer, "true \"bool\"\n") != nullptr, "Missing bool in mixed array");
+}
+
+Test(printJson, object_with_array, .init=redirect_all_stdout)
+{
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {
+        {"arrayKey", raytracer::parser::JsonProto(std::vector{
+            raytracer::parser::JsonProto(1),
+            raytracer::parser::JsonProto(2)
+        })}
+    };
+    const raytracer::parser::JsonValue val = object;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[4096] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "arrayKey: [ \"array\"\n") != nullptr, "Missing array inside object");
+    cr_assert(strstr(buffer, "1 \"int\"\n") != nullptr, "Missing first int");
+    cr_assert(strstr(buffer, "2 \"int\"\n") != nullptr, "Missing second int");
+}
+
+Test(printJson, array_with_object, .init=redirect_all_stdout)
+{
+    const std::vector array = {
+        raytracer::parser::JsonProto(std::unordered_map<std::string, raytracer::parser::JsonProto>{
+            {"key", raytracer::parser::JsonProto(123)}
+        })
+    };
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[4096] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "[ \"array\"\n") != nullptr, "Missing opening array");
+    cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Missing object inside array");
+    cr_assert(strstr(buffer, "key: 123 \"int\"\n") != nullptr, "Missing key-value inside object in array");
+    cr_assert(strstr(buffer, "]\n") != nullptr, "Missing closing bracket for array");
+}
+
+Test(printJson, double_values, .init=redirect_all_stdout)
+{
+    const std::vector array = {
+        raytracer::parser::JsonProto(0.0),
+        raytracer::parser::JsonProto(-3.14),
+    };
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[4096] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "0 \"double\"\n") != nullptr, "Missing 0 double");
+    cr_assert(strstr(buffer, "-3.14 \"double\"\n") != nullptr, "Missing negative double");
+}
+
+Test(printJson, string_no_debug, .init=redirect_all_stdout)
+{
+    const raytracer::parser::JsonValue val = std::string("simple");
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "simple\n") != nullptr, "String without debug should just print value");
+    cr_assert(strstr(buffer, "\"std::string\"") == nullptr, "Should not print type without debug");
+}
+
+Test(printJson, int_no_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = 1234;
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "1234\n") != nullptr, "Int without debug should just print number");
+    cr_assert(strstr(buffer, "\"int\"") == nullptr, "Should not print type without debug");
+}
+
+Test(printJson, double_no_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = 3.1415;
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "3.1415\n") != nullptr, "Double without debug should just print number");
+    cr_assert(strstr(buffer, "\"double\"") == nullptr, "Should not print type without debug");
+}
+
+Test(printJson, bool_true_no_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = true;
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert_str_eq(buffer, "true\n", "Bool true without debug should just be 'true\\n'");
+}
+
+Test(printJson, bool_false_no_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = false;
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert_str_eq(buffer, "false\n", "Bool false without debug should just be 'false\\n'");
+}
+
+Test(printJson, object_in_array_no_debug, .init=redirect_all_stdout)
+{
+    const raytracer::parser::JsonValue val = std::vector{
+        raytracer::parser::JsonProto(std::unordered_map<std::string, raytracer::parser::JsonProto>{
+            {"a", raytracer::parser::JsonProto(1)}
+        })
+    };
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+    char buffer[4096] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "{\n") != nullptr, "Missing object inside array without debug");
+    cr_assert(strstr(buffer, "a: 1\n") != nullptr, "Missing key:value pair inside object without debug");
+}
+
+Test(printJson, empty_array_debug, .init=redirect_all_stdout)
+{
+    constexpr std::vector<raytracer::parser::JsonProto> array = {};
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, true);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "[ \"array\"\n") != nullptr, "Missing array opening with type");
+    cr_assert(strstr(buffer, "]\n") != nullptr, "Missing closing bracket for empty array");
+}
+
+Test(printJson, empty_array_no_debug, .init=redirect_all_stdout)
+{
+    constexpr std::vector<raytracer::parser::JsonProto> array = {};
+    const raytracer::parser::JsonValue val = array;
+    printJson(val, false);
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "[\n") != nullptr, "Missing array opening with type");
+    cr_assert(strstr(buffer, "]\n") != nullptr, "Missing closing bracket for empty array");
+}
+
+Test(printJson, double_with_debug, .init=redirect_all_stdout)
+{
+    constexpr raytracer::parser::JsonValue val = 42.42;
+    printJson(val, true);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "42.42") != nullptr, "Should print the double value");
+    cr_assert(strstr(buffer, "\"double\"") != nullptr, "Should also print type 'double' when debug is true");
+}
+
+Test(printJson, empty_object_debug, .init=redirect_all_stdout)
+{
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {};
+    const raytracer::parser::JsonValue val = object;
+    printJson(val, true);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Should open object with type");
+    cr_assert(strstr(buffer, "}\n") != nullptr, "Should close empty object");
+}
+
+Test(printJson, empty_object_no_debug, .init=redirect_all_stdout)
+{
+    const std::unordered_map<std::string, raytracer::parser::JsonProto> object = {};
+    const raytracer::parser::JsonValue val = object;
+    printJson(val, false);
+
+    FILE *stdout_file = cr_get_redirected_stdout();
+    rewind(stdout_file);
+
+    char buffer[512] = {};
+    const std::size_t ret= fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
+    cr_assert_gt(ret, 1);
+
+    cr_assert(strstr(buffer, "{\n") != nullptr, "Should open object");
+    cr_assert(strstr(buffer, "}\n") != nullptr, "Should close empty object");
+    cr_assert(strstr(buffer, "\"object\"") == nullptr, "Should not print type when debug is false");
 }

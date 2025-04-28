@@ -45,7 +45,7 @@ unit_static void skipWhitespace(raytracer::parser::Iterator &it, const raytracer
             it += 2;
             while (it != end && *it != '\n') {
                 ++it;
-            };
+            }
         } else if (std::distance(it, end) >= 2 && std::string(it, it + 2) == "/*") {
             it += 2;
             while (std::distance(it, end) >= 2 && std::string(it, it + 2) != "*/") {
@@ -91,13 +91,13 @@ unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterato
     const raytracer::parser::Iterator start = it;
     bool isFloat = false;
 
-    if (peek(it, end) == '-') {
+    if (it != end && *it == '-') {
         ++it;
     }
     while (it != end && std::isdigit(*it)) {
         ++it;
     }
-    if (peek(it, end) == '.') {
+    if (it != end && *it == '.') {
         isFloat = true;
         ++it;
         while (it != end && std::isdigit(*it)) {

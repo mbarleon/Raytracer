@@ -17,22 +17,25 @@
 unit_static void skipWhitespace(raytracer::parser::Iterator &it,
     const raytracer::parser::Iterator &end)
 {
-    while (it != end && std::isspace(*it))
+    while (it != end && std::isspace(*it)) {
         ++it;
+    }
 }
 
 unit_static char get(raytracer::parser::Iterator &it,
     const raytracer::parser::Iterator &end)
 {
-    if (it == end)
+    if (it == end) {
         throw raytracer::exception::Error("raytracer::parser::get", "Unexpected end of input");
+    }
     return *it++;
 }
 
 unit_static char peek(raytracer::parser::Iterator it, const raytracer::parser::Iterator &end)
 {
-    if (it == end)
+    if (it == end) {
         throw raytracer::exception::Error("raytracer::parser::peek", "Unexpected end of input");
+    }
     return *it;
 }
 
@@ -40,8 +43,9 @@ unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parse
 {
     const char c = get(it, end);
 
-    if (c != expected)
+    if (c != expected) {
         throw raytracer::exception::Error("raytracer::parser::expect", "Expected '", expected, "', got '", c, "'");
+    }
 }
 
 unit_static raytracer::parser::JsonValue  parseNull(raytracer::parser::Iterator &it,
@@ -73,19 +77,24 @@ unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterato
     const raytracer::parser::Iterator start = it;
     bool isFloat = false;
 
-    if (*it == '-')
+    if (*it == '-') {
         ++it;
-    while (it != end && std::isdigit(*it))
+    }
+    while (it != end && std::isdigit(*it)) {
         ++it;
+    }
     if (it != end && *it == '.') {
         isFloat = true;
         ++it;
-        while (it != end && std::isdigit(*it)) ++it;
+        while (it != end && std::isdigit(*it)) {
+            ++it;
+        }
     }
-    std::string numStr(start, it);
+    const std::string numStr(start, it);
     try {
-        if (isFloat)
+        if (isFloat) {
             return std::stod(numStr);
+        }
         return std::stoi(numStr);
     } catch (const std::invalid_argument &) {
         throw raytracer::exception::Error("raytracer::parser::parseNumber", "Invalid number");
@@ -102,7 +111,7 @@ unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator
 
     expect(it, end, '"');
     while (it != end) {
-        char c = get(it, end);
+        const char c = get(it, end);
         if (c == '"') {
             terminated = true;
             break;
@@ -121,8 +130,9 @@ unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator
             result += c;
         }
     }
-    if (!terminated)
+    if (!terminated) {
         throw raytracer::exception::Error("raytracer::parser::parseString", "Unterminated string");
+    }
     return result;
 }
 
@@ -167,8 +177,9 @@ unit_static raytracer::parser::JsonValue parseObject(raytracer::parser::Iterator
     while (true) {
         skipWhitespace(it, end);
         raytracer::parser::JsonValue key = parseString(it, end);
-        if (std::get<std::string>(key).empty())
+        if (std::get<std::string>(key).empty()) {
             throw raytracer::exception::Error("raytracer::parser::parseObject", "Expected string key");
+        }
         skipWhitespace(it, end);
         expect(it, end, ':');
         skipWhitespace(it, end);
@@ -188,8 +199,9 @@ unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator 
 {
     skipWhitespace(it, end);
     char c = peek(it, end);
-    if (std::isdigit(c))
+    if (std::isdigit(c)) {
         return parseNumber(it, end);
+    }
     switch (c) {
         case '"':
             return parseString(it, end);
@@ -217,15 +229,17 @@ raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT f
     std::stringstream ss;
     std::ifstream file(filepath);
 
-    if (!file.is_open())
+    if (!file.is_open()) {
         throw exception::Error("raytracer::parser::parseJson", "Could not open ", filepath);
+    }
     ss << file.rdbuf();
     const std::string content = ss.str();
     raytracer::parser::Iterator it = content.begin();
     const raytracer::parser::Iterator end = content.end();
     const JsonValue result = parseValue(it, end);
     skipWhitespace(it, end);
-    if (it != end)
+    if (it != end) {
         throw exception::Error("raytracer::parser::parseJson", "Unexpected trailing data in ", filepath);
+    }
     return result;
 }

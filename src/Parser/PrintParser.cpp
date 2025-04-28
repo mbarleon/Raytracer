@@ -19,8 +19,9 @@ unit_static void printNull(__attribute__((unused))const raytracer::parser::JsonV
     const bool debug)
 {
     std::cout << std::string(indentation_level * 4, ' ') <<  "null";
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "std::nullptr_t" << "\"";
+    }
     std::cout << std::endl;
 }
 
@@ -30,8 +31,9 @@ unit_static void printString(const raytracer::parser::JsonValue &val, const std:
     const std::string str = std::get<std::string>(val);
 
     std::cout << std::string(indentation_level * 4, ' ') <<  str;
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "std::string" << "\"";
+    }
     std::cout << std::endl;
 }
 
@@ -41,8 +43,9 @@ unit_static void printInt(const raytracer::parser::JsonValue &val, const std::si
     const int i = std::get<int>(val);
 
     std::cout << std::string(indentation_level * 4, ' ') <<  i;
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "int" << "\"";
+    }
     std::cout << std::endl;
 }
 
@@ -52,8 +55,9 @@ unit_static void printDouble(const raytracer::parser::JsonValue &val, const std:
     const double d = std::get<double>(val);
 
     std::cout << std::string(indentation_level * 4, ' ') <<  d;
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "double" << "\"";
+    }
     std::cout << std::endl;
 }
 
@@ -63,8 +67,9 @@ unit_static void printBool(const raytracer::parser::JsonValue &val, const std::s
     const bool b = std::get<bool>(val);
 
     std::cout << std::string(indentation_level * 4, ' ') <<  (b ? "true" : "false");
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "bool" << "\"";
+    }
     std::cout << std::endl;
 }
 
@@ -74,8 +79,9 @@ unit_static void printValue(const raytracer::parser::JsonValue &val, std::size_t
 unit_static void printArray(const raytracer::parser::JsonValue &val, const std::size_t indentation_level, const bool debug) // NOLINT(*-no-recursion)
 {
     std::cout << std::string(indentation_level * 4, ' ') << '[';
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "array" << "\"";
+    }
     std::cout << std::endl;
 
     for (const auto arr = std::get<std::vector<raytracer::parser::JsonProto>>(val); const auto &elem : arr) {
@@ -89,8 +95,9 @@ unit_static void printArray(const raytracer::parser::JsonValue &val, const std::
 unit_static void printObject(const raytracer::parser::JsonValue &val, const std::size_t indentation_level, const bool debug) // NOLINT(*-no-recursion)
 {
     std::cout << std::string(indentation_level * 4, ' ') << '{';
-    if (debug)
+    if (debug) {
         std::cout << " \"" << "object" << "\"";
+    }
     std::cout << std::endl;
 
     for (const auto &obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(val);

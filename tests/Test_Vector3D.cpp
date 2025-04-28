@@ -108,14 +108,28 @@ Test(Vector3D, normalize)
     cr_assert_float_eq(n._z, 0.8, 1e-6);
 }
 
+Test(Vector3D, normalize_null_len)
+{
+    const math::Vector3D a(0.0, 0.0, 0.0);
+    const math::Vector3D n = a.normalize();
+
+    cr_assert_eq(n._x, 0.0);
+    cr_assert_eq(n._y, 0.0);
+    cr_assert_eq(n._z, 0.0);
+}
+
 Test(Vector3D, equal)
 {
     const math::Vector3D a(0.0, 3.0, 4.0);
     const math::Vector3D b(0.0, 3.0, 4.0);
     const math::Vector3D c(1.0, 3.0, 4.0);
+    const math::Vector3D d(0.0, 1.0, 4.0);
+    const math::Vector3D e(0.0, 3.0, 1.0);
 
     cr_assert(a == b);
     cr_assert_eq(a == c, false);
+    cr_assert_eq(a == d, false);
+    cr_assert_eq(a == e, false);
 }
 
 Test(Vector3D, different)
@@ -123,7 +137,11 @@ Test(Vector3D, different)
     const math::Vector3D a(0.0, 3.0, 4.0);
     const math::Vector3D b(0.0, 3.0, 4.0);
     const math::Vector3D c(1.0, 3.0, 4.0);
+    const math::Vector3D d(0.0, 1.0, 4.0);
+    const math::Vector3D e(0.0, 3.0, 1.0);
 
     cr_assert(a != c);
+    cr_assert(a != d);
+    cr_assert(a != e);
     cr_assert_eq(a != b, false);
 }

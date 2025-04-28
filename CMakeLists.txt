@@ -2,7 +2,7 @@
 ## EPITECH PROJECT, 2025
 ## Raytracer
 ## File description:
-## Main.cpp
+## CMakeList.txt
 ##
 
 cmake_minimum_required(VERSION 3.16)
@@ -14,7 +14,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion -g3)
+add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion)
 
 ########################################
 
@@ -28,11 +28,13 @@ file (GLOB MAIN_SOURCE
 file(GLOB MATH_SOURCE
     "src/Maths/*.cpp")
 
-
 file(GLOB CORE_SOURCE
     "src/Core/*.cpp")
 
-add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${MAIN_SOURCE})
+file (GLOB PARSER_SOURCE
+    "src/Parser/*.cpp")
+
+add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${MAIN_SOURCE})
 
 ########################################
 
@@ -48,7 +50,7 @@ file (GLOB SHAPE_SOURCE
 file(GLOB TEST_SOURCE
     "tests/*.cpp")
 
-add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${TEST_SOURCE})
+add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${TEST_SOURCE})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
     target_compile_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)
@@ -58,9 +60,17 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_options(unit_tests PRIVATE -fprofile-arcs -ftest-coverage)
 endif()
 
+target_compile_definitions(unit_tests PRIVATE UNIT_TESTS=1)
+
 target_link_libraries(unit_tests PRIVATE criterion)
 
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 enable_testing()
 add_test(NAME unit_tests COMMAND unit_tests)
+
+add_custom_target(tests_run
+    COMMAND unit_tests
+    DEPENDS unit_tests
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)

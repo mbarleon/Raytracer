@@ -10,30 +10,52 @@ on:
 
 jobs:
   check_program_compilation:
-    if: ${{vars.MIRROR_URL != ''}}
     runs-on: ubuntu-latest
-    container: epitechcontent/epitest-docker
     timeout-minutes: 5
     steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
-        - name: Check for build.sh
-          run: |
+      - uses: actions/checkout@v3
+
+      - name: Load cached Docker image
+        id: load-cache
+        uses: actions/cache@v3
+        with:
+          path: ./epitest-docker.tar
+          key: epitest-docker-cache
+
+      - name: Load image if cache hit
+        if: steps.load-cache.outputs.cache-hit == 'true'
+        run: docker load -i epitest-docker.tar
+
+      - name: Pull and save image if not cached
+        if: steps.load-cache.outputs.cache-hit != 'true'
+        run: |
+          docker pull epitechcontent/epitest-docker
+          docker save epitechcontent/epitest-docker -o epitest-docker.tar
+
+      - name: Save Docker image to cache
+        if: steps.load-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v3
+        with:
+          path: ./epitest-docker.tar
+          key: epitest-docker-cache
+
+      - name: Run build inside Docker
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace -e EXECUTABLE_PATH=${{ vars.EXECUTABLE_PATH }} epitechcontent/epitest-docker bash -c '
             if [ ! -f "build.sh" ]; then
               echo "::error ::/!\\ WARNING NO build.sh FOUND /!\\"
               exit 1
             else
               echo "::notice::build.sh found."
             fi
-        - name: Launch ./build.sh
-          run: |
-              if ./build.sh; then
-                echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
-              else
-                echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
-              fi
-        - name: Check executables
-          run: |
+
+            if ./build.sh; then
+              echo "::notice file=build.sh::Successfully compiled (./build.sh)."
+            else
+              echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
+              exit 1
+            fi
+
             executable="${EXECUTABLE_PATH}"
             if [ ! -x "$executable" ]; then
               echo "::error file=$executable::Executable $executable is missing or not executable."
@@ -41,17 +63,14 @@ jobs:
             else
               echo "::notice file=$executable::Executable $executable found and is executable."
             fi
-          env:
-            EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
-        - name: Check unit_tests
-          run: |
+
             if ./build.sh && ./build.sh --tests ; then
               echo "::notice file=build.sh::Unit tests successful (./build.sh --tests)."
             else
               echo "::error file=build.sh::/!\\ UNIT TESTS ERROR (./build.sh --tests)/!\\"
+              exit 1
             fi
-          env:
-            EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
+          '
 
   push_to_mirror:
     if: github.event_name == 'push'

@@ -15,34 +15,43 @@ jobs:
     container: epitechcontent/epitest-docker
     timeout-minutes: 5
     steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
-        - name: Check for build.sh
-          run: |
-            if [ ! -f "build.sh" ]; then
-              echo "::error ::/!\\ WARNING NO build.sh FOUND /!\\"
-              exit 1
-            else
-              echo "::notice::build.sh found."
-            fi
-        - name: Launch ./build.sh
-          run: |
-              if ./build.sh; then
-                echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
-              else
-                echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
-              fi
-        - name: Check executables
-          run: |
-            executable="${EXECUTABLE_PATH}"
-            if [ ! -x "$executable" ]; then
-              echo "::error file=$executable::Executable $executable is missing or not executable."
-              exit 1
-            else
-              echo "::notice file=$executable::Executable $executable found and is executable."
-            fi
-          env:
-            EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Check for build.sh
+        run: |
+          if [ ! -f "build.sh" ]; then
+            echo "::error ::/!\\ WARNING NO build.sh FOUND /!\\"
+            exit 1
+          else
+            echo "::notice::build.sh found."
+          fi
+      - name: Launch ./build.sh
+        run: |
+          if ./build.sh; then
+            echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
+          else
+            echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
+          fi
+      - name: Check executables
+        run: |
+          executable="${EXECUTABLE_PATH}"
+          if [ ! -x "$executable" ]; then
+            echo "::error file=$executable::Executable $executable is missing or not executable."
+            exit 1
+          else
+            echo "::notice file=$executable::Executable $executable found and is executable."
+          fi
+        env:
+          EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
+      - name: Check unit_tests
+        run: |
+          if ./build.sh && ./build.sh --tests ; then
+            echo "::notice file=build.sh::Unit tests successful (./build.sh --tests)."
+          else
+            echo "::error file=build.sh::/!\\ UNIT TESTS ERROR (./build.sh --tests)/!\\"
+          fi
+        env:
+          EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
 
   push_to_mirror:
     if: github.event_name == 'push'

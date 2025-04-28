@@ -15,6 +15,7 @@
           buildInputs = [
             pkg-config
             criterion
+            gcovr
             gnumake
             cmake
             gcc

@@ -5,14 +5,19 @@
 ** Main.cpp
 */
 
+#include "Core/Core.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
 #include "Macro.hpp"
 
-int main(void)
+int main(const int argc, char **argv)
 {
+    (void) argc;
+    (void) argv;
     try {
-        throw raytracer::exception::Error("main", "hello world");
+        raytracer::Core core;
+
+        core.run();
     } catch (raytracer::exception::Error &e) {
         raytracer::logger::error(e);
         return ERROR;

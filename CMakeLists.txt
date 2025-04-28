@@ -2,7 +2,7 @@
 ## EPITECH PROJECT, 2025
 ## Raytracer
 ## File description:
-## Main.cpp
+## CMakeList.txt
 ##
 
 cmake_minimum_required(VERSION 3.16)
@@ -14,7 +14,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion -g3)
+add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion)
 
 ########################################
 
@@ -68,3 +68,9 @@ target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 enable_testing()
 add_test(NAME unit_tests COMMAND unit_tests)
+
+add_custom_target(tests_run
+    COMMAND unit_tests
+    DEPENDS unit_tests
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)

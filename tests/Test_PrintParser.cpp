@@ -10,7 +10,7 @@
 #include "Error.hpp"
 #include "../src/Parser/PrintParser.hpp"
 
-static void redirect_all_stdout(void)
+static void redirect_all_stdout()
 {
     cr_redirect_stdout();
     cr_redirect_stderr();
@@ -334,8 +334,8 @@ Test(printJson, object_with_values_debug, .init=redirect_all_stdout)
     const size_t ret = fread(buffer, sizeof(char), sizeof(buffer) - 1, stdout_file);
     cr_assert_gt(ret, 1);
 
-    cr_assert(strstr(buffer, "{ \"object\"\n") != NULL, "Missing opening object");
-    cr_assert(strstr(buffer, "    1 \"int\"\n") != NULL, "Missing 1 int");
-    cr_assert(strstr(buffer, "    2 \"int\"\n") != NULL, "Missing 2 int");
-    cr_assert(strstr(buffer, "}\n") != NULL, "Missing closing bracket");
+    cr_assert(strstr(buffer, "{ \"object\"\n") != nullptr, "Missing opening object");
+    cr_assert(strstr(buffer, "    1 \"int\"\n") != nullptr, "Missing 1 int");
+    cr_assert(strstr(buffer, "    2 \"int\"\n") != nullptr, "Missing 2 int");
+    cr_assert(strstr(buffer, "}\n") != nullptr, "Missing closing bracket");
 }

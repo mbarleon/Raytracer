@@ -1,0 +1,132 @@
+{
+    "scene": {
+        "camera": {
+            "resolution": {
+                "width": 1920,
+                "height": 1080,
+            },
+            "position": {
+                "x": 0,
+                "y": -100,
+                "z": 20,
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0,
+                "z": 0,
+            },
+            "fieldOfView": 70,
+            "antialiasing": {
+                "type": "supersampling", // "none", "supersampling", "adaptive"
+                "samples": 4, // for supersampling
+            },
+        },
+        "background": {
+            "color": {
+                "r": 0,
+                "g": 0,
+                "b": 0,
+            },
+        },
+        "primitives": {
+            "spheres": [
+                {
+                    "position": {
+                        "x": 60,
+                        "y": 5,
+                        "z": 40,
+                    },
+                    "radius": 25,
+                    "material": {
+                        "type": "solid",
+                        "color": {
+                            "r": 255,
+                            "g": 64,
+                            "b": 64,
+                        },
+                        "reflectivity": 0.2,
+                        "transparency": 0,
+                        "refractiveIndex": 1,
+                    },
+                    "transformations": [
+                        {
+                            "type": "translation",
+                            "x": 0,
+                            "y": 0,
+                            "z": 0,
+                        },
+                    ],
+                },
+            ],
+            "planes": [
+                {
+                    "axis": "Z",
+                    "position": -20,
+                    "material": {
+                        "type": "solid",
+                        "color": {
+                            "r": 64,
+                            "g": 64,
+                            "b": 255,
+                        },
+                    },
+                },
+            ],
+            "cylinders": [],
+            "cones": [],
+            "triangles": [],
+        },
+        "lights": {
+            "ambient": {
+                "intensity": 0.4,
+                "color": {
+                    "r": 255,
+                    "g": 255,
+                    "b": 255,
+                },
+            },
+            "directional": [
+                {
+                    "direction": {
+                        "x": -1,
+                        "y": -1,
+                        "z": -1,
+                    },
+                    "intensity": 0.8,
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                    },
+                },
+            ],
+            "point": [
+                {
+                    "position": {
+                        "x": 400,
+                        "y": 100,
+                        "z": 500,
+                    },
+                    "intensity": 1,
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255,
+                    },
+                    "attenuation": {
+                        "constant": 1,
+                        "linear": 0,
+                        "quadratic": 0,
+                    },
+                },
+            ],
+        },
+        "render": {
+            "output": {
+                "file": "output.ppm",
+                "format": "ppm", // "ppm", "png", "jpg"
+            },
+            "maxDepth": 5, // for reflections/refractions
+        },
+    },
+}

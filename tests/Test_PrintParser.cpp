@@ -19,84 +19,84 @@ static void redirect_all_stdout()
 Test(printNull, print_without_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = nullptr;
-    raytracer::parser::printNull(val, 2, false);
+    printNull(val, 2, false);
     cr_assert_stdout_eq_str("        null\n");
 }
 
 Test(printNull, print_with_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = nullptr;
-    raytracer::parser::printNull(val, 1, true);
+    printNull(val, 1, true);
     cr_assert_stdout_eq_str("    null \"std::nullptr_t\"\n");
 }
 
 Test(printString, print_without_debug, .init=redirect_all_stdout)
 {
     const raytracer::parser::JsonValue val = std::string("hello");
-    raytracer::parser::printString(val, 0, false);
+    printString(val, 0, false);
     cr_assert_stdout_eq_str("hello\n");
 }
 
 Test(printString, print_with_debug, .init=redirect_all_stdout)
 {
     const raytracer::parser::JsonValue val = std::string("world");
-    raytracer::parser::printString(val, 1, true);
+    printString(val, 1, true);
     cr_assert_stdout_eq_str("    world \"std::string\"\n");
 }
 
 Test(printInt, print_without_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = 42;
-    raytracer::parser::printInt(val, 1, false);
+    printInt(val, 1, false);
     cr_assert_stdout_eq_str("    42\n");
 }
 
 Test(printInt, print_with_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = -1337;
-    raytracer::parser::printInt(val, 0, true);
+    printInt(val, 0, true);
     cr_assert_stdout_eq_str("-1337 \"int\"\n");
 }
 
 Test(printDouble, print_without_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = 3.14;
-    raytracer::parser::printDouble(val, 2, false);
+    printDouble(val, 2, false);
     cr_assert_stdout_eq_str("        3.14\n");
 }
 
 Test(printDouble, print_with_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = -0.5;
-    raytracer::parser::printDouble(val, 0, true);
+    printDouble(val, 0, true);
     cr_assert_stdout_eq_str("-0.5 \"double\"\n");
 }
 
 Test(printBool, print_true_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = true;
-    raytracer::parser::printBool(val, 1, true);
+    printBool(val, 1, true);
     cr_assert_stdout_eq_str("    true \"bool\"\n");
 }
 
 Test(printBool, print_false_no_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = false;
-    raytracer::parser::printBool(val, 0, false);
+    printBool(val, 0, false);
     cr_assert_stdout_eq_str("false\n");
 }
 
 Test(printBool, print_false_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = false;
-    raytracer::parser::printBool(val, 1, true);
+    printBool(val, 1, true);
     cr_assert_stdout_eq_str("    false \"bool\"\n");
 }
 
 Test(printBool, print_true_no_debug, .init=redirect_all_stdout)
 {
     constexpr raytracer::parser::JsonValue val = true;
-    raytracer::parser::printBool(val, 0, false);
+    printBool(val, 0, false);
     cr_assert_stdout_eq_str("true\n");
 }
 
@@ -108,7 +108,7 @@ Test(printArray, array_with_values, .init=redirect_all_stdout)
         raytracer::parser::JsonProto(4.5)
     };
     const raytracer::parser::JsonValue val = array;
-    raytracer::parser::printArray(val, 0, false);
+    printArray(val, 0, false);
     cr_assert_stdout_eq_str(
         "[\n"
         "    null\n"
@@ -125,7 +125,7 @@ Test(printObject, object_with_values, .init=redirect_all_stdout)
         {"key2", raytracer::parser::JsonProto(2)}
     };
     const raytracer::parser::JsonValue val = object;
-    raytracer::parser::printObject(val, 0, false);
+    printObject(val, 0, false);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
@@ -147,7 +147,7 @@ Test(printArray, array_with_values_debug, .init=redirect_all_stdout)
         raytracer::parser::JsonProto(4.5)
     };
     const raytracer::parser::JsonValue val = array;
-    raytracer::parser::printArray(val, 0, true);
+    printArray(val, 0, true);
     cr_assert_stdout_eq_str(
         "[ \"array\"\n"
         "    null \"std::nullptr_t\"\n"
@@ -164,7 +164,7 @@ Test(printObject, object_with_values_debug, .init=redirect_all_stdout)
         {"key2", raytracer::parser::JsonProto(2)}
     };
     const raytracer::parser::JsonValue val = object;
-    raytracer::parser::printObject(val, 0, true);
+    printObject(val, 0, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
@@ -228,7 +228,7 @@ Test(printValue, array_with_values_debug, .init=redirect_all_stdout)
         raytracer::parser::JsonProto(4.5)
     };
     const raytracer::parser::JsonValue val = array;
-    raytracer::parser::printValue(val, 0, true);
+    printValue(val, 0, true);
     cr_assert_stdout_eq_str(
         "[ \"array\"\n"
         "    null \"std::nullptr_t\"\n"
@@ -245,7 +245,7 @@ Test(printValue, object_with_values_debug, .init=redirect_all_stdout)
         {"key2", raytracer::parser::JsonProto(2)}
     };
     const raytracer::parser::JsonValue val = object;
-    raytracer::parser::printValue(val, 0, true);
+    printValue(val, 0, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 
@@ -309,7 +309,7 @@ Test(printJson, array_with_values_debug, .init=redirect_all_stdout)
         raytracer::parser::JsonProto(4.5)
     };
     const raytracer::parser::JsonValue val = array;
-    raytracer::parser::printJson(val, true);
+    printJson(val, true);
     cr_assert_stdout_eq_str(
         "[ \"array\"\n"
         "    null \"std::nullptr_t\"\n"
@@ -326,7 +326,7 @@ Test(printJson, object_with_values_debug, .init=redirect_all_stdout)
         {"key2", raytracer::parser::JsonProto(2)}
     };
     const raytracer::parser::JsonValue val = object;
-    raytracer::parser::printJson(val, true);
+    printJson(val, true);
     FILE *stdout_file = cr_get_redirected_stdout();
     rewind(stdout_file);
 

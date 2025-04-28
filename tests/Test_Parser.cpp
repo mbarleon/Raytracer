@@ -187,7 +187,7 @@ Test(parseNull, null_too_small)
     const auto end = test.end();
 
     try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseNull(begin, end);
+        raytracer::parser::parseNull(begin, end);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.where(), "raytracer::parser::parseNull");
@@ -236,7 +236,7 @@ Test(parseBool, Wrong_false)
     const auto end = test.end();
 
     try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
+        raytracer::parser::parseBool(begin, end);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");
@@ -253,7 +253,7 @@ Test(parseBool, Wrong_true)
     const auto end = test.end();
 
     try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
+        raytracer::parser::parseBool(begin, end);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");
@@ -270,7 +270,7 @@ Test(parseBool, too_small)
     const auto end = test.end();
 
     try {
-        const raytracer::parser::JsonValue ret = raytracer::parser::parseBool(begin, end);
+        raytracer::parser::parseBool(begin, end);
         cr_assert_fail("Expected raytracer::exception::Error, but no exception was thrown");
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.where(), "raytracer::parser::parseBool");

@@ -40,16 +40,7 @@ unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parse
 
 unit_static void skipWhitespace(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end)
 {
-    while (it != end) {
-        if (std::distance(it, end) >= 2 && std::string(it, it + 2) == "//") {
-            while (it != end && peek(it, end) != '\n') {
-                ++it;
-            };
-            continue;
-        }
-        if (!std::isspace(*it)) {
-            break;
-        }
+    while (it != end && std::isspace(*it)) {
         ++it;
     }
 }

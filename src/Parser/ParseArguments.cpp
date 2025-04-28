@@ -24,17 +24,28 @@ unit_static bool filepath_exists(const char *RESTRICT filepath)
     return stat(filepath, &st) == 0;
 }
 
-unit_static void version()
+static void version()
 {
-    std::cout << "Raytracer - Version 0.0.1" << std::endl;
+    std::cout << R"(
+  ╭──────────────────────────────────────╮
+  │        Raytracer — Version 0.0.1     │
+  ╰──────────────────────────────────────╯
+)" << std::endl;
 }
 
-unit_static void usage()
+static void usage()
 {
-    std::cout << "USAGE:" << std::endl
-              << "\t./raytracer <SCENE_FILE.jsonc>" << std::endl
-              << "SCENE_FILE.json:" << std::endl
-              << "\tscene configuration" << std::endl;
+    std::cout << R"(
+USAGE:
+    ./raytracer <SCENE_FILE.jsonc>
+
+ARGUMENTS:
+    SCENE_FILE.jsonc   Path to the scene configuration file (JSON with comments)
+
+EXAMPLES:
+    ./raytracer scenes/simple_scene.jsonc
+
+)" << std::endl;
 }
 
 #if defined(UNIT_TESTS)

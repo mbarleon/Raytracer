@@ -1,10 +1,10 @@
-<h1 style="text-align: center">
+<h1 align="center">
   Ray-tracer - 2025<br>
   <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/macchiato.png" width="600px" alt="color palette"/>
   <br>
 </h1>
 
-<p style="text-align: center">
+<p align="center">
   YOUR CPU GOES BRRRRR!<br>
 </p>
 

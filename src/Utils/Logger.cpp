@@ -16,9 +16,9 @@
  */
 void raytracer::logger::error(const exception::Error &e)
 {
-    std::cerr << RED_BOLD << "╔════════════════════════════════╗" << RESET << std::endl;
-    std::cerr << RED_BOLD << "║       ⚠ ERROR OCCURRED ⚠       ║" << RESET << std::endl;
-    std::cerr << RED_BOLD << "╚════════════════════════════════╝" << RESET << std::endl;
-    std::cerr << YELLOW << "⮞ Raised by: " << RESET << e.where() << std::endl;
-    std::cerr << YELLOW << "⮞ Reason:    " << RESET << e.what() << std::endl;
+    std::cerr << RED_BOLD << "╔════════════════════════════════╗" << RESET << std::endl
+              << RED_BOLD << "║       ⚠ ERROR OCCURRED ⚠       ║" << RESET << std::endl
+              << RED_BOLD << "╚════════════════════════════════╝" << RESET << std::endl
+              << YELLOW << "⮞ Raised by: " << RESET << e.where() << std::endl
+              << YELLOW << "⮞ Reason:    " << RESET << e.what() << std::endl;
 }

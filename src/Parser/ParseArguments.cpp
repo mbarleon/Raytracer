@@ -7,10 +7,8 @@
 
 #include "ParseArguments.hpp"
 #include "Error.hpp"
-#include "Macro.hpp"
 #include <cstring>
 #include <iostream>
-#include <ostream>
 #include <sys/stat.h>
 
 #if defined(UNIT_TESTS)

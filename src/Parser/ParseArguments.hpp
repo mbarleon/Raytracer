@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "Macro.hpp"
+
 namespace raytracer::parser {
 
 [[nodiscard]] bool parse_arguments(int argc, char **argv);

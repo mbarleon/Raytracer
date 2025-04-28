@@ -14,14 +14,6 @@
     namespace raytracer::parser {
 #endif
 
-unit_static void skipWhitespace(raytracer::parser::Iterator &it,
-    const raytracer::parser::Iterator &end)
-{
-    while (it != end && std::isspace(*it)) {
-        ++it;
-    }
-}
-
 unit_static char get(raytracer::parser::Iterator &it,
     const raytracer::parser::Iterator &end)
 {
@@ -43,6 +35,29 @@ unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parse
 {
     if (const char c = get(it, end); c != expected) {
         throw raytracer::exception::Error("raytracer::parser::expect", "Expected '", expected, "', got '", c, "'");
+    }
+}
+
+unit_static void skipWhitespace(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end)
+{
+    while (it != end) {
+        if (std::distance(it, end) >= 2 && std::string(it, it + 2) == "//") {
+            it += 2;
+            while (it != end && *it != '\n') {
+                ++it;
+            };
+        } else if (std::distance(it, end) >= 2 && std::string(it, it + 2) == "/*") {
+            it += 2;
+            while (std::distance(it, end) >= 2 && std::string(it, it + 2) != "*/") {
+                ++it;
+            }
+            if (std::distance(it, end) >= 2 && std::string(it, it + 2) == "*/") {
+                ++it;
+            }
+        } else if (!std::isspace(*it)) {
+            break;
+        }
+        ++it;
     }
 }
 
@@ -76,13 +91,13 @@ unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterato
     const raytracer::parser::Iterator start = it;
     bool isFloat = false;
 
-    if (*it == '-') {
+    if (peek(it, end) == '-') {
         ++it;
     }
     while (it != end && std::isdigit(*it)) {
         ++it;
     }
-    if (it != end && *it == '.') {
+    if (peek(it, end) == '.') {
         isFloat = true;
         ++it;
         while (it != end && std::isdigit(*it)) {
@@ -157,7 +172,6 @@ unit_static raytracer::parser::JsonValue parseArray(raytracer::parser::Iterator 
             ++it;
             break;
         }
-        expect(it, end, ',');
     }
     return array;
 }
@@ -188,7 +202,6 @@ unit_static raytracer::parser::JsonValue parseObject(raytracer::parser::Iterator
             ++it;
             break;
         }
-        expect(it, end, ',');
     }
     return object;
 }
@@ -197,26 +210,36 @@ unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator 
     const raytracer::parser::Iterator &end)
 {
     skipWhitespace(it, end);
-    char c = peek(it, end);
-    if (std::isdigit(c)) {
-        return parseNumber(it, end);
+    raytracer::parser::JsonValue object;
+
+    if (char c = peek(it, end); std::isdigit(c)) {
+        object = parseNumber(it, end);
+    } else {
+        switch (c) {
+            case '"':
+                object = parseString(it, end);
+                break;
+            case '-':
+                object = parseNumber(it, end);
+                break;
+            case 'n':
+                object = parseNull(it, end);
+                break;
+            case 't': case 'f':
+                object = parseBool(it, end);
+                break;
+            case '[':
+                object = parseArray(it, end);
+                break;
+            case '{':
+                object = parseObject(it, end);
+                break;
+            default:
+                throw raytracer::exception::Error("parseValue", "Unknown value", c);
+        }
     }
-    switch (c) {
-        case '"':
-            return parseString(it, end);
-        case '-':
-            return parseNumber(it, end);
-        case 'n':
-            return parseNull(it, end);
-        case 't': case 'f':
-            return parseBool(it, end);
-        case '[':
-            return parseArray(it, end);
-        case '{':
-            return parseObject(it, end);
-        default:
-            throw raytracer::exception::Error("parseValue", "Unknown value", c);
-    }
+    expect(it, end, ',');
+    return object;
 }
 
 #if defined(UNIT_TESTS)

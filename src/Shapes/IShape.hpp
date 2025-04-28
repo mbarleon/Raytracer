@@ -15,7 +15,6 @@ class IShape
     public:
         virtual ~IShape() = default;
 
-        virtual bool intersect(const math::Ray &ray) const noexcept = 0;
+        [[nodiscard]] virtual bool intersect(const math::Ray &ray) const noexcept = 0;
 };
 }// namespace raytracer::shape
-

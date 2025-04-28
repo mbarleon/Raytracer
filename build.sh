@@ -3,7 +3,6 @@
 GREEN="\033[1;32m"
 RED="\033[1;31m"
 ILC="\033[3m"
-#ORANGE="\033[38;5;214m"
 RST="\033[0m"
 
 function _error()
@@ -19,7 +18,7 @@ function _success()
 
 function _all()
 {
-    if ! command -v cmake 2>&1 >/dev/null; then
+    if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
     _success "command 'cmake' found, building..."
@@ -36,7 +35,7 @@ function _all()
 
 function _debug()
 {
-    if ! command -v cmake 2>&1 >/dev/null; then
+    if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
     _success "command 'cmake' found, building..."
@@ -53,7 +52,7 @@ function _debug()
 
 function _tests_run()
 {
-    if ! command -v cmake 2>&1 >/dev/null; then
+    if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
     _success "command 'cmake' found, building..."
@@ -114,7 +113,6 @@ EOF
         ;;
     -d|--debug)
         _debug
-        exit 0
         ;;
     -t|--tests)
         _tests_run

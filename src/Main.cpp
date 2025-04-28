@@ -10,7 +10,7 @@
 #include "Logger.hpp"
 #include "Macro.hpp"
 
-int main(int argc, char **argv)
+int main(const int argc, char **argv)
 {
     (void) argc;
     (void) argv;

@@ -14,11 +14,11 @@ class AShape : public IShape
 {
     public:
         AShape() = default;
-        ~AShape() = default;
+        ~AShape() override = default;
 
         //TODO: here material lib like setMAterial getMaterial ect...
 
-    protected:
+    // protected:
         //TODO: shared_ptr of IMaterial ?
 };
 }// namespace raytracer::shape

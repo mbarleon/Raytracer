@@ -124,10 +124,10 @@ math::Vector3D math::Vector3D::cross(const Vector3D &other) const
 
 bool math::Vector3D::operator==(const Vector3D &other) const
 {
-    return (_x == other._x && _y == other._y && _z == other._z);
+    return _x == other._x && _y == other._y && _z == other._z;
 }
 
 bool math::Vector3D::operator!=(const Vector3D &other) const
 {
-    return (_x != other._x || _y != other._y || _z != other._z);
+    return _x != other._x || _y != other._y || _z != other._z;
 }

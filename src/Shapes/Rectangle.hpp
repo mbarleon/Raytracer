@@ -10,12 +10,12 @@
 #include "AShape.hpp"
 
 namespace raytracer::shape {
-class Rectangle : public AShape
+class Rectangle final : public AShape
 {
     public:
         Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side, const math::Vector3D &left_side);
 
-        bool intersect(const math::Ray &ray) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
 
     private:
         math::Point3D _origin;

@@ -17,10 +17,10 @@ namespace math {
 * prefer to pass it as reference like `const Ray &`
 */
 struct Ray {
-    math::Point3D _origin;
-    math::Vector3D _dir;
+    Point3D _origin;
+    Vector3D _dir;
 
-    math::Point3D at(const double t) const noexcept;
+    [[nodiscard]] Point3D at( double t) const noexcept;
 };
 // clang-format on
 }// namespace math

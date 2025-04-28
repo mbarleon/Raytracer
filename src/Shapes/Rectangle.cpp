@@ -38,7 +38,7 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray) const noexcept
         return false;
     }
 
-    const double t = (normal.dot(_origin - ray._origin)) / denom;
+    const double t = normal.dot(_origin - ray._origin) / denom;
 
     if (t < 0) {
         return false;
@@ -51,8 +51,8 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray) const noexcept
     const double left_length = _left_side.length();
 
     const double proj_bottom = v.dot(_bottom_side) / bottom_length;
-    const double proj_left = v.dot((_left_side) / left_length);
+    const double proj_left = v.dot(_left_side / left_length);
 
-    return (proj_bottom >= 0 && proj_bottom <= bottom_length)
-        && (proj_left >= 0 && proj_left <= left_length);
+    return proj_bottom >= 0 && proj_bottom <= bottom_length
+        && proj_left >= 0 && proj_left <= left_length;
 }

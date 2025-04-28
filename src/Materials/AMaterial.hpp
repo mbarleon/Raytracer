@@ -14,10 +14,8 @@ class AMaterial : public IMaterial
 {
     public:
         AMaterial() = default;
-        ~AMaterial() = default;
+        ~AMaterial() override = default;
 
         /*void setColor(const types::color_u &color);*/
-
-    protected:
 };
 }// namespace raytracer::material

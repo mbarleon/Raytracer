@@ -11,7 +11,7 @@
 
 Test(debug, test_logger_debug)
 {
-    std::stringstream buffer;
+    const std::stringstream buffer;
     std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
 
     try {

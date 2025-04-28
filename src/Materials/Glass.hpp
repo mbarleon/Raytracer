@@ -10,12 +10,10 @@
 #include "AMaterial.hpp"
 
 namespace raytracer::material {
-class Glass : public AMaterial
+class Glass final : public AMaterial
 {
     public:
         Glass() = default;
-        ~Glass() = default;
-
-    private:
+        ~Glass() override = default;
 };
 }// namespace raytracer::material

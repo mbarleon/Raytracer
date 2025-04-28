@@ -14,8 +14,6 @@ class Core
         constexpr explicit Core() = default;
         constexpr ~Core() = default;
 
-        void run(void);
-
-    private:
+        void run();
 };
 }// namespace raytracer

@@ -31,7 +31,7 @@ unit_static char get(raytracer::parser::Iterator &it,
     return *it++;
 }
 
-unit_static char peek(raytracer::parser::Iterator it, const raytracer::parser::Iterator &end)
+unit_static char peek(const raytracer::parser::Iterator it, const raytracer::parser::Iterator &end)
 {
     if (it == end) {
         throw raytracer::exception::Error("raytracer::parser::peek", "Unexpected end of input");
@@ -41,9 +41,7 @@ unit_static char peek(raytracer::parser::Iterator it, const raytracer::parser::I
 
 unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end, char expected)
 {
-    const char c = get(it, end);
-
-    if (c != expected) {
+    if (const char c = get(it, end); c != expected) {
         throw raytracer::exception::Error("raytracer::parser::expect", "Expected '", expected, "', got '", c, "'");
     }
 }
@@ -64,7 +62,8 @@ unit_static raytracer::parser::JsonValue  parseBool(raytracer::parser::Iterator 
     if (std::distance(it, end) >= 4 && std::string(it, it + 4) == "true") {
         std::advance(it, 4);
         return true;
-    } else if (std::distance(it, end) >= 5 && std::string(it, it + 5) == "false") {
+    }
+    if (std::distance(it, end) >= 5 && std::string(it, it + 5) == "false") {
         std::advance(it, 5);
         return false;
     }
@@ -234,8 +233,8 @@ raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT f
     }
     ss << file.rdbuf();
     const std::string content = ss.str();
-    raytracer::parser::Iterator it = content.begin();
-    const raytracer::parser::Iterator end = content.end();
+    Iterator it = content.begin();
+    const Iterator end = content.end();
     const JsonValue result = parseValue(it, end);
     skipWhitespace(it, end);
     if (it != end) {

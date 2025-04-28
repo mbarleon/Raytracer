@@ -9,12 +9,10 @@
 
 #include "AMaterial.hpp"
 namespace raytracer::material {
-class Light : public AMaterial
+class Light final : public AMaterial
 {
     public:
         Light() = default;
-        ~Light() = default;
-
-    private:
+        ~Light() override = default;
 };
 }// namespace raytracer::material

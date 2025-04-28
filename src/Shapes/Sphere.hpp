@@ -10,12 +10,12 @@
 #include "AShape.hpp"
 
 namespace raytracer::shape {
-class Sphere : public AShape
+class Sphere final : public AShape
 {
     public:
-        Sphere(const math::Point3D &center, const double radius);
+        Sphere(const math::Point3D &center, double radius);
 
-        bool intersect(const math::Ray &ray) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
 
     private:
         math::Point3D _center;

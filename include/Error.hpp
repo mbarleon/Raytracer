@@ -10,6 +10,7 @@
 #include <exception>
 #include <sstream>
 #include <string>
+#include <utility>
 
 /**
  * @brief generic Error class
@@ -17,7 +18,7 @@
  * @return void
  */
 namespace raytracer::exception {
-class Error : public std::exception
+class Error final : public std::exception
 {
     public:
         /**
@@ -26,14 +27,14 @@ class Error : public std::exception
          * @return Error
          */
         template<typename... Args>
-        constexpr explicit Error(const std::string &where, Args &&...args)
-            : _where(where), _what(concatStrings(std::forward<Args>(args)...))
+        constexpr explicit Error(std::string where, Args &&...args)
+            : _where(std::move(where)), _what(concatStrings(std::forward<Args>(args)...))
         {
             /* empty */
         }
 
-        const char *what() const noexcept override;
-        const char *where() const noexcept;
+        [[nodiscard]] const char *what() const noexcept override;
+        [[nodiscard]] const char *where() const noexcept;
 
     private:
         const std::string _where;

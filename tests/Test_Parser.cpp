@@ -91,7 +91,7 @@ Test(get, end)
 Test(peek, normal)
 {
     const std::string test = "a";
-    auto begin = test.begin();
+    const auto begin = test.begin();
     const auto end = test.end();
     const char ret = raytracer::parser::peek(begin, end);
 
@@ -314,7 +314,7 @@ Test(parseNumber, invalid_number)
 {
     const std::string test = "abc";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseNumber(begin, end);
@@ -331,7 +331,7 @@ Test(parseNumber, number_out_of_range)
 {
     const std::string test = "99999999999999999999999999999999";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseNumber(begin, end);
@@ -412,10 +412,10 @@ Test(parseArray, empty_array)
 {
     const std::string test = "[]";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
-        auto ret = raytracer::parser::parseArray(begin, end);
+        const auto ret = raytracer::parser::parseArray(begin, end);
         cr_assert(std::holds_alternative<std::nullptr_t>(ret));
     } catch (...) {
         cr_assert_fail("Unexpected exception type thrown");
@@ -444,10 +444,10 @@ Test(parseObject, empty_object)
 {
     const std::string test = "{}";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
-        auto ret = raytracer::parser::parseObject(begin, end);
+        const auto ret = raytracer::parser::parseObject(begin, end);
         cr_assert(std::holds_alternative<std::nullptr_t>(ret));
     } catch (...) {
         cr_assert_fail("Unexpected exception type thrown");
@@ -477,7 +477,7 @@ Test(parseObject, non_string_key_should_throw)
 {
     const std::string test = "{123: \"value\"}";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseObject(begin, end);
@@ -556,10 +556,10 @@ Test(parseValue, value_null)
 {
     const std::string test = "null";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
-        auto ret = raytracer::parser::parseValue(begin, end);
+        const auto ret = raytracer::parser::parseValue(begin, end);
         cr_assert(std::holds_alternative<std::nullptr_t>(ret));
     } catch (...) {
         cr_assert_fail("Unexpected exception type thrown");
@@ -618,7 +618,7 @@ Test(parseValue, value_invalid)
 {
     const std::string test = "@oops";
     auto begin = test.begin();
-    auto end = test.end();
+    const auto end = test.end();
 
     try {
         raytracer::parser::parseValue(begin, end);
@@ -666,7 +666,7 @@ Test(parseJson, file_not_found)
 
 Test(parseJson, file_with_trailing_data)
 {
-    const char* filename = "test_trailing.json";
+    const auto filename = "test_trailing.json";
     std::ofstream file(filename);
     file << "123 true";
     file.close();

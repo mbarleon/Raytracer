@@ -16,7 +16,7 @@
  * @details where the Error was raised
  * @return const char *
  */
-const char *raytracer::exception::Error::where(void) const noexcept
+const char *raytracer::exception::Error::where() const noexcept
 {
     return _where.c_str();
 }
@@ -26,7 +26,7 @@ const char *raytracer::exception::Error::where(void) const noexcept
  * @details why the Error was raised
  * @return const char *
  */
-const char *raytracer::exception::Error::what(void) const noexcept
+const char *raytracer::exception::Error::what() const noexcept
 {
     return _what.c_str();
 }

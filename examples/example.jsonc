@@ -15,7 +15,7 @@
                 "y": 0,
                 "z": 0,
             },
-            "fieldOfView": 70.0,
+            "fieldOfView": 70,
             "antialiasing": {
                 "type": "supersampling", // "none", "supersampling", "adaptive"
                 "samples": 4, // for supersampling
@@ -45,8 +45,8 @@
                             "b": 64,
                         },
                         "reflectivity": 0.2,
-                        "transparency": 0.0,
-                        "refractiveIndex": 1.0,
+                        "transparency": 0,
+                        "refractiveIndex": 1,
                     },
                     "transformations": [
                         {
@@ -107,16 +107,16 @@
                         "y": 100,
                         "z": 500,
                     },
-                    "intensity": 1.0,
+                    "intensity": 1,
                     "color": {
                         "r": 255,
                         "g": 255,
                         "b": 255,
                     },
                     "attenuation": {
-                        "constant": 1.0,
-                        "linear": 0.0,
-                        "quadratic": 0.0,
+                        "constant": 1,
+                        "linear": 0,
+                        "quadratic": 0,
                     },
                 },
             ],

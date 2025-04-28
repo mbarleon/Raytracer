@@ -14,14 +14,6 @@
     namespace raytracer::parser {
 #endif
 
-unit_static void skipWhitespace(raytracer::parser::Iterator &it,
-    const raytracer::parser::Iterator &end)
-{
-    while (it != end && std::isspace(*it)) {
-        ++it;
-    }
-}
-
 unit_static char get(raytracer::parser::Iterator &it,
     const raytracer::parser::Iterator &end)
 {
@@ -43,6 +35,13 @@ unit_static void  expect(raytracer::parser::Iterator &it, const raytracer::parse
 {
     if (const char c = get(it, end); c != expected) {
         throw raytracer::exception::Error("raytracer::parser::expect", "Expected '", expected, "', got '", c, "'");
+    }
+}
+
+unit_static void skipWhitespace(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end)
+{
+    while (it != end && std::isspace(*it)) {
+        ++it;
     }
 }
 

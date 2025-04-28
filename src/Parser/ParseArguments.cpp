@@ -7,10 +7,8 @@
 
 #include "ParseArguments.hpp"
 #include "Error.hpp"
-#include "Macro.hpp"
 #include <cstring>
 #include <iostream>
-#include <ostream>
 #include <sys/stat.h>
 
 #if defined(UNIT_TESTS)
@@ -24,7 +22,7 @@ unit_static bool filepath_exists(const char *RESTRICT filepath)
     return stat(filepath, &st) == 0;
 }
 
-static void version()
+unit_static void version()
 {
     std::cout << R"(
   ╭──────────────────────────────────────╮
@@ -33,7 +31,7 @@ static void version()
 )" << std::endl;
 }
 
-static void usage()
+unit_static void usage()
 {
     std::cout << R"(
 USAGE:

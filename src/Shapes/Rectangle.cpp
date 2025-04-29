@@ -6,7 +6,7 @@
 */
 
 #include "Rectangle.hpp"
-#include <cstdlib>
+#include "Logger.hpp"
 
 /*
 * public
@@ -21,7 +21,7 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
     const math::Vector3D &left_side)
     : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
 {
-    /* empty __ctor__ */
+    logger::debug("rectangle was built: origin", origin, " bottom_side", bottom_side, " left_side", left_side);
 }
 
 /**
@@ -53,6 +53,5 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray) const noexcept
     const double proj_bottom = v.dot(_bottom_side) / bottom_length;
     const double proj_left = v.dot(_left_side / left_length);
 
-    return proj_bottom >= 0 && proj_bottom <= bottom_length
-        && proj_left >= 0 && proj_left <= left_length;
+    return proj_bottom >= 0 && proj_bottom <= bottom_length && proj_left >= 0 && proj_left <= left_length;
 }

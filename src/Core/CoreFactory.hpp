@@ -12,7 +12,8 @@
 #include "Macro.hpp"
 #include <memory>
 
-std::vector<std::shared_ptr<raytracer::shape::Sphere>> get_spheres(const raytracer::parser::JsonProto &primitives);
+std::vector<std::shared_ptr<raytracer::shape::IShape>> primitive_factory(
+    const raytracer::parser::JsonProto &primitives);
 
 #if defined(UNIT_TESTS)
 unit_static double get_double(const raytracer::parser::JsonProto &proto);

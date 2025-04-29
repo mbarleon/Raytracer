@@ -55,15 +55,15 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_spheres(const raytr
 * @details ENTRY POINT
 * @return TODO
 */
-std::vector<std::shared_ptr<raytracer::shape::Sphere>> get_spheres(const raytracer::parser::JsonProto &primitives)
+std::vector<std::shared_ptr<raytracer::shape::IShape>> primitive_factory(const raytracer::parser::JsonProto &primitives)
 {
     const auto &primitivesObj =
         std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(primitives.value);
-    const auto &spheresArray = std::get<std::vector<raytracer::parser::JsonProto>>(primitivesObj.at("spheres").value);
-    std::vector<std::shared_ptr<raytracer::shape::Sphere>> spheres;
+    const auto &spheres = std::get<std::vector<raytracer::parser::JsonProto>>(primitivesObj.at("spheres").value);
+    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes;
 
-    for (const auto &sphereJson : spheresArray) {
-        spheres.emplace_back(create_spheres(sphereJson));
+    for (const auto &e : spheres) {
+        shapes.emplace_back(create_spheres(e));
     }
-    return spheres;
+    return shapes;
 }

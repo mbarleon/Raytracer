@@ -6,14 +6,18 @@
 */
 
 #include "CoreFactory.hpp"
+#include "../Shapes/Rectangle.hpp"
+#include "../Shapes/Sphere.hpp"
 #include "Error.hpp"
+#include "Macro.hpp"
+#include <memory>
 
 /**
 * @brief
 * @details private static
 * @return
 */
-unit_static double get_double(const raytracer::parser::JsonProto &proto)
+unit_static double get_double(const ParsedJson &proto)
 {
     if (std::holds_alternative<int>(proto.value)) {
         return static_cast<double>(std::get<int>(proto.value));
@@ -29,9 +33,9 @@ unit_static double get_double(const raytracer::parser::JsonProto &proto)
 * @details private static
 * @return
 */
-unit_static math::Vector3D get_vec3D(const raytracer::parser::JsonProto &proto)
+unit_static math::Vector3D get_vec3D(const ParsedJson &proto)
 {
-    const auto &obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(proto.value);
+    const auto &obj = std::get<Primitives>(proto.value);
 
     return math::Vector3D(get_double(obj.at("x")), get_double(obj.at("y")), get_double(obj.at("z")));
 }
@@ -41,29 +45,69 @@ unit_static math::Vector3D get_vec3D(const raytracer::parser::JsonProto &proto)
 * @details private static
 * @return
 */
-unit_static std::shared_ptr<raytracer::shape::Sphere> create_spheres(const raytracer::parser::JsonProto &proto)
-{
-    const auto &obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(proto.value);
-    const math::Vector3D center = get_vec3D(obj.at("position"));
-    const double radius = get_double(obj.at("radius"));
+/*unit_static std::shared_ptr<raytracer::shape::Sphere> get_material(const ParsedJson &proto)*/
+/*{*/
+/**/
+/* TODO: later add material using pattern matching and lambda return class ptr*/
+/*}*/
 
-    return std::make_shared<raytracer::shape::Sphere>(center, radius);
+/**
+* @brief
+* @details private static
+* @return
+*/
+unit_static std::shared_ptr<raytracer::shape::Sphere> create_spheres(const ParsedJson &proto)
+{
+    const auto &obj = std::get<Primitives>(proto.value);
+    const math::Vector3D position = get_vec3D(obj.at("position"));
+    const double radius = get_double(obj.at("radius"));
+    /*const auto &material = get_material(obj.at("material"));*/
+
+    return std::make_shared<raytracer::shape::Sphere>(position, radius);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+* @brief
+* @details private static
+* @return
+*/
+unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const raytracer::parser::JsonProto &proto)
+{
+    const auto &obj = std::get<Primitives>(proto.value);
+    const math::Vector3D origin = get_vec3D(obj.at("origin"));
+    const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
+    const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
+    /*const auto &material = get_material(obj.at("material"));*/
+
+    return std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
 }
 
 /**
-* @brief ENTRY POINT
-* @details ENTRY POINT
-* @return TODO
+* @brief primitive factory entry point called by Core
+* @details factory creating shared objects according to user parsed json configuration
+* @return vector of shared Shape objects
 */
-std::vector<std::shared_ptr<raytracer::shape::IShape>> primitive_factory(const raytracer::parser::JsonProto &primitives)
+std::vector<std::shared_ptr<raytracer::shape::IShape>> primitive_factory(const ParsedJson &json_primitives)
 {
-    const auto &primitivesObj =
-        std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(primitives.value);
-    const auto &spheres = std::get<std::vector<raytracer::parser::JsonProto>>(primitivesObj.at("spheres").value);
-    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes;
+    const auto &primitives = std::get<Primitives>(json_primitives.value);
+    const auto &spheres = std::get<Shapes>(primitives.at("spheres").value);
+    const auto &rectangles = std::get<Shapes>(primitives.at("rectangles").value);
 
+    /* reserve spheres size */
+    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes(spheres.size() + rectangles.size());
+
+    /* place spheres */
     for (const auto &e : spheres) {
         shapes.emplace_back(create_spheres(e));
+    }
+    for (const auto &e : rectangles) {
+        shapes.emplace_back(create_rectangle(e));
     }
     return shapes;
 }

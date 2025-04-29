@@ -72,6 +72,36 @@
                     },
                 },
             ],
+            "rectangles": [
+                {
+                    "origin": {
+                        "x": 60,
+                        "y": 5,
+                        "z": 40,
+                    },
+                    "bottom_side": {
+                        "x": 10,
+                        "y": 20,
+                        "z": 30,
+                    },
+                    "left_side": {
+                        "x": 40,
+                        "y": 50,
+                        "z": 60,
+                    },
+                    "material": {
+                        "type": "solid",
+                        "color": {
+                            "r": 255,
+                            "g": 64,
+                            "b": 64,
+                        },
+                        "reflectivity": 0.2,
+                        "transparency": 0,
+                        "refractiveIndex": 1,
+                    },
+                },
+            ],
             "cylinders": [],
             "cones": [],
             "triangles": [],

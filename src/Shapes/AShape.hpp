@@ -8,6 +8,8 @@
 #pragma once
 
 #include "IShape.hpp"
+#include "Materials/IMaterial.hpp"
+#include <memory>
 
 namespace raytracer::shape {
 class AShape : public IShape
@@ -18,7 +20,9 @@ class AShape : public IShape
 
         //TODO: here material lib like setMAterial getMaterial ect...
 
-    // protected:
+        // protected:
         //TODO: shared_ptr of IMaterial ?
+    protected:
+        std::shared_ptr<material::IMaterial> _material;
 };
 }// namespace raytracer::shape

@@ -10,18 +10,14 @@
 #include "Logger.hpp"
 #include "Macro.hpp"
 #include "Parser/ParseArguments.hpp"
-#include "Parser/Parser.hpp"
-#include "Parser/PrintParser.hpp"
 
 int main(const int argc, char **argv)
 {
     try {
         if (raytracer::parser::parse_arguments(argc, argv)) {
-            const auto json = raytracer::parser::parseJson(argv[1]);
-
-            printJson(json, true);
             raytracer::Core core;
-            core.run();
+
+            core.run(argv[1]);
         }
 
     } catch (raytracer::exception::Error &e) {

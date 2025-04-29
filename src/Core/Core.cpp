@@ -6,7 +6,11 @@
 */
 
 #include "Core.hpp"
+#include "../Parser/Parser.hpp"
+#include "../Parser/PrintParser.hpp"
+#include "Logger.hpp"
 #include <iostream>
+#include <unordered_map>
 
 /*
 * public
@@ -17,9 +21,12 @@
  * @details Core entry-point, starts the raytracer program
  * @return void
  */
-void raytracer::Core::run()
+void raytracer::Core::run(const char *RESTRICT filename)
 {
-    std::cout << "Corrrrrrre goes brrrrrrrrrrrrrrrr" << std::endl;
+    const auto jsonc = parser::parseJson(filename);
+    const auto a = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(jsonc);
+
+    (void) a;
 }
 
 /*

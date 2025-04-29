@@ -9,6 +9,8 @@
 
 #include "Error.hpp"
 
+#define DEBUG
+
 #ifdef DEBUG
     #include <iostream>
 #else

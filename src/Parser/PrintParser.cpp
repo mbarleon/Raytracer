@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <ranges>
-#include "Error.hpp"
 #include "PrintParser.hpp"
 
 #if defined(UNIT_TESTS)

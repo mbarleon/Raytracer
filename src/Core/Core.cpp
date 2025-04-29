@@ -7,9 +7,8 @@
 
 #include "Core.hpp"
 #include "../Parser/Parser.hpp"
-#include "../Parser/PrintParser.hpp"
+#include "CoreFactory.hpp"
 #include "Logger.hpp"
-#include <iostream>
 #include <unordered_map>
 
 /*
@@ -23,12 +22,11 @@
  */
 void raytracer::Core::run(const char *RESTRICT filename)
 {
-    const auto jsonc = parser::parseJson(filename);
-    const auto a = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(jsonc);
+    const parser::JsonValue jsonc = parser::parseJson(filename);
+    const auto &root = std::get<std::unordered_map<std::string, parser::JsonProto>>(jsonc);
+    const auto &scene = std::get<std::unordered_map<std::string, parser::JsonProto>>(root.at("scene").value);
+    const auto &primitives = scene.at("primitives");
+    const auto spheres = get_spheres(primitives);
 
-    (void) a;
+    logger::debug("Core loaded: ", spheres.size(), " sphere(s) from ", filename);
 }
-
-/*
-* private
-*/

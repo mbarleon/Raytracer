@@ -9,6 +9,7 @@
 
 #include "../Shapes/IShape.hpp"
 #include "Macro.hpp"
+#include <memory>
 #include <vector>
 
 namespace raytracer {
@@ -21,6 +22,6 @@ class Core final
         void run(const char *RESTRICT filename);
 
     private:
-        std::vector<shape::IShape> _shapes;
+        std::vector<std::shared_ptr<shape::IShape>> _shapes;
 };
 }// namespace raytracer

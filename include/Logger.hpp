@@ -9,7 +9,11 @@
 
 #include "Error.hpp"
 
-#define DEBUG
+#if defined(UNIT_TESTS)
+    #undef DEBUG
+#else
+    #define DEBUG
+#endif
 
 #ifdef DEBUG
     #include <iostream>

@@ -6,6 +6,7 @@
 */
 
 #include "Sphere.hpp"
+#include "Logger.hpp"
 
 /*
 * public
@@ -18,7 +19,7 @@
 */
 raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radius) : _center(center), _radius(radius)
 {
-    /* empty __ctor__ */
+    logger::debug("sphere was built: ", center);
 }
 
 /**

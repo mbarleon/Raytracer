@@ -20,6 +20,12 @@ add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion)
 
 file(GLOB UTILS_SOURCE "src/Utils/*.cpp")
 
+#TODO: in the future, .so for shapes in a folder ./plugins/
+#INFO: Shapes are currently compiled with Core
+
+file (GLOB SHAPE_SOURCE
+    "src/Shapes/*.cpp")
+
 ########################################
 
 file (GLOB MAIN_SOURCE
@@ -34,16 +40,11 @@ file(GLOB CORE_SOURCE
 file (GLOB PARSER_SOURCE
     "src/Parser/*.cpp")
 
-add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${MAIN_SOURCE})
+add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${MAIN_SOURCE})
 
 ########################################
 
 target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
-
-########################################
-
-file (GLOB SHAPE_SOURCE
-    "src/Shapes/*.cpp")
 
 ########################################
 

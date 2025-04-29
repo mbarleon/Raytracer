@@ -23,3 +23,5 @@
 #else
     #define unit_static static
 #endif
+
+#define DEFAULT_IDENTATION 0

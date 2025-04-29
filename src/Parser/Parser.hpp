@@ -12,7 +12,7 @@
 
 namespace raytracer::parser {
 
-JsonValue parseJson(const char * RESTRICT filepath);
+JsonValue parseJsonc(const char * RESTRICT filepath);
 
 #if defined (UNIT_TESTS)
     unit_static void skipWhitespace(Iterator &it, const Iterator &end);

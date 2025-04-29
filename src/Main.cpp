@@ -17,9 +17,9 @@ int main(const int argc, char **argv)
 {
     try {
         if (raytracer::parser::parse_arguments(argc, argv)) {
-            const auto json = raytracer::parser::parseJson(argv[1]);
+            const auto json = raytracer::parser::parseJsonc(argv[1]);
 
-            printJson(json, true);
+            printJsonc(json, true);
             raytracer::Core core;
             core.run();
         }

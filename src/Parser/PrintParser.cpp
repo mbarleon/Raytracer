@@ -132,7 +132,7 @@ unit_static void printValue(const raytracer::parser::JsonValue &val, const std::
     };//namespace raytracer::parser
 #endif
 
-void raytracer::parser::printJson(const JsonValue &val, const bool debug = false)
+void raytracer::parser::printJsonc(const JsonValue &val, const bool debug = false)
 {
     printValue(val, 0, debug);
 }

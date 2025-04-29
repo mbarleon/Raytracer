@@ -12,7 +12,7 @@
 
 namespace raytracer::parser {
 
-void printJson(const JsonValue &val, bool debug);
+void printJsonc(const JsonValue &val, bool debug);
 
 #if defined(UNIT_TESTS)
     unit_static void printNull(__attribute__((unused))JsonValue &val, bool debug);

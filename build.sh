@@ -26,7 +26,7 @@ function _all()
     cd build || _error "mkdir failed"
     cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
     # INFO: Epitech's moulinette does: `cmake --build .` but this is slow as fuc
-    if [[ $(make -j"$(nproc)" raytracer) ]]; then
+    if make -j"$(nproc)" raytracer; then
         _success "compiled raytracer"
         exit 0
     fi
@@ -43,7 +43,7 @@ function _debug()
     cd build || _error "mkdir failed"
     cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
     # INFO: Epitech's moulinette does: `cmake --build .` but this is slow as fuc
-    if [[ $(make -j"$(nproc)" raytracer) ]]; then
+    if make -j"$(nproc)" raytracer; then
         _success "compiled raytracer"
         exit 0
     fi
@@ -59,11 +59,11 @@ function _tests_run()
     mkdir -p build
     cd build || _error "mkdir failed"
     cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
-    if [[ $(make -j"$(nproc)" unit_tests) -ne 0 ]]; then
+    if ! make -j"$(nproc)" unit_tests; then
         _error "unit tests compilation error" "failed to compile unit_tests"
     fi
     cd .. || _error "cd failed"
-    if [[ $(./unit_tests) -ne 0 ]]; then
+    if ! ./unit_tests; then
         _error "unit tests error" "unit tests failed!"
     fi
     _success "unit tests succeed!"

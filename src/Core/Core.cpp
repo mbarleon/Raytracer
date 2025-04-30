@@ -21,7 +21,7 @@
  */
 void raytracer::Core::run(const char *RESTRICT filename)
 {
-    const parser::JsonValue jsonc = parser::parseJson(filename);
+    const parser::JsonValue jsonc = parser::parseJsonc(filename);
     const auto &root = std::get<std::unordered_map<std::string, parser::JsonProto>>(jsonc);
     const auto &scene = std::get<std::unordered_map<std::string, parser::JsonProto>>(root.at("scene").value);
     const auto &primitives = scene.at("primitives");

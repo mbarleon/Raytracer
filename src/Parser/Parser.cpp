@@ -14,8 +14,7 @@
     namespace raytracer::parser {
 #endif
 
-unit_static char get(raytracer::parser::Iterator &it,
-    const raytracer::parser::Iterator &end)
+unit_static char get(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end)
 {
     if (it == end) {
         throw raytracer::exception::Error("raytracer::parser::get", "Unexpected end of input");
@@ -61,11 +60,34 @@ unit_static void skipWhitespace(raytracer::parser::Iterator &it, const raytracer
     }
 }
 
+unit_static void check_comma(const raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end)
+{
+    auto start = it;
+    bool has_comma = false;
+
+    skipWhitespace(start, end);
+    if (start == end) {
+        return;
+    }
+    if (peek(start, end) == ',') {
+        has_comma = true;
+        ++start;
+    }
+    skipWhitespace(start, end);
+    if (start == end && has_comma) {
+        throw raytracer::exception::Error("raytracer::parser::check_comma", "Unexpected trailing comma");
+    }
+    if (const char next = peek(start, end); next != '}' && next != ']' && !has_comma) {
+        throw raytracer::exception::Error("raytracer::parser::check_comma", "Expected a comma");
+    }
+}
+
 unit_static raytracer::parser::JsonValue  parseNull(raytracer::parser::Iterator &it,
     const raytracer::parser::Iterator &end)
 {
     if (std::distance(it, end) >= 4 && std::string(it, it + 4) == "null") {
         std::advance(it, 4);
+        check_comma(it, end);
         return nullptr;
     }
     throw raytracer::exception::Error("raytracer::parser::parseNull", "Expected 'null'");
@@ -76,10 +98,12 @@ unit_static raytracer::parser::JsonValue  parseBool(raytracer::parser::Iterator 
 {
     if (std::distance(it, end) >= 4 && std::string(it, it + 4) == "true") {
         std::advance(it, 4);
+        check_comma(it, end);
         return true;
     }
     if (std::distance(it, end) >= 5 && std::string(it, it + 5) == "false") {
         std::advance(it, 5);
+        check_comma(it, end);
         return false;
     }
     throw raytracer::exception::Error("raytracer::parser::parseBool", "Expected 'true' or 'false'");
@@ -104,6 +128,7 @@ unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterato
             ++it;
         }
     }
+    check_comma(it, end);
     const std::string numStr(start, it);
     try {
         if (isFloat) {
@@ -117,8 +142,8 @@ unit_static raytracer::parser::JsonValue  parseNumber(raytracer::parser::Iterato
     }
 }
 
-unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator &it,
-    const raytracer::parser::Iterator &end)
+unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator &it, const raytracer::parser::Iterator &end,
+    const bool key = false)
 {
     std::string result;
     bool terminated = false;
@@ -147,6 +172,9 @@ unit_static raytracer::parser::JsonValue parseString(raytracer::parser::Iterator
     if (!terminated) {
         throw raytracer::exception::Error("raytracer::parser::parseString", "Unterminated string");
     }
+    if (!key) {
+        check_comma(it, end);
+    }
     return result;
 }
 
@@ -173,6 +201,7 @@ unit_static raytracer::parser::JsonValue parseArray(raytracer::parser::Iterator 
             break;
         }
     }
+    check_comma(it, end);
     return array;
 }
 
@@ -189,7 +218,7 @@ unit_static raytracer::parser::JsonValue parseObject(raytracer::parser::Iterator
     }
     while (true) {
         skipWhitespace(it, end);
-        raytracer::parser::JsonValue key = parseString(it, end);
+        raytracer::parser::JsonValue key = parseString(it, end, true);
         if (std::get<std::string>(key).empty()) {
             throw raytracer::exception::Error("raytracer::parser::parseObject", "Expected string key");
         }
@@ -203,6 +232,7 @@ unit_static raytracer::parser::JsonValue parseObject(raytracer::parser::Iterator
             break;
         }
     }
+    check_comma(it, end);
     return object;
 }
 
@@ -235,10 +265,13 @@ unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator 
                 object = parseObject(it, end);
                 break;
             default:
-                throw raytracer::exception::Error("parseValue", "Unknown value", c);
+                throw raytracer::exception::Error("raytracer::parser::parseValue", "Unknown value");
         }
     }
-    expect(it, end, ',');
+    skipWhitespace(it, end);
+    if (it != end && peek(it, end) == ',') {
+        ++it;
+    }
     return object;
 }
 
@@ -246,13 +279,13 @@ unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator 
     };
 #endif
 
-raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT filepath)
+raytracer::parser::JsonValue raytracer::parser::parseJsonc(const char *RESTRICT filepath)
 {
     std::stringstream ss;
     std::ifstream file(filepath);
 
     if (!file.is_open()) {
-        throw exception::Error("raytracer::parser::parseJson", "Could not open ", filepath);
+        throw exception::Error("raytracer::parser::parseJsonc", "Could not open ", filepath);
     }
     ss << file.rdbuf();
     const std::string content = ss.str();
@@ -261,7 +294,7 @@ raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT f
     const JsonValue result = parseValue(it, end);
     skipWhitespace(it, end);
     if (it != end) {
-        throw exception::Error("raytracer::parser::parseJson", "Unexpected trailing data in ", filepath);
+        throw exception::Error("raytracer::parser::parseJsonc", "Unexpected trailing data in ", filepath);
     }
     return result;
 }

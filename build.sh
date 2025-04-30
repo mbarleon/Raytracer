@@ -97,6 +97,7 @@ USAGE:
 
 ARGUMENTS:
       $0 [-h|--help]    displays this message
+      $0 [-d|--debug]   debug flags compilation
       $0 [-c|--clean]   clean the project
       $0 [-f|--fclean]  fclean the project
       $0 [-t|--tests]   run unit tests

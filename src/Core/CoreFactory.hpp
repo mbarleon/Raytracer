@@ -7,16 +7,22 @@
 
 #pragma once
 
+#include "../Camera/Camera.hpp"
 #include "../Parser/ParserTypes.hpp"
 #include "../Shapes/IShape.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;
-using Primitives = std::unordered_map<std::string, ParsedJson>;
+using JsonMap = std::unordered_map<std::string, ParsedJson>;
 using Shapes = std::vector<ParsedJson>;
+using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 
-std::vector<std::shared_ptr<raytracer::shape::IShape>> primitive_factory(
-    const raytracer::parser::JsonProto &primitives);
+/**
+* TODO: templates?
+*/
+
+IShapesList primitive_factory(const raytracer::parser::JsonProto &primitives_json);
+std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonProto &camera_json);
 
 #if defined(UNIT_TESTS)
     #include "../Shapes/Rectangle.hpp"

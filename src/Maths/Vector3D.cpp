@@ -134,6 +134,5 @@ bool math::Vector3D::operator!=(const Vector3D &other) const
 
 std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
 {
-    os << "{" << self._x << ", " << self._y << ", " << self._z << "}";
-    return os;
+    return (os << "{" << self._x << ", " << self._y << ", " << self._z << "}");
 }

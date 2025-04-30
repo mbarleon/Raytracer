@@ -24,4 +24,10 @@
     #define unit_static static
 #endif
 
+/**
+* @brief DEFAULT MACROS
+* @details default general macros to avoid magic numbers everywhere
+*/
+
 #define DEFAULT_IDENTATION 0
+#define DEFAULT_FIELD_OF_VIEW 70

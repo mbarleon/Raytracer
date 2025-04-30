@@ -84,7 +84,7 @@ function _clean()
 function _fclean()
 {
     _clean
-    rm -rf raytracer unit_tests plugins code_coverage.txt unit_tests-*.profraw unit_tests.profdata
+    rm -rf raytracer unit_tests plugins code_coverage.txt unit_tests-*.profraw unit_tests.profdata vgcore*
 }
 
 for args in "$@"

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../Maths/Vector2u.hpp"
-#include "../Maths/Vector3D.hpp"
+#include "../../Maths/Vector2u.hpp"
+#include "../../Maths/Vector3D.hpp"
 #include "Macro.hpp"
 
 // clang-format off

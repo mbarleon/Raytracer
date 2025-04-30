@@ -5,7 +5,7 @@
 ** Test_Sphere.cpp
 */
 
-#include "../src/Shapes/Sphere.hpp"
+#include "../src/Scene/Shapes/Sphere.hpp"
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 

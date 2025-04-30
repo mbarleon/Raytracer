@@ -23,9 +23,6 @@ file(GLOB UTILS_SOURCE "src/Utils/*.cpp")
 #TODO: in the future, .so for shapes in a folder ./plugins/
 #INFO: Shapes are currently compiled with Core
 
-file (GLOB SHAPE_SOURCE
-    "src/Shapes/*.cpp")
-
 ########################################
 
 file (GLOB MAIN_SOURCE
@@ -40,14 +37,14 @@ file(GLOB CORE_SOURCE
 file (GLOB PARSER_SOURCE
     "src/Parser/*.cpp")
 
-file (GLOB CAMERA_SOURCE
-    "src/Camera/*.cpp")
+file(GLOB_RECURSE SCENE_SOURCE
+    "src/Scene/*.cpp")
+
 
 add_executable(raytracer
     ${UTILS_SOURCE}
     ${MATH_SOURCE}
-    ${SHAPE_SOURCE}
-    ${CAMERA_SOURCE}
+    ${SCENE_SOURCE}
     ${PARSER_SOURCE}
     ${CORE_SOURCE}
     ${MAIN_SOURCE}
@@ -66,8 +63,7 @@ file(GLOB TEST_SOURCE
 add_executable(unit_tests
     ${UTILS_SOURCE}
     ${MATH_SOURCE}
-    ${SHAPE_SOURCE}
-    ${CAMERA_SOURCE}
+    ${SCENE_SOURCE}
     ${PARSER_SOURCE}
     ${CORE_SOURCE}
     ${TEST_SOURCE}

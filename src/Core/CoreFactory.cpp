@@ -6,8 +6,8 @@
 */
 
 #include "CoreFactory.hpp"
-#include "../Shapes/Rectangle.hpp"
-#include "../Shapes/Sphere.hpp"
+#include "../Scene/Shapes/Rectangle.hpp"
+#include "../Scene/Shapes/Sphere.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 #include <memory>

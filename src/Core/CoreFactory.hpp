@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "../Camera/Camera.hpp"
 #include "../Parser/ParserTypes.hpp"
-#include "../Shapes/IShape.hpp"
+#include "../Scene/Camera/Camera.hpp"
+#include "../Scene/Shapes/IShape.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;
@@ -25,8 +25,8 @@ IShapesList primitive_factory(const raytracer::parser::JsonProto &primitives_jso
 std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonProto &camera_json);
 
 #if defined(UNIT_TESTS)
-    #include "../Shapes/Rectangle.hpp"
-    #include "../Shapes/Sphere.hpp"
+    #include "../Scene/Shapes/Rectangle.hpp"
+    #include "../Scene/Shapes/Sphere.hpp"
     #include "Macro.hpp"
 unit_static double get_double(const raytracer::parser::JsonProto &proto);
 unit_static math::Vector3D get_vec3D(const raytracer::parser::JsonProto &proto);

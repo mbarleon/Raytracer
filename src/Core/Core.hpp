@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../Camera/Camera.hpp"
-#include "../Shapes/IShape.hpp"
+#include "../Scene/Camera/Camera.hpp"
+#include "../Scene/Shapes/IShape.hpp"
 #include "Macro.hpp"
 #include <memory>
 #include <vector>

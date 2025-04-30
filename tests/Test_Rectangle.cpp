@@ -5,7 +5,7 @@
 ** Test_Rectangle.cpp
 */
 
-#include "../src/Shapes/Rectangle.hpp"
+#include "../src/Scene/Shapes/Rectangle.hpp"
 #include <criterion/criterion.h>
 #include <criterion/new/assert.h>
 

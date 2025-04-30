@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../Maths/Ray.hpp"
+#include "../../Maths/Ray.hpp"
 
 namespace raytracer::shape {
 class IShape

@@ -420,7 +420,7 @@ Test(FileTests, parse_valid_json_file)
     file << R"({"name": "Mathieu",})";
     file.close();
 
-    auto result = raytracer::parser::parseJson(filename);
+    auto result = raytracer::parser::parseJsonc(filename);
     auto obj = std::get<std::unordered_map<std::string, raytracer::parser::JsonProto>>(result);
     cr_assert(obj.contains("name"));
 
@@ -429,7 +429,7 @@ Test(FileTests, parse_valid_json_file)
 
 Test(FileTests, file_not_found)
 {
-    ASSERT_THROW_ERROR(raytracer::parser::parseJson("nonexistent.json"), "raytracer::parser::parseJson", "Could not open nonexistent.json");
+    ASSERT_THROW_ERROR(raytracer::parser::parseJsonc("nonexistent.json"), "raytracer::parser::parseJsonc", "Could not open nonexistent.json");
 }
 
 Test(FileTests, file_with_trailing_data)
@@ -439,7 +439,7 @@ Test(FileTests, file_with_trailing_data)
     file << R"({ "key": "value" }, trailing_data)";
     file.close();
 
-    ASSERT_THROW_ERROR(raytracer::parser::parseJson(filename), "raytracer::parser::parseJson", "Unexpected trailing data in test_trailing.json");
+    ASSERT_THROW_ERROR(raytracer::parser::parseJsonc(filename), "raytracer::parser::parseJsonc", "Unexpected trailing data in test_trailing.json");
 
     std::remove(filename);
 }

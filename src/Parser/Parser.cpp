@@ -74,11 +74,8 @@ unit_static void check_comma(const raytracer::parser::Iterator &it, const raytra
         ++start;
     }
     skipWhitespace(start, end);
-    if (start == end) {
-        if (has_comma) {
-            throw raytracer::exception::Error("raytracer::parser::check_comma", "Unexpected trailing comma");
-        }
-        return; // This may never happen but it will stay as a safety
+    if (start == end && has_comma) {
+        throw raytracer::exception::Error("raytracer::parser::check_comma", "Unexpected trailing comma");
     }
     if (const char next = peek(start, end); next != '}' && next != ']' && !has_comma) {
         throw raytracer::exception::Error("raytracer::parser::check_comma", "Expected a comma");
@@ -282,13 +279,13 @@ unit_static raytracer::parser::JsonValue parseValue(raytracer::parser::Iterator 
     };
 #endif
 
-raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT filepath)
+raytracer::parser::JsonValue raytracer::parser::parseJsonc(const char *RESTRICT filepath)
 {
     std::stringstream ss;
     std::ifstream file(filepath);
 
     if (!file.is_open()) {
-        throw exception::Error("raytracer::parser::parseJson", "Could not open ", filepath);
+        throw exception::Error("raytracer::parser::parseJsonc", "Could not open ", filepath);
     }
     ss << file.rdbuf();
     const std::string content = ss.str();
@@ -297,7 +294,7 @@ raytracer::parser::JsonValue raytracer::parser::parseJson(const char *RESTRICT f
     const JsonValue result = parseValue(it, end);
     skipWhitespace(it, end);
     if (it != end) {
-        throw exception::Error("raytracer::parser::parseJson", "Unexpected trailing data in ", filepath);
+        throw exception::Error("raytracer::parser::parseJsonc", "Unexpected trailing data in ", filepath);
     }
     return result;
 }

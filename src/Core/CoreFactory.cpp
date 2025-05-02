@@ -132,18 +132,21 @@ std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonPr
 IShapesList primitive_factory(const ParsedJson &json_primitives)
 {
     const auto &primitives = std::get<JsonMap>(json_primitives.value);
-    const auto &spheres = std::get<Shapes>(primitives.at("spheres").value);
-    const auto &rectangles = std::get<Shapes>(primitives.at("rectangles").value);
+    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes;
 
-    /* reserve spheres size */
-    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes(spheres.size() + rectangles.size());
-
-    /* place spheres */
-    for (const auto &e : spheres) {
-        shapes.emplace_back(create_spheres(e));
+    auto spheres_it = primitives.find("spheres");
+    if (spheres_it != primitives.end() && std::holds_alternative<Shapes>(spheres_it->second.value)) {
+        const auto &spheres = std::get<Shapes>(spheres_it->second.value);
+        shapes.reserve(shapes.size() + spheres.size());
+        for (const auto &e : spheres)
+            shapes.emplace_back(create_spheres(e));
     }
-    for (const auto &e : rectangles) {
-        shapes.emplace_back(create_rectangle(e));
+    auto rectangles_it = primitives.find("rectangles");
+    if (rectangles_it != primitives.end() && std::holds_alternative<Shapes>(rectangles_it->second.value)) {
+        const auto &rectangles = std::get<Shapes>(rectangles_it->second.value);
+        shapes.reserve(shapes.size() + rectangles.size());
+        for (const auto &e : rectangles)
+            shapes.emplace_back(create_rectangle(e));
     }
     return shapes;
 }

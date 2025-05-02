@@ -2,7 +2,7 @@
     "scene": {
         "camera": {
             "resolution": { "width": 1920, "height": 1080 },
-            "position": { "x": 0, "y": -100, "z": 20 },
+            "position": { "x": 0, "y": 0, "z": 0 },
             "rotation": { "x": 0, "y": 0, "z": 0 },
             "fieldOfView": 70
         },
@@ -34,8 +34,8 @@
         "primitives": {
             "spheres": [
                 {
-                    "position": { "x": 60, "y": 5, "z": 40 },
-                    "radius": 25,
+                    "position": { "x": 0, "y": 0, "z": 0 },
+                    "radius": 1,
                     "material": "corail_red",
                     "transformations": [
                         { "type": "translation", "x": 0, "y": 0, "z": 0 }

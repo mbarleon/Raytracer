@@ -8,6 +8,7 @@
 #include "Camera.hpp"
 #include "Logger.hpp"
 #include <cmath>
+#include <fstream>
 
 // clang-format off
 
@@ -21,13 +22,19 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 
 void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>> &shapes) const noexcept
 {
-    std::cout << "P3\n"
+    std::ofstream ppm("output.ppm");
+    if (!ppm.is_open()) {
+        std::cerr << "Failed to open output.ppm for writing.\n";
+        return;
+    }
+
+    ppm << "P3\n"
         << _resolution.x << " " << _resolution.y << "\n"
         << "255\n";
 
     math::Ray r = {_position, math::Vector3D()};
 
-    for (unsigned y = 0; y < _resolution.x; ++y) {
+    for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             double u = (x + 0.5) / double(_resolution.x);
             double v = (y + 0.5) / double(_resolution.y);
@@ -44,12 +51,12 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
             }
 
             if (hit) {
-                std::cout << "255 255 255 ";
+                ppm << "255 255 255 ";
             } else {
-                std::cout << "0 0 0 ";
+                ppm << "0 0 0 ";
             }
         }
-        std::cout << "\n";
+        ppm << "\n";
     }
 }
 

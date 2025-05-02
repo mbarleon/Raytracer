@@ -8,7 +8,7 @@
         },
         "render": {
             "background": {
-                "color": { "r": 0, "g": 0, "b": 0 },
+                "color": { "r": 135, "g": 206, "b": 250 },
                 "antialiasing": {
                     "type": "supersampling", // "none", "supersampling", "adaptive"
                     "samples": 4 // for supersampling
@@ -34,12 +34,14 @@
         "primitives": {
             "spheres": [
                 {
-                    "position": { "x": 0, "y": 0, "z": -5 },
+                    "position": { "x": 0, "y": 0, "z": -6 },
                     "radius": 2,
-                    "material": "corail_red",
-                    "transformations": [
-                        { "type": "translation", "x": 0, "y": 0, "z": 0 }
-                    ]
+                    "material": "corail_red"
+                },
+                {
+                    "position": { "x": -1, "y": -1, "z": -6 },
+                    "radius": 2,
+                    "material": "whale_blue"
                 }
             ],
             "planes": [

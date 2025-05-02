@@ -53,7 +53,7 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
             if (hit) {
                 ppm << "255 255 255 ";
             } else {
-                ppm << "0 0 0 ";
+                ppm << "135 206 235 ";
             }
         }
         ppm << "\n";

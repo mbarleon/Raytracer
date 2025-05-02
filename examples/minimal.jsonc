@@ -34,8 +34,8 @@
         "primitives": {
             "spheres": [
                 {
-                    "position": { "x": 0, "y": 0, "z": 0 },
-                    "radius": 1,
+                    "position": { "x": 0, "y": 0, "z": -5 },
+                    "radius": 2,
                     "material": "corail_red",
                     "transformations": [
                         { "type": "translation", "x": 0, "y": 0, "z": 0 }

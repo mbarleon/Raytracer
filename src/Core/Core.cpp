@@ -29,4 +29,5 @@ void raytracer::Core::run(const char *RESTRICT filename)
 
     _shapes = primitive_factory(primitives);
     _camera = create_camera(camera);
+    _camera.get()->render(_shapes);
 }

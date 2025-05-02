@@ -7,8 +7,12 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "../../Maths/Vector2u.hpp"
 #include "../../Maths/Vector3D.hpp"
+#include "../../Maths/Ray.hpp"
+#include "../Shapes/IShape.hpp"
 #include "Macro.hpp"
 
 // clang-format off
@@ -19,6 +23,9 @@ class Camera final
     public:
         explicit Camera(const math::Vector2u &resolution, const math::Point3D &position, const math::Vector3D &rotation, const uint field_of_view);
         ~Camera() = default;
+
+        void ray(double u, double v, math::Ray &cameraRay) const noexcept;
+        void render(const std::vector<std::shared_ptr<shape::IShape>> &shapes) const noexcept;
 
     private:
         math::Vector2u _resolution;

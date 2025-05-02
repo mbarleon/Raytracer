@@ -15,7 +15,7 @@ class Sphere final : public AShape
     public:
         Sphere(const math::Point3D &center, double radius);
 
-        [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, double &t) const noexcept override;
 
     private:
         math::Point3D _center;

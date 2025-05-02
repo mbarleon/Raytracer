@@ -48,35 +48,6 @@
                     "position": -20,
                     "material": "whale_blue"
                 }
-            ],
-            "rectangles": [],
-            "cylinders": [],
-            "cones": [],
-            "triangles": []
-        },
-        "lights": {
-            "ambient": {
-                "intensity": 0.4,
-                "color": { "r": 255, "g": 255, "b": 255 }
-            },
-            "directional": [
-                {
-                    "direction": { "x": -1, "y": -1, "z": -1 },
-                    "intensity": 0.8,
-                    "color": { "r": 255, "g": 255, "b": 255 }
-                }
-            ],
-            "point": [
-                {
-                    "position": { "x": 400, "y": 100, "z": 500 },
-                    "intensity": 1,
-                    "color": { "r": 255, "g": 255, "b": 255 },
-                    "attenuation": {
-                        "constant": 1,
-                        "linear": 0,
-                        "quadratic": 0
-                    }
-                }
             ]
         }
     }

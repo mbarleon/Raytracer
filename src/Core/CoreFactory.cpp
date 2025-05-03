@@ -10,6 +10,7 @@
 #include "../Scene/Shapes/Sphere.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
+#include "../../include/Logger.hpp"
 #include <memory>
 
 /**
@@ -72,13 +73,28 @@ unit_static math::Vector3D get_vec3D(const ParsedJson &proto)
 * @details private static
 * @return
 */
-unit_static math::Vector2u get_vec2u(const raytracer::parser::JsonProto &proto)
+unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
     const double x = get_double(obj.at("width"));
     const double y = get_double(obj.at("height"));
 
     return math::Vector2u{static_cast<uint>(x), static_cast<uint>(y)};
+}
+
+/**
+* @brief
+* @details private static
+* @return
+*/
+unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials)
+{
+    const std::string mat_str = get_string(proto);
+
+    auto it = materials.find(mat_str);
+    if (it == materials.end())
+        throw raytracer::exception::Error("Core", "Undefined material");
+    return it->second;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,6 +121,7 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
     std::shared_ptr<raytracer::Material> material =
         std::make_shared<raytracer::Material>(color, reflectivity, transparency, refractiveIndex);
     materials[name] = material;
+    raytracer::logger::debug("Material '", name, "' was built.");
 }
 
 /**
@@ -112,14 +129,17 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
 * @details private static
 * @return
 */
-unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto)
+unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const double radius = get_double(obj.at("radius"));
-    /*const auto &material = get_material(obj.at("material"));*/
+    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
 
-    return std::make_shared<raytracer::shape::Sphere>(position, radius);
+    std::shared_ptr<raytracer::shape::Sphere> sphere =
+        std::make_shared<raytracer::shape::Sphere>(position, radius);
+    sphere.get()->setMaterial(material);
+    return sphere;
 }
 
 /**
@@ -127,15 +147,18 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
 * @details private static
 * @return
 */
-unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const raytracer::parser::JsonProto &proto)
+unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto, const MaterialsList &materials)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
     const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
-    /*const auto &material = get_material(obj.at("material"));*/
+    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
 
-    return std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    std::shared_ptr<raytracer::shape::Rectangle> rectangle =
+        std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    rectangle.get()->setMaterial(material);
+    return rectangle;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +172,7 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
 * @details Entry point
 * @return TODO
 */
-std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonProto &camera_json)
+std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 {
     const auto &obj = std::get<JsonMap>(camera_json.value);
     const math::Vector2u vec2 = get_vec2u(obj.at("resolution"));
@@ -165,7 +188,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonPr
 * @details Entry point
 * @return TODO
 */
-std::unique_ptr<raytracer::Render> create_render(const raytracer::parser::JsonProto &render_json)
+std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = std::get<JsonMap>(render_json.value);
 
@@ -214,7 +237,7 @@ MaterialsList material_factory(const ParsedJson &json_scene)
 * @details factory creating shared objects according to user parsed json configuration
 * @return vector of shared Shape objects
 */
-IShapesList primitive_factory(const ParsedJson &json_primitives)
+IShapesList primitive_factory(const ParsedJson &json_primitives, const MaterialsList &materials)
 {
     const auto &primitives = std::get<JsonMap>(json_primitives.value);
     IShapesList shapes;
@@ -224,14 +247,14 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
         const auto &spheres = std::get<Shapes>(spheres_it->second.value);
         shapes.reserve(shapes.size() + spheres.size());
         for (const auto &e : spheres)
-            shapes.emplace_back(create_sphere(e));
+            shapes.emplace_back(create_sphere(e, materials));
     }
     auto rectangles_it = primitives.find("rectangles");
     if (rectangles_it != primitives.end() && std::holds_alternative<Shapes>(rectangles_it->second.value)) {
         const auto &rectangles = std::get<Shapes>(rectangles_it->second.value);
         shapes.reserve(shapes.size() + rectangles.size());
         for (const auto &e : rectangles)
-            shapes.emplace_back(create_rectangle(e));
+            shapes.emplace_back(create_rectangle(e, materials));
     }
     return shapes;
 }

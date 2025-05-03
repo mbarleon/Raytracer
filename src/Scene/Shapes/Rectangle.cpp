@@ -21,7 +21,7 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
     const math::Vector3D &left_side)
     : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
 {
-    logger::debug("rectangle was built: origin", origin, " bottom_side", bottom_side, " left_side", left_side);
+    logger::debug("Rectangle was built: origin ", origin, " bottom_side ", bottom_side, " left_side ", left_side, ".");
 }
 
 /**

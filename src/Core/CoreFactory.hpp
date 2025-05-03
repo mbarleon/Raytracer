@@ -25,10 +25,10 @@ using MaterialsList = std::unordered_map<std::string, std::shared_ptr<raytracer:
 * TODO: templates?
 */
 
-IShapesList primitive_factory(const raytracer::parser::JsonProto &primitives_json);
+IShapesList primitive_factory(const ParsedJson &json_primitives, const MaterialsList &materials);
 MaterialsList material_factory(const ParsedJson &json_scene);
-std::unique_ptr<raytracer::Camera> create_camera(const raytracer::parser::JsonProto &camera_json);
-std::unique_ptr<raytracer::Render> create_render(const raytracer::parser::JsonProto &render_json);
+std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json);
+std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json);
 
 #if defined(UNIT_TESTS)
     #include "../Scene/Shapes/Rectangle.hpp"
@@ -36,9 +36,10 @@ std::unique_ptr<raytracer::Render> create_render(const raytracer::parser::JsonPr
     #include "Macro.hpp"
 unit_static std::string get_string(const ParsedJson &proto);
 unit_static raytracer::types::RGB_color get_color(const ParsedJson &proto);
-unit_static double get_double(const raytracer::parser::JsonProto &proto);
-unit_static math::Vector3D get_vec3D(const raytracer::parser::JsonProto &proto);
-unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const raytracer::parser::JsonProto &proto);
-unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const raytracer::parser::JsonProto &proto);
+unit_static double get_double(const ParsedJson &proto);
+unit_static math::Vector3D get_vec3D(const ParsedJson &proto);
+unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials);
+unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials);
+unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto, const MaterialsList &materials);
 unit_static void create_material(const ParsedJson &proto, MaterialsList &materials);
 #endif

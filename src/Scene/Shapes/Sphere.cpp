@@ -18,9 +18,10 @@
 * @details
 * @return
 */
-raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radius) : _center(center), _radius(radius)
+raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radius) :
+    _center(center), _radius(radius)
 {
-    logger::debug("sphere was built: ", center);
+    logger::debug("Sphere was built: ", center, ".");
 }
 
 /**

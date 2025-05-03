@@ -8,8 +8,6 @@
 #pragma once
 
 #include "IShape.hpp"
-#include "../Material/Material.hpp"
-#include <memory>
 
 namespace raytracer::shape {
 class AShape : public IShape
@@ -18,7 +16,8 @@ class AShape : public IShape
         AShape() = default;
         ~AShape() override = default;
 
-        //TODO: here material lib like setMAterial getMaterial ect...
+        void setMaterial(const std::shared_ptr<Material> &material) override;
+        std::shared_ptr<Material> getMaterial() const override;
 
     protected:
         std::shared_ptr<Material> _material;

@@ -29,7 +29,7 @@ void raytracer::Core::run(const char *RESTRICT filename)
     const auto &render = scene.at("render");
 
     _materials = material_factory(root.at("scene"));
-    _shapes = primitive_factory(primitives);
+    _shapes = primitive_factory(primitives, _materials);
     _render = create_render(render);
     _camera = create_camera(camera);
     _camera.get()->render(_shapes);

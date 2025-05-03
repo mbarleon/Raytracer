@@ -16,8 +16,8 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
     const math::Vector3D &rotation, const uint field_of_view) : _resolution(resolution),
     _position(position), _rotation(rotation), _fov(field_of_view)
 {
-    logger::debug("camera was built: resolution", resolution, " position", position,
-        " rotation", rotation, " fov: ", field_of_view);
+    logger::debug("Camera was built: resolution ", resolution, " position ", position,
+        " rotation ", rotation, " fov: ", field_of_view, ".");
 }
 
 void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>> &shapes) const noexcept

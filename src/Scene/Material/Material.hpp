@@ -7,7 +7,13 @@
 
 #pragma once
 
+#include "../../../include/Types.hpp"
+
 namespace raytracer {
     typedef struct material {
+        types::RGB_color color;
+        double reflectivity;
+        double transparency;
+        double refractiveIndex;
     } Material;
 };

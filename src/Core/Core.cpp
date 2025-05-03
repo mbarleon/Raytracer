@@ -26,8 +26,11 @@ void raytracer::Core::run(const char *RESTRICT filename)
     const auto &scene = std::get<std::unordered_map<std::string, parser::JsonProto>>(root.at("scene").value);
     const auto &primitives = scene.at("primitives");
     const auto &camera = scene.at("camera");
+    const auto &render = scene.at("render");
 
+    _materials = material_factory(root.at("scene"));
     _shapes = primitive_factory(primitives);
+    _render = create_render(render);
     _camera = create_camera(camera);
     _camera.get()->render(_shapes);
 }

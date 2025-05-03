@@ -4,7 +4,7 @@
             "resolution": { "width": 1920, "height": 1080 },
             "position": { "x": 0, "y": 0, "z": 0 },
             "rotation": { "x": 0, "y": 0, "z": 0 },
-            "fieldOfView": 70
+            "fov": 70
         },
         "render": {
             "background-color": { "r": 135, "g": 206, "b": 250 },
@@ -16,19 +16,24 @@
                 "file": "output.ppm",
                 "format": "ppm" // "ppm", "png", "jpg"
             },
-            "maxDepth": 5 // for reflections/refractions
+            "max-depth": 5 // for reflections/refractions
         },
-        "materials": {
-            "corail-red": {
+        "materials": [
+            {
+                "name": "corail-red",
                 "color": { "r": 255, "g": 64, "b": 64 },
                 "reflectivity": 0.2,
                 "transparency": 0,
-                "refractiveIndex": 1
+                "refractive-index": 1
             },
-            "whale-blue": {
-                "color": { "r": 64, "g": 64, "b": 255 }
+            {
+                "name": "whale-blue",
+                "color": { "r": 64, "g": 64, "b": 255 },
+                "reflectivity": 0.2,
+                "transparency": 0,
+                "refractive-index": 1
             }
-        },
+        ],
         "primitives": {
             "spheres": [
                 {

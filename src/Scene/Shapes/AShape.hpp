@@ -20,8 +20,6 @@ class AShape : public IShape
 
         //TODO: here material lib like setMAterial getMaterial ect...
 
-        // protected:
-        //TODO: shared_ptr of IMaterial ?
     protected:
         std::shared_ptr<material::IMaterial> _material;
 };

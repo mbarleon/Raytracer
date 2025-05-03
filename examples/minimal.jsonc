@@ -7,27 +7,25 @@
             "fieldOfView": 70
         },
         "render": {
-            "background": {
-                "color": { "r": 135, "g": 206, "b": 250 },
-                "antialiasing": {
-                    "type": "supersampling", // "none", "supersampling", "adaptive"
-                    "samples": 4 // for supersampling
-                },
-                "output": {
-                    "file": "output.ppm",
-                    "format": "ppm" // "ppm", "png", "jpg"
-                },
-                "maxDepth": 5 // for reflections/refractions
-            }
+            "background-color": { "r": 135, "g": 206, "b": 250 },
+            "antialiasing": {
+                "type": "supersampling", // "none", "supersampling", "adaptive"
+                "samples": 4 // for supersampling
+            },
+            "output": {
+                "file": "output.ppm",
+                "format": "ppm" // "ppm", "png", "jpg"
+            },
+            "maxDepth": 5 // for reflections/refractions
         },
         "materials": {
-            "corail_red": {
+            "corail-red": {
                 "color": { "r": 255, "g": 64, "b": 64 },
                 "reflectivity": 0.2,
                 "transparency": 0,
                 "refractiveIndex": 1
             },
-            "whale_blue": {
+            "whale-blue": {
                 "color": { "r": 64, "g": 64, "b": 255 }
             }
         },
@@ -36,19 +34,19 @@
                 {
                     "position": { "x": 0, "y": 0, "z": -6 },
                     "radius": 2,
-                    "material": "corail_red"
+                    "material": "corail-red"
                 },
                 {
                     "position": { "x": -1, "y": -1, "z": -6 },
                     "radius": 2,
-                    "material": "whale_blue"
+                    "material": "whale-blue"
                 }
             ],
             "planes": [
                 {
                     "axis": "Z",
                     "position": -20,
-                    "material": "whale_blue"
+                    "material": "whale-blue"
                 }
             ]
         }

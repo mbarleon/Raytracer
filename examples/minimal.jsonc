@@ -47,13 +47,24 @@
                     "material": "whale-blue"
                 }
             ],
+            "rectangles": [
+                {
+                    "origin": { "x": 60, "y": 5, "z": 40 },
+                    "bottom_side": { "x": 10, "y": 20, "z": 30 },
+                    "left_side": { "x": 40, "y": 50, "z": 60 },
+                    "material": "whale-blue"
+                }
+            ],
             "planes": [
                 {
                     "axis": "Z",
                     "position": -20,
                     "material": "whale-blue"
                 }
-            ]
+            ],
+            "cylinders": [],
+            "cones": [],
+            "triangles": []
         }
     }
 }

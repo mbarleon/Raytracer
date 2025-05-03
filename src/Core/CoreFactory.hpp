@@ -34,7 +34,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json);
     #include "../Scene/Shapes/Sphere.hpp"
     #include "Macro.hpp"
 unit_static std::string get_string(const ParsedJson &proto);
-unit_static raytracer::types::RGB_color get_color(const ParsedJson &proto);
+unit_static raytracer::RGB_color get_color(const ParsedJson &proto);
 unit_static double get_double(const ParsedJson &proto);
 unit_static math::Vector3D get_vec3D(const ParsedJson &proto);
 unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials);

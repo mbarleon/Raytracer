@@ -12,7 +12,6 @@
 #include "../Scene/Render/Render.hpp"
 #include "../Scene/Material/Material.hpp"
 #include "../Scene/Shapes/IShape.hpp"
-#include "../../include/Types.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;

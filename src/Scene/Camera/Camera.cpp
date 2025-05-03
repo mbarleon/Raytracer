@@ -22,6 +22,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 
 void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>> &shapes) const noexcept
 {
+    // remplacer par fichier présent dans la catégorie "render"
     std::ofstream ppm("output.ppm");
     if (!ppm.is_open()) {
         std::cerr << "Failed to open output.ppm for writing.\n";
@@ -33,7 +34,10 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
         << "255\n";
 
     math::Ray r = {_position, math::Vector3D()};
+    raytracer::RGB_color px_color;
 
+    // optimiser en ajoutant un tri par distance avec la caméra du vecteur shapes (compatible multi-thread ?)
+    // mettre x et y en paramètre pour ajouter le rendu multi-thread compatible réseau
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             double u = (x + 0.5) / double(_resolution.x);
@@ -41,20 +45,21 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
             ray(u, v, r);
 
             double t_min = std::numeric_limits<double>::infinity();
-            bool hit = false;
+            px_color = {135, 206, 235};
             for (const auto &shape : shapes) {
                 double t;
+                /**
+                 * pour gérer la transparence, créer un autre vecteur de IShape avec uniquement
+                 * les formes entrées en collion avec le ray de la caméra; le trier par distance
+                 * à la fin. additionner les couleurs * la transparence permettra de déterminer
+                 * la couleur du pixel [obj1 * opacity + obj2 * opacity...]
+                 */   
                 if (shape->intersect(r, t) && t < t_min) {
                     t_min = t;
-                    hit = true;
+                    px_color = shape.get()->getMaterial().get()->color;
                 }
             }
-
-            if (hit) {
-                ppm << "255 255 255 ";
-            } else {
-                ppm << "135 206 235 ";
-            }
+            ppm << px_color << ' ';
         }
         ppm << "\n";
     }

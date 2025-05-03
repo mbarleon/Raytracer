@@ -47,7 +47,7 @@ unit_static std::string get_string(const ParsedJson &proto)
 * @details private static
 * @return
 */
-unit_static raytracer::types::RGB_color get_color(const ParsedJson &proto)
+unit_static raytracer::RGB_color get_color(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
 
@@ -113,7 +113,7 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
     const auto &obj = std::get<JsonMap>(proto.value);
 
     const std::string name = get_string(obj.at("name"));
-    const raytracer::types::RGB_color color = get_color(obj.at("color"));
+    const raytracer::RGB_color color = get_color(obj.at("color"));
     const double reflectivity = get_double(obj.at("reflectivity"));
     const double transparency = get_double(obj.at("transparency"));
     const double refractiveIndex = get_double(obj.at("refractive-index"));
@@ -192,7 +192,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = std::get<JsonMap>(render_json.value);
 
-    const raytracer::types::RGB_color bgColor = get_color(obj.at("background-color"));
+    const raytracer::RGB_color bgColor = get_color(obj.at("background-color"));
 
     const auto &anti_obj = std::get<JsonMap>(obj.at("antialiasing").value);
     const raytracer::Antialiasing anti = {get_string(anti_obj.at("type")),

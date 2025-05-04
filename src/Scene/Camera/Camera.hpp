@@ -24,7 +24,7 @@ class Camera final
         explicit Camera(const math::Vector2u &resolution, const math::Point3D &position, const math::Vector3D &rotation, const uint field_of_view);
         ~Camera() = default;
 
-        void ray(double u, double v, math::Ray &cameraRay) const noexcept;
+        void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
         void render(const std::vector<std::shared_ptr<shape::IShape>> &shapes) const noexcept;
 
     private:

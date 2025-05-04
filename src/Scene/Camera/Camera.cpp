@@ -33,7 +33,8 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
         << _resolution.x << " " << _resolution.y << "\n"
         << "255\n";
 
-    math::Ray r = {_position, math::Vector3D()};
+    math::Ray cameraRay = {_position, math::Vector3D()};
+    math::Vector3D intPoint;
     raytracer::RGB_color px_color;
 
     // optimiser en ajoutant un tri par distance avec la caméra du vecteur shapes (compatible multi-thread ?)
@@ -42,21 +43,24 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
         for (unsigned x = 0; x < _resolution.x; ++x) {
             double u = (x + 0.5) / double(_resolution.x);
             double v = (y + 0.5) / double(_resolution.y);
-            ray(u, v, r);
+            generateRay(u, v, cameraRay);
 
-            double t_min = std::numeric_limits<double>::infinity();
-            px_color = {135, 206, 235};
+            double dist_min = std::numeric_limits<double>::infinity();
+            px_color = {0, 0, 0};
             for (const auto &shape : shapes) {
-                double t;
                 /**
                  * pour gérer la transparence, créer un autre vecteur de IShape avec uniquement
                  * les formes entrées en collion avec le ray de la caméra; le trier par distance
                  * à la fin. additionner les couleurs * la transparence permettra de déterminer
                  * la couleur du pixel [obj1 * opacity + obj2 * opacity...]
-                 */   
-                if (shape->intersect(r, t) && t < t_min) {
-                    t_min = t;
-                    px_color = shape.get()->getMaterial().get()->color;
+                 */
+                if (shape->intersect(cameraRay, intPoint)) {
+                    double dist = (intPoint - cameraRay._origin).length();
+
+                    if (dist < dist_min) {
+                        dist_min = dist;
+                        px_color = shape.get()->getMaterial().get()->color;
+                    }
                 }
             }
             ppm << px_color << ' ';
@@ -91,7 +95,7 @@ void raytracer::Camera::render(const std::vector<std::shared_ptr<shape::IShape>>
 //     );
 // }
 
-void raytracer::Camera::ray(double u, double v, math::Ray &cameraRay) const noexcept
+void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) const noexcept
 {
     double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
     double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);

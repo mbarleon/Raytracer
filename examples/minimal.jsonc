@@ -7,7 +7,7 @@
             "fov": 70
         },
         "render": {
-            "background-color": { "r": 135, "g": 206, "b": 250 },
+            "background-color": { "r": 0, "g": 0, "b": 0 },
             "antialiasing": {
                 "type": "supersampling", // "none", "supersampling", "adaptive"
                 "samples": 4 // for supersampling

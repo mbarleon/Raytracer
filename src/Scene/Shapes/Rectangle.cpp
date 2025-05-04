@@ -29,8 +29,9 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
  * @details
  * @return
  */
-bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, double &t) const noexcept
+bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
 {
+    (void)intPoint;
     const math::Vector3D normal = _bottom_side.cross(_left_side).normalize();
     const double denom = normal.dot(ray._dir);
 
@@ -38,7 +39,7 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, double &t) con
         return false;
     }
 
-    t = normal.dot(_origin - ray._origin) / denom;
+    double t = normal.dot(_origin - ray._origin) / denom;
 
     if (t < 0) {
         return false;

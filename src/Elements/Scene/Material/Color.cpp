@@ -6,6 +6,7 @@
 */
 
 #include "Color.hpp"
+#include <numeric>
 
 std::ostream &raytracer::operator<<(std::ostream &os, const RGBColor &self)
 {
@@ -26,4 +27,11 @@ raytracer::RGBColor raytracer::RGBColor::operator+(const RGBColor &other) const
 raytracer::RGBColor raytracer::RGBColor::operator*(double s) const
 {
     return RGBColor(r * s, g * s, b * s);
+}
+
+void raytracer::RGBColor::realign(int maximum)
+{
+    r = std::min(maximum, std::max(0, int(r * maximum)));
+    g = std::min(maximum, std::max(0, int(g * maximum)));
+    b = std::min(maximum, std::max(0, int(b * maximum)));
 }

@@ -23,18 +23,26 @@
         "materials": [
             {
                 "name": "glass",
-                "reflectivity": 0.2, // coefficient de réflexion [0,1]
-                "transparency": 0.0, // coefficient de transparence [0,1]
-                "refractive-index": 1.0, // indice de réfraction (1.0 = air)
+                "reflectivity": 0.05, // coefficient de réflexion [0,1]
+                "transparency": 0.95, // coefficient de transparence [0,1]
+                "refractive-index": 1.5, // indice de réfraction (1.0 = air)
                 "emissive-intensity": 0.0, // emission de lumière en candela
-                "shininess": 50.0
-            },
+                "shininess": 100.0
+            }, 
             {
                 "name": "metal",
-                "reflectivity": 0.2,
+                "reflectivity": 0.90,
                 "transparency": 0.0,
-                "refractive-index": 1.0,
-                "emissive-intensity": 1.0,
+                "refractive-index": 0.0,
+                "emissive-intensity": 0.0,
+                "shininess": 300.0
+            },
+            {
+                "name": "light",
+                "reflectivity": 0.0,
+                "transparency": 0.0,
+                "refractive-index": 0.0,
+                "emissive-intensity": 500.0,
                 "shininess": 50.0
             }
         ],
@@ -45,31 +53,38 @@
                     "position": { "x": 0, "y": 0, "z": -6 },
                     "radius": 2,
                     "material": "glass",
-                    "color": { "r": 255, "g": 64, "b": 64 }
+                    "color": { "r": 0.95, "g": 0.97, "b": 1.00 }
                 },
                 {
                     "position": { "x": -1, "y": -1, "z": -6 },
                     "radius": 2,
                     "material": "metal",
-                    "color": { "r": 64, "g": 64, "b": 255 }
+                    "color": { "r": 0.80, "g": 0.80, "b": 0.80 }
+                },
+                {
+                    "position": { "x": 10, "y": -20, "z": -5 },
+                    "radius": 2,
+                    "material": "light",
+                    "color": { "r": 1.00, "g": 0.90, "b": 0.70 }
                 }
-            ],
+            ]
             // "rectangles": [
             //     {
             //         "origin": { "x": 60, "y": 5, "z": 40 },
             //         "bottom_side": { "x": 10, "y": 20, "z": 30 },
             //         "left_side": { "x": 40, "y": 50, "z": 60 },
-            //         "material": "metal"
+            //         "material": "metal",
+            //         "color": { "r": 64, "g": 64, "b": 255 }
             //     }
             // ],
-            "planes": [
-                {
-                    "axis": "Z",
-                    "position": -20,
-                    "material": "metal",
-                    "color": { "r": 64, "g": 64, "b": 255 }
-                }
-            ]
+            // "planes": [
+            //     {
+            //         "axis": "Z",
+            //         "position": -20,
+            //         "material": "metal",
+            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //     }
+            // ]
             // "cylinders": [],
             // "cones": [],
             // "triangles": [],

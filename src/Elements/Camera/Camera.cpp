@@ -80,13 +80,13 @@ raytracer::RGBColor computeLighting(const math::Point3D &P, const math::Vector3D
 {
     raytracer::RGBColor result(0,0,0);
 
-    for (auto& lightObj : shapes) {
-        const raytracer::Material &Lm = *lightObj->getMaterial().get();
+    for (auto &light : shapes) {
+        const raytracer::Material &Lm = *light->getMaterial().get();
 
         if (Lm.emissiveIntensity <= 0.0)
             continue;
 
-        math::Vector3D Ld = lightObj->getPosition() - P;
+        math::Vector3D Ld = light->getPosition() - P;
         double dist2 = Ld.length() * Ld.length();
         Ld = Ld.normalize();
 
@@ -196,11 +196,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 
             RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
 
-            // conversion de l'interval [0, 1] vers [0, 255] pour l'affichage
-            int R = std::min(255, std::max(0, int(pixel.r * 255)));
-            int G = std::min(255, std::max(0, int(pixel.g * 255)));
-            int B = std::min(255, std::max(0, int(pixel.b * 255)));
-
+            pixel.realign(255);
             ppm << pixel << '\n';
         }
     }

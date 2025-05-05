@@ -26,4 +26,4 @@ class AShape : public IShape
         std::shared_ptr<Material> _material;
         RGBColor _color;
 };
-}// namespace raytracer::shape
+};// namespace raytracer::shape

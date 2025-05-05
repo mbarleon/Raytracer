@@ -9,6 +9,7 @@
 
 #define SUCCESS 0
 #define ERROR 84
+constexpr double EPSILON = 1e-6;
 
 #if defined(_MSC_VER)
     #define RESTRICT __restrict

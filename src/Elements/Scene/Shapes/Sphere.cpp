@@ -29,6 +29,27 @@ raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radiu
 * @details
 * @return
 */
+math::Vector3D raytracer::shape::Sphere::getPosition() const
+{
+    return _center;
+}
+
+/**
+* @brief
+* @details
+* @return
+*/
+math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point) const noexcept
+{
+    math::Vector3D normal = point - _center;
+    return normal.normalize();
+}
+
+/**
+* @brief
+* @details
+* @return
+*/
 bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
 {
     const math::Vector3D o_c = ray._origin - _center;

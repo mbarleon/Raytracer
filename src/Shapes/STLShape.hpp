@@ -21,8 +21,7 @@ class STLShape final: public AShape
 
         [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
     private:
-        struct _Vertex
-        {
+        struct _Vertex {
             float _x, _y, _z;
         };
 
@@ -43,5 +42,6 @@ class STLShape final: public AShape
         uint32_t _n_triangles;
         const char *RESTRICT _filename;
         std::vector<_Triangle>_triangles;
+        static constexpr unsigned int STL_COMMENT_LENGTH = 80;
 };
 }//namespace raytracer::shape

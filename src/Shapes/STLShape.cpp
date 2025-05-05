@@ -16,7 +16,7 @@ void raytracer::shape::STLShape::_openFile()
         throw exception::Error("raytracer::shape::STLShape::_openFile", "Could not open file ", std::string(_filename));
     }
 
-    _file.seekg(80, std::ios::beg);
+    _file.seekg(STL_COMMENT_LENGTH, std::ios::beg);
     if (!_file) {
         throw exception::Error("raytracer::shape::STLShape::_openFile", "Could not read from file ", std::string(_filename));
     }
@@ -38,13 +38,13 @@ void raytracer::shape::STLShape::_getTriangles()
 {
     for (uint32_t i = 0; i < _n_triangles; ++i) {
         uint16_t control;
-        _Vertex vecs[4];
+        _Vertex vertex_array[4];
 
-        for (auto &vec : vecs) {
-            _file.read(reinterpret_cast<char *>(&vec), sizeof(float) * 3);
+        for (auto &vert : vertex_array) {
+            _file.read(reinterpret_cast<char *>(&vert), sizeof(float) * 3);
             _checkRead(sizeof(float) * 3);
         }
-        _triangles.push_back(_Triangle(vecs));
+        _triangles.push_back(_Triangle(vertex_array));
         _file.read(reinterpret_cast<char *>(&control), sizeof(uint16_t));
         _checkRead(sizeof(uint16_t));
     }
@@ -102,7 +102,7 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
 
 bool raytracer::shape::STLShape::intersect(const math::Ray &ray) const noexcept override
 {
-    for (auto &triangle : _triangles) {
+    for (const auto &triangle : _triangles) {
         if (_intersectTriangle(ray, triangle)) {
             return true;
         }

@@ -8,6 +8,7 @@
 #include "CoreFactory.hpp"
 #include "../Elements/Scene/Shapes/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Plane.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 #include "../../include/Logger.hpp"
@@ -167,6 +168,28 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     return rectangle;
 }
 
+/**
+* @brief
+* @details private static
+* @return
+*/
+unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto, const MaterialsList &materials)
+{
+    const auto &obj = std::get<JsonMap>(proto.value);
+    const std::string str = get_string(obj.at("axis"));
+    const double position = get_double(obj.at("position"));
+    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::RGBColor color = get_color(obj.at("color"));
+
+    if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z')
+        throw raytracer::exception::Error("Core", "Invalid plane axis");
+    std::shared_ptr<raytracer::shape::Plane> plane =
+        std::make_shared<raytracer::shape::Plane>(str[0], position);
+    plane.get()->setMaterial(material);
+    plane.get()->setColor(color);
+    return plane;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
@@ -261,6 +284,13 @@ IShapesList primitive_factory(const ParsedJson &json_primitives, const Materials
         shapes.reserve(shapes.size() + rectangles.size());
         for (const auto &e : rectangles)
             shapes.emplace_back(create_rectangle(e, materials));
+    }
+    auto planes_it = primitives.find("planes");
+    if (planes_it != primitives.end() && std::holds_alternative<Shapes>(planes_it->second.value)) {
+        const auto &planes = std::get<Shapes>(planes_it->second.value);
+        shapes.reserve(shapes.size() + planes.size());
+        for (const auto &e : planes)
+            shapes.emplace_back(create_plane(e, materials));
     }
     return shapes;
 }

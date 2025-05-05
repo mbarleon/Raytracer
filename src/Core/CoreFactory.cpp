@@ -115,12 +115,15 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
     const double reflectivity = get_double(obj.at("reflectivity"));
     const double transparency = get_double(obj.at("transparency"));
     const double refractiveIndex = get_double(obj.at("refractive-index"));
+    const double emissiveIntensity = get_double(obj.at("emissive-intensity"));
     const double shininess = get_double(obj.at("shininess"));
 
     std::shared_ptr<raytracer::Material> material =
-        std::make_shared<raytracer::Material>(reflectivity, transparency, refractiveIndex, shininess);
+        std::make_shared<raytracer::Material>(reflectivity, transparency, refractiveIndex, emissiveIntensity, shininess);
     materials[name] = material;
-    raytracer::logger::debug("Material '", name, "' was built.");
+    raytracer::logger::debug("Material was built: { name: ", name, ", reflectivity: ", reflectivity,
+        ", transparency: ", transparency, ", refractiveIndex: ", refractiveIndex, ", emissiveIntensity: ",
+        emissiveIntensity, ", shininess: ", shininess, " }.");
 }
 
 /**

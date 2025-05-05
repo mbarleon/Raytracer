@@ -32,8 +32,11 @@ raytracer::RGBColor raytracer::RGBColor::operator*(double s) const
     return RGBColor(r * s, g * s, b * s);
 }
 
-void raytracer::RGBColor::realign(int maximum)
+void raytracer::RGBColor::realign(double oldMaximum, int maximum)
 {
+    r = std::min(oldMaximum, std::max(0.0, r));
+    g = std::min(oldMaximum, std::max(0.0, g));
+    b = std::min(oldMaximum, std::max(0.0, b));
     r = std::min(maximum, std::max(0, int(r * maximum)));
     g = std::min(maximum, std::max(0, int(g * maximum)));
     b = std::min(maximum, std::max(0, int(b * maximum)));

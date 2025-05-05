@@ -41,7 +41,7 @@ raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const mat
 
 raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
-    const render &render)
+    const Render &render)
 {
     math::Vector3D I = ray._dir.normalize();
     math::Vector3D N = intersect.normal;
@@ -76,7 +76,7 @@ inline math::Vector3D raytracer::reflect(const math::Vector3D &I, const math::Ve
 }
 
 raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const math::Vector3D &N,
-    const math::Vector3D &V, const Material &M, const IShapesList &shapes)
+    const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M, const IShapesList &shapes)
 {
     RGBColor result(0,0,0);
 
@@ -92,25 +92,27 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 
         math::Ray shadowRay { P + N * EPSILON, Ld };
         math::Intersect tmp;
-
-        if (!(findClosestIntersection(shadowRay, shapes, tmp)
+        bool blocked = findClosestIntersection(shadowRay, shapes, tmp)
         && tmp.distance * tmp.distance < dist2
-        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0)) {
-            // atténuation (1/d²) × intensité (candela)
-            double I = Lm.emissiveIntensity / dist2;
+        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0;
 
-            // composante diffuse : diffuseColor × I × max(0, N·L)
-            double NdotL = std::max(0.0, N.dot(Ld));
-            RGBColor diffuse = tmp.object.get()->getColor() * (I * NdotL);
+        if (blocked)
+            continue;
 
-            // composante spéculaire : blanc × I × (max(0,R·V)^shininess)
-            math::Vector3D R = reflect(-Ld, N);
-            double RdotV = std::max(0.0, R.dot(V));
-            RGBColor specular(1,1,1);
-            specular = specular * (I * std::pow(RdotV, M.shininess));
+        // atténuation (1/d²) × intensité (candela)
+        double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
 
-            result = result + diffuse + specular;
-        }
+        // composante diffuse : diffuseColor × I × max(0, N·L)
+        double NdotL = std::max(0.0, N.dot(Ld));
+        RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
+
+        // composante spéculaire : blanc × I × (max(0,R·V)^shininess)
+        math::Vector3D R = reflect(-Ld, N);
+        double RdotV = std::max(0.0, R.dot(V));
+        RGBColor specular(1,1,1);
+        specular = specular * (I * std::pow(RdotV, M.shininess));
+
+        result = result + diffuse + specular;
     }
     return result;
 }
@@ -122,7 +124,7 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
     math::Vector3D viewDir = -ray._dir;
 
     RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
-        *intersect.object->getMaterial(), shapes);
+        intersect.object.get()->getColor(), *intersect.object.get()->getMaterial(), shapes);
 
     RGBColor reflected(0,0,0);
     if (intersect.object->getMaterial()->reflectivity > 0.0)
@@ -143,11 +145,10 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     math::Intersect &intersect)
 {
     double distMin = std::numeric_limits<double>::infinity();
+    math::Point3D intersectPoint;
     bool hit = false;
 
-    for (auto& shape : shapes) {
-        math::Point3D intersectPoint;
-
+    for (auto &shape : shapes) {
         if (shape->intersect(ray, intersectPoint)) {
             double dist = (intersectPoint - ray._origin).length();
             if (dist < distMin) {
@@ -192,11 +193,13 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
-            generateRay(x, y, cameraRay);
+            double u = (x + 0.5) / double(_resolution.x);
+            double v = (y + 0.5) / double(_resolution.y);
+            generateRay(u, v, cameraRay);
 
             RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
 
-            pixel.realign(255);
+            pixel.realign(1, 255);
             ppm << pixel << '\n';
         }
     }
@@ -236,6 +239,8 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 
 void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) const noexcept
 {
+    cameraRay._origin = _position;
+
     double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
     double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);
 

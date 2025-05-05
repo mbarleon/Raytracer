@@ -19,7 +19,7 @@ namespace raytracer {
         RGBColor(double red, double green, double blue);
         RGBColor operator+(const RGBColor &other) const;
         RGBColor operator*(double s) const;
-        void realign(int maximum);
+        void realign(double oldMaximum, int maximum);
     } RGBColor;
 
     std::ostream &operator<<(std::ostream &os, const RGBColor &self);

@@ -9,7 +9,7 @@
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
         },
-        "max-depth": 5 // reflection and refraction limit
+        "max-depth": 50 // reflection and refraction limit
     },
 
     "camera": {
@@ -42,7 +42,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 500.0,
+                "emissive-intensity": 10.0,
                 "shininess": 50.0
             }
         ],
@@ -62,7 +62,7 @@
                     "color": { "r": 0.80, "g": 0.80, "b": 0.80 }
                 },
                 {
-                    "position": { "x": 10, "y": -20, "z": -5 },
+                    "position": { "x": 3, "y": 4, "z": -4 },
                     "radius": 2,
                     "material": "light",
                     "color": { "r": 1.00, "g": 0.90, "b": 0.70 }

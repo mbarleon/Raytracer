@@ -15,6 +15,7 @@ namespace raytracer {
         double g;
         double b;
 
+        RGBColor();
         RGBColor(double red, double green, double blue);
         RGBColor operator+(const RGBColor &other) const;
         RGBColor operator*(double s) const;

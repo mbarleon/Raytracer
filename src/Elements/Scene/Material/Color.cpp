@@ -14,8 +14,11 @@ std::ostream &raytracer::operator<<(std::ostream &os, const RGBColor &self)
     return os;
 }
 
-raytracer::RGBColor::RGBColor(double red, double green, double blue) :
-    r(red), g(green), b(blue)
+raytracer::RGBColor::RGBColor() : r(0), g(0), b(0)
+{
+}
+
+raytracer::RGBColor::RGBColor(double red, double green, double blue) : r(red), g(green), b(blue)
 {
 }
 

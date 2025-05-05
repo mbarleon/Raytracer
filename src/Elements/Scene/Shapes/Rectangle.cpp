@@ -18,8 +18,7 @@
  * @return
  */
 raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side,
-    const math::Vector3D &left_side)
-    : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
+    const math::Vector3D &left_side) : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
 {
     logger::debug("Rectangle was built: origin ", origin, " bottom_side ", bottom_side, " left_side ", left_side, ".");
 }
@@ -54,4 +53,15 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D 
     const double proj_bottom = v.dot(_bottom_side) / bottom_length;
     const double proj_left = v.dot(_left_side / left_length);
     return proj_bottom >= 0 && proj_bottom <= bottom_length && proj_left >= 0 && proj_left <= left_length;
+}
+
+math::Vector3D raytracer::shape::Rectangle::getPosition() const
+{
+    return math::Vector3D();
+}
+
+math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D &point) const noexcept
+{
+    (void)point;
+    return math::Vector3D();
 }

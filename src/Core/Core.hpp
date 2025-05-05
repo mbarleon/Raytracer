@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../Scene/Camera/Camera.hpp"
-#include "../Scene/Shapes/IShape.hpp"
-#include "../Scene/Material/Material.hpp"
-#include "../Scene/Render/Render.hpp"
+#include "../Elements/Camera/Camera.hpp"
+#include "../Elements/Scene/Shapes/IShape.hpp"
+#include "../Elements/Scene/Material/Material.hpp"
+#include "../Elements/Render/Render.hpp"
 #include "Macro.hpp"
 #include <unordered_map>
 #include <memory>

@@ -38,7 +38,7 @@ file (GLOB PARSER_SOURCE
     "src/Parser/*.cpp")
 
 file(GLOB_RECURSE SCENE_SOURCE
-    "src/Scene/*.cpp")
+    "src/Elements/*.cpp")
 
 
 add_executable(raytracer

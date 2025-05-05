@@ -15,6 +15,9 @@ class Rectangle final : public AShape
     public:
         Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side, const math::Vector3D &left_side);
 
+        math::Vector3D getPosition() const override;
+        math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
+
         [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept;
 
     private:

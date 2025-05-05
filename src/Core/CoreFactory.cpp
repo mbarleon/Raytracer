@@ -6,8 +6,8 @@
 */
 
 #include "CoreFactory.hpp"
-#include "../Scene/Shapes/Rectangle.hpp"
-#include "../Scene/Shapes/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Rectangle.hpp"
+#include "../Elements/Scene/Shapes/Sphere.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 #include "../../include/Logger.hpp"
@@ -47,13 +47,12 @@ unit_static std::string get_string(const ParsedJson &proto)
 * @details private static
 * @return
 */
-unit_static raytracer::RGB_color get_color(const ParsedJson &proto)
+unit_static raytracer::RGBColor get_color(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
 
-    return {static_cast<unsigned char>(get_double(obj.at("r"))),
-        static_cast<unsigned char>(get_double(obj.at("g"))),
-        static_cast<unsigned char>(get_double(obj.at("b")))};
+    return raytracer::RGBColor(get_double(obj.at("r")),
+        get_double(obj.at("g")), get_double(obj.at("b")));
 }
 
 /**
@@ -113,13 +112,13 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
     const auto &obj = std::get<JsonMap>(proto.value);
 
     const std::string name = get_string(obj.at("name"));
-    const raytracer::RGB_color color = get_color(obj.at("color"));
     const double reflectivity = get_double(obj.at("reflectivity"));
     const double transparency = get_double(obj.at("transparency"));
     const double refractiveIndex = get_double(obj.at("refractive-index"));
+    const double shininess = get_double(obj.at("shininess"));
 
     std::shared_ptr<raytracer::Material> material =
-        std::make_shared<raytracer::Material>(color, reflectivity, transparency, refractiveIndex);
+        std::make_shared<raytracer::Material>(reflectivity, transparency, refractiveIndex, shininess);
     materials[name] = material;
     raytracer::logger::debug("Material '", name, "' was built.");
 }
@@ -135,10 +134,12 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const double radius = get_double(obj.at("radius"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::RGBColor color = get_color(obj.at("color"));
 
     std::shared_ptr<raytracer::shape::Sphere> sphere =
         std::make_shared<raytracer::shape::Sphere>(position, radius);
     sphere.get()->setMaterial(material);
+    sphere.get()->setColor(color);
     return sphere;
 }
 
@@ -154,10 +155,12 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::RGBColor color = get_color(obj.at("color"));
 
     std::shared_ptr<raytracer::shape::Rectangle> rectangle =
         std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
     rectangle.get()->setMaterial(material);
+    rectangle.get()->setColor(color);
     return rectangle;
 }
 
@@ -192,7 +195,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = std::get<JsonMap>(render_json.value);
 
-    const raytracer::RGB_color bgColor = get_color(obj.at("background-color"));
+    const raytracer::RGBColor bgColor = get_color(obj.at("background-color"));
 
     const auto &anti_obj = std::get<JsonMap>(obj.at("antialiasing").value);
     const raytracer::Antialiasing anti = {get_string(anti_obj.at("type")),

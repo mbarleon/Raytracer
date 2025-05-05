@@ -22,15 +22,15 @@
 void raytracer::Core::run(const char *RESTRICT filename)
 {
     const parser::JsonValue jsonc = parser::parseJsonc(filename);
-    const auto &root = std::get<std::unordered_map<std::string, parser::JsonProto>>(jsonc);
-    const auto &scene = std::get<std::unordered_map<std::string, parser::JsonProto>>(root.at("scene").value);
+    const auto &root = std::get<JsonMap>(jsonc);
+    const auto &render = root.at("render");
+    const auto &camera = root.at("camera");
+    const auto &scene = std::get<JsonMap>(root.at("scene").value);
     const auto &primitives = scene.at("primitives");
-    const auto &camera = scene.at("camera");
-    const auto &render = scene.at("render");
 
     _materials = material_factory(root.at("scene"));
     _shapes = primitive_factory(primitives, _materials);
     _render = create_render(render);
     _camera = create_camera(camera);
-    _camera.get()->render(_shapes);
+    _camera.get()->render(_shapes, *_render.get());
 }

@@ -13,7 +13,6 @@ namespace raytracer::shape {
 class AShape : public IShape
 {
     public:
-        AShape() = default;
         ~AShape() override = default;
 
         void setMaterial(const std::shared_ptr<Material> &material) override;

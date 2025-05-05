@@ -26,10 +26,8 @@ int main(const int argc, char **argv)
     try {
         if (raytracer::parser::parse_arguments(argc, argv)) {
             raytracer::Core core;
-
             core.run(argv[1]);
         }
-
     } catch (raytracer::exception::Error &e) {
         raytracer::logger::error(e);
         return ERROR;

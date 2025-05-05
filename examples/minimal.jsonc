@@ -1,70 +1,79 @@
 {
+    "render": {
+        "background-color": { "r": 0, "g": 0, "b": 0 },
+        "antialiasing": {
+            "type": "supersampling", // "none", "supersampling", "adaptive"
+            "samples": 4 // for supersampling
+        },
+        "output": {
+            "file": "output.ppm",
+            "format": "ppm" // "ppm", "png", "jpg"
+        },
+        "max-depth": 5 // reflection and refraction limit
+    },
+
+    "camera": {
+        "resolution": { "width": 1920, "height": 1080 },
+        "position": { "x": 0, "y": 0, "z": 0 },
+        "rotation": { "x": 0, "y": 0, "z": 0 },
+        "fov": 70
+    },
+
     "scene": {
-        "camera": {
-            "resolution": { "width": 1920, "height": 1080 },
-            "position": { "x": 0, "y": 0, "z": 0 },
-            "rotation": { "x": 0, "y": 0, "z": 0 },
-            "fov": 70
-        },
-        "render": {
-            "background-color": { "r": 0, "g": 0, "b": 0 },
-            "antialiasing": {
-                "type": "supersampling", // "none", "supersampling", "adaptive"
-                "samples": 4 // for supersampling
-            },
-            "output": {
-                "file": "output.ppm",
-                "format": "ppm" // "ppm", "png", "jpg"
-            },
-            "max-depth": 5 // for reflections/refractions
-        },
         "materials": [
             {
-                "name": "corail-red",
-                "color": { "r": 255, "g": 64, "b": 64 },
-                "reflectivity": 0.2,
-                "transparency": 0,
-                "refractive-index": 1
+                "name": "glass",
+                "reflectivity": 0.2, // coefficient de réflexion [0,1]
+                "transparency": 0.0, // coefficient de transparence [0,1]
+                "refractive-index": 1.0, // indice de réfraction (1.0 = air)
+                "emissive-intensity": 0.0, // emission de lumière en candela
+                "shininess": 50.0
             },
             {
-                "name": "whale-blue",
-                "color": { "r": 64, "g": 64, "b": 255 },
+                "name": "metal",
                 "reflectivity": 0.2,
-                "transparency": 0,
-                "refractive-index": 1
+                "transparency": 0.0,
+                "refractive-index": 1.0,
+                "emissive-intensity": 1.0,
+                "shininess": 50.0
             }
         ],
+
         "primitives": {
             "spheres": [
                 {
                     "position": { "x": 0, "y": 0, "z": -6 },
                     "radius": 2,
-                    "material": "corail-red"
+                    "material": "glass",
+                    "color": { "r": 255, "g": 64, "b": 64 }
                 },
                 {
                     "position": { "x": -1, "y": -1, "z": -6 },
                     "radius": 2,
-                    "material": "whale-blue"
+                    "material": "metal",
+                    "color": { "r": 64, "g": 64, "b": 255 }
                 }
             ],
-            "rectangles": [
-                {
-                    "origin": { "x": 60, "y": 5, "z": 40 },
-                    "bottom_side": { "x": 10, "y": 20, "z": 30 },
-                    "left_side": { "x": 40, "y": 50, "z": 60 },
-                    "material": "whale-blue"
-                }
-            ],
+            // "rectangles": [
+            //     {
+            //         "origin": { "x": 60, "y": 5, "z": 40 },
+            //         "bottom_side": { "x": 10, "y": 20, "z": 30 },
+            //         "left_side": { "x": 40, "y": 50, "z": 60 },
+            //         "material": "metal"
+            //     }
+            // ],
             "planes": [
                 {
                     "axis": "Z",
                     "position": -20,
-                    "material": "whale-blue"
+                    "material": "metal",
+                    "color": { "r": 64, "g": 64, "b": 255 }
                 }
-            ],
-            "cylinders": [],
-            "cones": [],
-            "triangles": []
+            ]
+            // "cylinders": [],
+            // "cones": [],
+            // "triangles": [],
+            // "scenes": [] // composite design pattern
         }
     }
 }

@@ -40,6 +40,11 @@ math::Vector3D &math::Vector3D::operator+=(const Vector3D &other)
     return *this;
 }
 
+math::Vector3D math::Vector3D::operator-() const
+{
+    return Vector3D(-_x, -_y, -_z);
+}
+
 math::Vector3D math::Vector3D::operator-(const Vector3D &other) const
 {
     return Vector3D(_x - other._x, _y - other._y, _z - other._z);

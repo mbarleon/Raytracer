@@ -8,10 +8,10 @@
 #pragma once
 
 #include "../Parser/ParserTypes.hpp"
-#include "../Scene/Camera/Camera.hpp"
-#include "../Scene/Render/Render.hpp"
-#include "../Scene/Material/Material.hpp"
-#include "../Scene/Shapes/IShape.hpp"
+#include "../Elements/Camera/Camera.hpp"
+#include "../Elements/Render/Render.hpp"
+#include "../Elements/Scene/Material/Material.hpp"
+#include "../Elements/Scene/Shapes/IShape.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;

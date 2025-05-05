@@ -11,9 +11,10 @@
 
 namespace raytracer {
     typedef struct material {
-        RGB_color color;
         double reflectivity;
         double transparency;
         double refractiveIndex;
+        double emissiveIntensity;
+        double shininess;
     } Material;
 };

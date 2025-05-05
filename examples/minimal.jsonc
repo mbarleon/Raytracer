@@ -9,12 +9,12 @@
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
         },
-        "max-depth": 50 // reflection and refraction limit
+        "max-depth": 10 // reflection and refraction limit
     },
 
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 0, "z": 0 },
+        "position": { "x": 0, "y": 0, "z": 10 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 70
     },
@@ -30,12 +30,12 @@
                 "shininess": 100.0
             }, 
             {
-                "name": "metal",
-                "reflectivity": 0.90,
+                "name": "ground",
+                "reflectivity": 0.10,
                 "transparency": 0.0,
-                "refractive-index": 0.0,
+                "refractive-index": 1.9,
                 "emissive-intensity": 0.0,
-                "shininess": 300.0
+                "shininess": 20.0
             },
             {
                 "name": "light",
@@ -49,42 +49,42 @@
 
         "primitives": {
             "spheres": [
+                // {
+                //     "position": { "x": 0, "y": 0, "z": -6 },
+                //     "radius": 2,
+                //     "material": "glass",
+                //     "color": { "r": 0.95, "g": 0.97, "b": 1.00 }
+                // },
                 {
-                    "position": { "x": 0, "y": 0, "z": -6 },
+                    "position": { "x": 4.8, "y": 4.17, "z": -8.12 },
                     "radius": 2,
-                    "material": "glass",
-                    "color": { "r": 0.95, "g": 0.97, "b": 1.00 }
-                },
-                {
-                    "position": { "x": -1, "y": -1, "z": -6 },
-                    "radius": 2,
-                    "material": "metal",
-                    "color": { "r": 0.80, "g": 0.80, "b": 0.80 }
+                    "material": "light",
+                    "color": { "r": 0.90, "g": 0.0, "b": 0.0 }
                 },
                 {
                     "position": { "x": 3, "y": 4, "z": -4 },
                     "radius": 2,
-                    "material": "light",
-                    "color": { "r": 1.00, "g": 0.90, "b": 0.70 }
+                    "material": "ground",
+                    "color": { "r": 1.00, "g": 0.0, "b": 0.0 }
                 }
-            ]
+            ],
             // "rectangles": [
             //     {
             //         "origin": { "x": 60, "y": 5, "z": 40 },
             //         "bottom_side": { "x": 10, "y": 20, "z": 30 },
             //         "left_side": { "x": 40, "y": 50, "z": 60 },
-            //         "material": "metal",
+            //         "material": "ground",
             //         "color": { "r": 64, "g": 64, "b": 255 }
             //     }
             // ],
-            // "planes": [
-            //     {
-            //         "axis": "Z",
-            //         "position": -20,
-            //         "material": "metal",
-            //         "color": { "r": 64, "g": 64, "b": 255 }
-            //     }
-            // ]
+            "planes": [
+                {
+                    "axis": "Y",
+                    "position": -3,
+                    "material": "ground",
+                    "color": { "r": 0.0, "g": 0.94, "b": 0.0 }
+                }
+            ]
             // "cylinders": [],
             // "cones": [],
             // "triangles": [],

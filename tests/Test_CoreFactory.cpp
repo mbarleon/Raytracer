@@ -14,14 +14,13 @@ using JsonMap = std::unordered_map<std::string, raytracer::parser::JsonProto>;
 Test(create_camera, test_primitive_factory_camera)
 {
     const std::string input =
-        "{\"scene\": {\"camera\": {\"resolution\": {\"width\": 1920,\"height\": 1080, },\"position\": {\"x\": 0,\"y\": -100,\"z\": 20, },\"rotation\": {\"x\": 0,\"y\": 0,\"z\": 0, },\"fov\": 70, }, }, }";
+        "{\"camera\": {\"resolution\": {\"width\": 1920,\"height\": 1080, },\"position\": {\"x\": 0,\"y\": -100,\"z\": 20, },\"rotation\": {\"x\": 0,\"y\": 0,\"z\": 0, },\"fov\": 70, }, }";
 
     auto it = input.begin();
     const auto end = input.end();
     const auto &jsonc = raytracer::parser::parseValue(it, end);
     const auto &root = std::get<JsonMap>(jsonc);
-    const auto &scene = std::get<JsonMap>(root.at("scene").value);
-    const auto &camera = scene.at("camera");
+    const auto &camera = root.at("camera");
     const std::unique_ptr<raytracer::Camera> camera_ptr = create_camera(camera);
 
     cr_assert_not_null(camera_ptr);
@@ -30,7 +29,7 @@ Test(create_camera, test_primitive_factory_camera)
 Test(primitive_factory, test_primitive_factory_camera)
 {
     const std::string input =
-        "{ \"scene\": { \"camera\": { \"resolution\": { \"width\": 1920, \"height\": 1080 }, \"position\": { \"x\": 0, \"y\": 0, \"z\": 0 }, \"rotation\": { \"x\": 0, \"y\": 0, \"z\": 0 }, \"fov\": 70 },\"render\": { \"background-color\": { \"r\": 135, \"g\": 206, \"b\": 250 }, \"antialiasing\": { \"type\": \"supersampling\", \"samples\": 4}, \"output\": { \"file\": \"output.ppm\", \"format\": \"ppm\" }, \"max-depth\": 5 }, \"materials\": [ { \"name\": \"corail-red\", \"color\": { \"r\": 255, \"g\": 64, \"b\": 64 }, \"reflectivity\": 0.2,\"transparency\": 0, \"refractive-index\": 1 } ], \"primitives\": { \"spheres\": [ {\"position\": { \"x\": 0, \"y\": 0, \"z\": -6 }, \"radius\": 2, \"material\": \"corail-red\" } ],}}}";
+        "{\"render\": {\"background-color\": { \"r\": 0, \"g\": 0, \"b\": 0 },\"antialiasing\": {\"type\": \"supersampling\",\"samples\": 4},\"output\": {\"file\": \"output.ppm\",\"format\": \"ppm\"},\"max-depth\": 10},\"camera\": {\"resolution\": { \"width\": 1920, \"height\": 1080 },\"position\": { \"x\": 0, \"y\": 0, \"z\": 10 },\"rotation\": { \"x\": 0, \"y\": 0, \"z\": 0 },\"fov\": 70},\"scene\": {\"materials\": [{\"name\": \"light\",\"reflectivity\": 0.0,\"transparency\": 0.0,\"refractive-index\": 0.0,\"emissive-intensity\": 10.0, \"shininess\": 50.0}],\"primitives\": {\"spheres\": [{\"position\": { \"x\": 4.8, \"y\": 4.17, \"z\": -8.12 },\"radius\": 2,\"material\": \"light\",\"color\": { \"r\": 0.90, \"g\": 0.0, \"b\": 0.0 }}]}}}";
 
     auto it = input.begin();
     const auto end = input.end();

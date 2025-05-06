@@ -5,6 +5,7 @@
 ** Logger.cpp
 */
 
+#define PROGRESS_BAR_ENABLE
 #include "Logger.hpp"
 #include <iomanip>
 #include <iostream>
@@ -34,21 +35,45 @@ void raytracer::logger::error(const exception::Error &e)
 */
 void raytracer::logger::progress_bar(const float total_wait, const float current_state)
 {
-    if (total_wait == 0 || current_state > total_wait) {
+    if (total_wait <= 0.0f || current_state > total_wait) {
         return;
     }
 
-    const float progress = static_cast<float>(current_state) / static_cast<float>(total_wait);
-    const float filled = static_cast<float>(progress * PROGRESS_BAR_WIDTH);
-    const float percent = progress * HUNDRED_PERCENT;
+    static bool cursor_hidden = false;
+    const float progress = current_state / total_wait;
+    const uint32 filled_length = static_cast<uint32>(progress * PROGRESS_BAR_WIDTH);
+    const uint32 percent = static_cast<uint32>(progress * HUNDRED_PERCENT);
+    const uint32 segment_size = PROGRESS_BAR_WIDTH / NUM_COLORS;
+
+    if (!cursor_hidden) {
+        std::cerr << "\x1b[?25l";
+        cursor_hidden = true;
+    }
 
     std::cerr << "\r[";
+
     for (uint32 i = 0; i < PROGRESS_BAR_WIDTH; ++i) {
-        std::cerr << (i < static_cast<uint32>(filled) ? "━" : " ");
+
+        if (i < filled_length) {
+            uint32 idx = i / segment_size;
+
+            if (idx >= NUM_COLORS) {
+                idx = NUM_COLORS - 1;
+            }
+
+            std::cerr << colored_blocks[idx];
+
+        } else {
+            std::cerr << ' ';
+        }
     }
-    std::cerr << "] " << std::setw(PROGRESS_BAR_SET_WIDTH) << static_cast<int>(percent) << "%";
+
+    std::cerr << "] " << std::setw(PROGRESS_BAR_SET_WIDTH) << percent << "%";
 
     if (current_state == total_wait) {
-        std::cerr << std::endl;
+        std::cerr << "\x1b[?25h\n";
+        cursor_hidden = false;
+    } else {
+        std::cerr << std::flush;
     }
 }

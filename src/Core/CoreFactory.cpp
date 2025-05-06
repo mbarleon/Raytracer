@@ -218,17 +218,20 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = std::get<JsonMap>(render_json.value);
 
-    const raytracer::RGBColor bgColor = get_color(obj.at("background-color"));
-
     const auto &anti_obj = std::get<JsonMap>(obj.at("antialiasing").value);
     const raytracer::Antialiasing anti = {get_string(anti_obj.at("type")),
         static_cast<unsigned int>(get_double(anti_obj.at("samples")))};
 
+    const auto &ambi_obj = std::get<JsonMap>(obj.at("ambient-light").value);
+    const raytracer::AmbiantLight ambi = {get_color(ambi_obj.at("color")),
+        get_double(ambi_obj.at("intensity"))};
+
+    const double mdepth = static_cast<uint>(get_double(obj.at("max-depth")));
+
     const auto &out_obj = std::get<JsonMap>(obj.at("output").value);
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    const double mdepth = static_cast<uint>(get_double(obj.at("max-depth")));
-    return std::make_unique<raytracer::Render>(bgColor, anti, output, mdepth);
+    return std::make_unique<raytracer::Render>(anti, ambi, mdepth, output);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

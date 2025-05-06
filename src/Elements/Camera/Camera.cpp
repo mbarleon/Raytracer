@@ -120,11 +120,18 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
     const IShapesList & shapes, unsigned int depth, const Render &render)
 {
+    const RGBColor surfaceColor = intersect.object.get()->getColor();
+    RGBColor ambientTerm = RGBColor(
+        surfaceColor.r * render.ambiantLight.color.r,
+        surfaceColor.g * render.ambiantLight.color.g,
+        surfaceColor.b * render.ambiantLight.color.b
+    ) * render.ambiantLight.intensity;
+
     // turn direction to camera
     const math::Vector3D viewDir = -ray._dir;
 
     const RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
-        intersect.object.get()->getColor(), *intersect.object.get()->getMaterial(), shapes);
+        surfaceColor, *intersect.object.get()->getMaterial(), shapes);
 
     RGBColor reflected(0,0,0);
     if (intersect.object->getMaterial()->reflectivity > 0.0)
@@ -138,7 +145,7 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
     const double T = intersect.object->getMaterial().get()->transparency;
     const double K = std::max(0.0, 1.0 - R - T);
 
-    return local * K + reflected * R + refracted * T;
+    return ambientTerm + local * K + reflected * R + refracted * T;
 }
 
 bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,

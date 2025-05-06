@@ -1,15 +1,18 @@
 {
     "render": {
-        "background-color": { "r": 0, "g": 0, "b": 0 },
         "antialiasing": {
             "type": "supersampling", // "none", "supersampling", "adaptive"
             "samples": 4 // for supersampling
         },
+        "ambient-light": {
+            "color": { "r": 0.12, "g": 0.12, "b": 0.15 },
+            "intensity": 1.0
+        },
+        "max-depth": 10, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
-        },
-        "max-depth": 10 // reflection and refraction limit
+        }
     },
 
     "camera": {

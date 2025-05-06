@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include "../Scene/Material/Color.hpp"
 #include "Antialiasing.hpp"
 #include "Output.hpp"
+#include "AmbiantLight.hpp"
 
 // clang-format off
 namespace raytracer {
 typedef struct render {
-	RGBColor background;
 	Antialiasing antialiasing;
-	RenderOutput output;
+	AmbiantLight ambiantLight;
 	unsigned int maxDepth;
+	RenderOutput output;
 } Render;
 };// namespace raytracer
 // clang-format on

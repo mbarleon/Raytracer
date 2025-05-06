@@ -5,11 +5,12 @@
             "samples": 4 // for supersampling
         },
         "background-color": { "r": 0, "g": 0, "b": 0 },
-        "ambient-light": {
-            "color": { "r": 255, "g": 255, "b": 255 },
-            "intensity": 0.7
+        "lighting": {
+            "ambient": 0.4,
+            "diffuse": 0.6,
+            "specular": 0.5
         },
-        "max-depth": 10, // reflection and refraction limit
+        "max-depth": 50, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
@@ -18,7 +19,7 @@
 
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": -100, "z": 20 },
+        "position": { "x": 0, "y": -150, "z": 20 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
@@ -35,9 +36,9 @@
             }, 
             {
                 "name": "ground",
-                "reflectivity": 0.10,
+                "reflectivity": 0.0,
                 "transparency": 0.0,
-                "refractive-index": 1.9,
+                "refractive-index": 1.0,
                 "emissive-intensity": 0.0,
                 "shininess": 20.0
             },
@@ -46,7 +47,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 10.0,
+                "emissive-intensity": 1000.0,
                 "shininess": 50.0
             }
         ],
@@ -59,12 +60,12 @@
                 //     "material": "glass",
                 //     "color": { "r": 0.95, "g": 0.97, "b": 1.00 }
                 // },
-                // {
-                //     "position": { "x": 400, "y": 100, "z": 500 },
-                //     "radius": 2,
-                //     "material": "light",
-                //     "color": { "r": 255, "g": 0, "b": 0 }
-                // },
+                {
+                    "position": { "x": 400, "y": 100, "z": 500 },
+                    "radius": 500,
+                    "material": "light",
+                    "color": { "r": 255, "g": 255, "b": 0 }
+                },
                 {
                     "position": { "x": 60, "y": 5, "z": 40 },
                     "radius": 25,

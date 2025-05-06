@@ -93,11 +93,10 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 
         const math::Ray shadowRay { P + N * EPSILON, Ld };
         math::Intersect tmp;
-        bool blocked = findClosestIntersection(shadowRay, shapes, tmp)
-        && tmp.distance * tmp.distance < dist2
-        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0;
 
-        if (blocked)
+        if (findClosestIntersection(shadowRay, shapes, tmp)
+        && tmp.distance * tmp.distance < dist2
+        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0)
             continue;
 
         // attenuation (1/d²) × intensity (lux)
@@ -105,13 +104,15 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 
         // diffuse component : diffuseColor × I × max(0, N·L)
         const double NdotL = std::max(0.0, N.dot(Ld));
-        const RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
+        const double lambert = I * NdotL / M_PI * render.lighting.diffuse;
+        const RGBColor diffuse = surfaceColor * lambert;
 
         // specular component : blanc × I × (max(0,R·V)^shininess)
         const math::Vector3D R = reflect(-Ld, N);
         const double RdotV = std::max(0.0, R.dot(V));
+        const double phong = I * std::pow(RdotV, M.shininess) * render.lighting.specular;
         RGBColor specular(1,1,1);
-        specular = specular * (I * std::pow(RdotV, M.shininess));
+        specular = specular * phong;
 
         result = result + diffuse + specular;
     }
@@ -123,10 +124,10 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
 {
     const RGBColor surfaceColor = intersect.object.get()->getColor();
     RGBColor ambientTerm = RGBColor(
-        surfaceColor.r * render.ambiantLight.color.r,
-        surfaceColor.g * render.ambiantLight.color.g,
-        surfaceColor.b * render.ambiantLight.color.b
-    ) * render.ambiantLight.intensity;
+        surfaceColor.r * 255,
+        surfaceColor.g * 255,
+        surfaceColor.b * 255
+    ) * render.lighting.ambient;
 
     // turn direction to camera
     const math::Vector3D viewDir = -ray._dir;

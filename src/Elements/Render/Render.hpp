@@ -9,14 +9,14 @@
 
 #include "Antialiasing.hpp"
 #include "Output.hpp"
-#include "AmbiantLight.hpp"
+#include "Lighting.hpp"
 
 // clang-format off
 namespace raytracer {
 typedef struct render {
 	Antialiasing antialiasing;
 	RGBColor background;
-	AmbiantLight ambiantLight;
+	Lighting lighting;
 	unsigned int maxDepth;
 	RenderOutput output;
 } Render;

@@ -247,9 +247,9 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 
     const raytracer::RGBColor background = get_color(obj.at("background-color"));
 
-    const auto &ambi_obj = std::get<JsonMap>(obj.at("ambient-light").value);
-    const raytracer::AmbiantLight ambi = {get_color(ambi_obj.at("color")),
-        get_double(ambi_obj.at("intensity"))};
+    const auto &ambi_obj = std::get<JsonMap>(obj.at("lighting").value);
+    const raytracer::Lighting ambi = {get_double(ambi_obj.at("ambient")),
+        get_double(ambi_obj.at("diffuse")), get_double(ambi_obj.at("specular"))};
 
     const double mdepth = static_cast<uint>(get_double(obj.at("max-depth")));
 

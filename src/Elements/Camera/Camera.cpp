@@ -124,9 +124,9 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
 {
     const RGBColor surfaceColor = intersect.object.get()->getColor();
     RGBColor ambientTerm = RGBColor(
-        surfaceColor.r * 255,
-        surfaceColor.g * 255,
-        surfaceColor.b * 255
+        surfaceColor.r * 1.0,
+        surfaceColor.g * 1.0,
+        surfaceColor.b * 1.0
     ) * render.lighting.ambient;
 
     // turn direction to camera

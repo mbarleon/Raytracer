@@ -5,6 +5,8 @@
 ** STLShape
 */
 
+#include <thread>
+#include <mutex>
 #include "Error.hpp"
 #include "STLShape.hpp"
 
@@ -44,7 +46,7 @@ void raytracer::shape::STLShape::_getTriangles()
             _file.read(reinterpret_cast<char *>(&vert), sizeof(float) * 3);
             _checkRead(sizeof(float) * 3);
         }
-        _triangles.push_back(_Triangle(vertex_array));
+        _triangles.emplace_back(_Triangle(vertex_array));
         _file.read(reinterpret_cast<char *>(&control), sizeof(uint16_t));
         _checkRead(sizeof(uint16_t));
     }
@@ -57,28 +59,90 @@ void raytracer::shape::STLShape::_checkRead(const std::streamsize size) const
     }
 }
 
-void raytracer::shape::STLShape::_centerSTL()
+void raytracer::shape::STLShape::_computeMinMax(const std::size_t chunk_size, const std::size_t t, std::mutex &mutex)
 {
-    for (const auto &triangle : _triangles) {
-        for (const _Vertex verts[3] = {triangle._v1, triangle._v2, triangle._v3};
+    const std::size_t start = t * chunk_size;
+    const std::size_t end = std::min(start + chunk_size, _triangles.size());
+    float local_min_x = FLT_MAX, local_min_y = FLT_MAX, local_min_z = FLT_MAX;
+    float local_max_x = -FLT_MAX, local_max_y = -FLT_MAX, local_max_z = -FLT_MAX;
+
+    for (std::size_t i = start; i < end; ++i) {
+        for (const _Vertex verts[3] = {_triangles[i]._v1, _triangles[i]._v2, _triangles[i]._v3};
             const auto &[_x, _y, _z] : verts) {
-            _min_x = std::min(_min_x, _x); _max_x = std::max(_max_x, _x);
-            _min_y = std::min(_min_y, _y); _max_y = std::max(_max_y, _y);
-            _min_z = std::min(_min_z, _z); _max_z = std::max(_max_z, _z);
+            local_min_x = std::min(local_min_x, _x);
+            local_max_x = std::max(local_max_x, _x);
+            local_min_y = std::min(local_min_y, _y);
+            local_max_y = std::max(local_max_y, _y);
+            local_min_z = std::min(local_min_z, _z);
+            local_max_z = std::max(local_max_z, _z);
         }
     }
 
-    _center_x = (_max_x - _min_x) / 2.0f;
-    _center_y = (_max_y - _min_y) / 2.0f;
-    _center_z = (_max_z - _min_z) / 2.0f;
+    std::lock_guard lock(mutex);
+    _min_x = std::min(_min_x, local_min_x);
+    _max_x = std::max(_max_x, local_max_x);
+    _min_y = std::min(_min_y, local_min_y);
+    _max_y = std::max(_max_y, local_max_y);
+    _min_z = std::min(_min_z, local_min_z);
+    _max_z = std::max(_max_z, local_max_z);
+}
 
-    for (auto &triangle : _triangles) {
-        for (_Vertex *verts[4] = {&triangle._vec, &triangle._v1, &triangle._v2, &triangle._v3};
+void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, const std::size_t t)
+{
+    const std::size_t start = t * chunk_size;
+    const std::size_t end = std::min(start + chunk_size, _triangles.size());
+
+    for (std::size_t i = start; i < end; ++i) {
+        _Triangle &tri = _triangles[i];
+        for (_Vertex *verts[4] = {&tri._vec, &tri._v1, &tri._v2, &tri._v3};
             auto *v : verts) {
             v->_x -= _center_x;
             v->_y -= _center_y;
             v->_z -= _center_z;
         }
+    }
+}
+
+void raytracer::shape::STLShape::_centerSTL()
+{
+    std::mutex mutex;
+    std::vector<std::thread> threads;
+    const std::size_t numThreads = std::thread::hardware_concurrency();
+    const std::size_t chunkSize = (_triangles.size() + numThreads - 1) / numThreads;
+
+    if (numThreads <= 0) {
+        throw exception::Error("raytracer::shape::STLShape::_centerSTL", "Could not create threads");
+    }
+
+    threads.reserve(numThreads);
+    for (std::size_t t = 0; t < numThreads; ++t) {
+        threads.emplace_back([this, chunkSize, t, &mutex] {
+            _computeMinMax(chunkSize, t, mutex);
+        });
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+    threads.clear();
+
+    _center_x = (_max_x - _min_x) / 2.0f;
+    _center_y = (_max_y - _min_y) / 2.0f;
+    _center_z = (_max_z - _min_z) / 2.0f;
+
+    for (std::size_t t = 0; t < numThreads; ++t) {
+        threads.emplace_back([this, chunkSize, t] {
+            _moveTriangles(chunkSize, t);
+        });
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+}
+
+void raytracer::shape::STLShape::_addInTree()
+{
+    for (const auto &triangle : _triangles) {
+
     }
 }
 
@@ -89,6 +153,7 @@ constexpr raytracer::shape::STLShape::STLShape(const char *RESTRICT filename): _
     _getTriangles();
     _file.close();
     _centerSTL();
+    _addInTree();
 }
 
 bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const _Triangle &triangle) noexcept

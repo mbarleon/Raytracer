@@ -11,6 +11,7 @@
 #include "AShape.hpp"
 
 #include <vector>
+#include <memory>
 #include <cfloat>
 #include <fstream>
 
@@ -34,13 +35,23 @@ class STLShape final: public AShape
                 _vec(vec[0]), _v1(vec[1]), _v2(vec[2]), _v3(vec[3]) {}
         };
 
+        struct _Tree {
+            _Triangle _triangle;
+            std::shared_ptr<_Tree> left = nullptr;
+            std::shared_ptr<_Tree> right = nullptr;
+        };
+
         void _openFile();
         void _centerSTL();
+        void _addInTree();
         void _getTriangles();
         void _countTriangles();
         void _checkRead(std::streamsize size) const;
+        void _moveTriangles(std::size_t chunk_size, std::size_t t);
+        void _computeMinMax(std::size_t chunk_size, std::size_t t, std::mutex &mutex);
         [[nodiscard]] static bool _intersectTriangle(const math::Ray &ray, const _Triangle &triangle) noexcept;
 
+        _Tree _tree;
         std::ifstream _file;
         uint32_t _n_triangles;
         const char *RESTRICT _filename;

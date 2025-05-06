@@ -9,7 +9,6 @@
 
 #define SUCCESS 0
 #define ERROR 84
-constexpr double EPSILON = 1e-6;
 
 #if defined(_MSC_VER)
     #define RESTRICT __restrict
@@ -32,3 +31,5 @@ constexpr double EPSILON = 1e-6;
 
 #define DEFAULT_IDENTATION 0
 #define DEFAULT_FIELD_OF_VIEW 70
+
+static constexpr double EPSILON = 1e-6;

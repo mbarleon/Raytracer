@@ -107,17 +107,17 @@ void raytracer::shape::STLShape::_centerSTL()
 {
     std::mutex mutex;
     std::vector<std::thread> threads;
-    const std::size_t numThreads = std::thread::hardware_concurrency();
-    const std::size_t chunkSize = (_triangles.size() + numThreads - 1) / numThreads;
+    const std::size_t num_threads = std::thread::hardware_concurrency();
+    const std::size_t chunk_size = (_triangles.size() + num_threads - 1) / num_threads;
 
-    if (numThreads <= 0) {
+    if (num_threads <= 0) {
         throw exception::Error("raytracer::shape::STLShape::_centerSTL", "Could not create threads");
     }
 
-    threads.reserve(numThreads);
-    for (std::size_t t = 0; t < numThreads; ++t) {
-        threads.emplace_back([this, chunkSize, t, &mutex] {
-            _computeMinMax(chunkSize, t, mutex);
+    threads.reserve(num_threads);
+    for (std::size_t t = 0; t < num_threads; ++t) {
+        threads.emplace_back([this, chunk_size, t, &mutex] {
+            _computeMinMax(chunk_size, t, mutex);
         });
     }
     for (auto &thread : threads) {
@@ -129,20 +129,13 @@ void raytracer::shape::STLShape::_centerSTL()
     _center_y = (_max_y - _min_y) / 2.0f;
     _center_z = (_max_z - _min_z) / 2.0f;
 
-    for (std::size_t t = 0; t < numThreads; ++t) {
-        threads.emplace_back([this, chunkSize, t] {
-            _moveTriangles(chunkSize, t);
+    for (std::size_t t = 0; t < num_threads; ++t) {
+        threads.emplace_back([this, chunk_size, t] {
+            _moveTriangles(chunk_size, t);
         });
     }
     for (auto &thread : threads) {
         thread.join();
-    }
-}
-
-void raytracer::shape::STLShape::_addInTree()
-{
-    for (const auto &triangle : _triangles) {
-
     }
 }
 
@@ -153,7 +146,6 @@ constexpr raytracer::shape::STLShape::STLShape(const char *RESTRICT filename): _
     _getTriangles();
     _file.close();
     _centerSTL();
-    _addInTree();
 }
 
 bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const _Triangle &triangle) noexcept

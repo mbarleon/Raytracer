@@ -251,7 +251,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;
     cameraRay._dir._y = (1.0 - 2.0 * v) * fov_adjustment;
-    cameraRay._dir._z = -1.0;
+    cameraRay._dir._z = +1.0;
     cameraRay._dir = cameraRay._dir.normalize();
     cameraRay._dir = applyRotation(cameraRay._dir, _rotation).normalize();
 }

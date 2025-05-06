@@ -18,8 +18,8 @@
 
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 20, "z": -100 },
-        "rotation": { "x": 0, "y": 9.5, "z": 0 },
+        "position": { "x": 0, "y": -100, "z": 20 },
+        "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
 
@@ -66,13 +66,13 @@
                 //     "color": { "r": 255, "g": 0, "b": 0 }
                 // },
                 {
-                    "position": { "x": 60, "y": 40, "z": 5 },
+                    "position": { "x": 60, "y": 5, "z": 40 },
                     "radius": 25,
                     "material": "ground",
                     "color": { "r": 255, "g": 64, "b": 64 }
                 },
                 {
-                    "position": { "x": -40, "y": -10, "z": 20 },
+                    "position": { "x": -40, "y": 20, "z": -10 },
                     "radius": 35,
                     "material": "ground",
                     "color": { "r": 64, "g": 255, "b": 64 }
@@ -89,7 +89,7 @@
             // ],
             "planes": [
                 {
-                    "axis": "Y",
+                    "axis": "Z",
                     "position": -20,
                     "material": "ground",
                     "color": { "r": 64, "g": 64, "b": 255 }

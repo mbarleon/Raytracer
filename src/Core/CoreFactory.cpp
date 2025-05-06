@@ -13,6 +13,7 @@
 #include "Error.hpp"
 #include "Macro.hpp"
 #include <memory>
+#include <cmath>
 
 /**
 * @brief
@@ -79,7 +80,7 @@ unit_static math::Vector3D get_vec3D(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
 
-    return math::Vector3D(get_double(obj.at("x")), get_double(obj.at("y")), get_double(obj.at("z")));
+    return math::Vector3D(get_double(obj.at("x")), get_double(obj.at("z")), get_double(obj.at("y")));
 }
 
 /**
@@ -189,13 +190,17 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
 unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto, const MaterialsList &materials)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
-    const std::string str = get_string(obj.at("axis"));
+    std::string str = get_string(obj.at("axis"));
     const double position = get_double(obj.at("position"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
     const raytracer::RGBColor color = get_color(obj.at("color"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z')
         throw raytracer::exception::Error("Core", "Invalid plane axis");
+    if (str[0] == 'Y')
+        str[0] = 'Z';
+    if (str[0] == 'Z')
+        str[0] = 'Y';
     std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
     plane.get()->setMaterial(material);
     plane.get()->setColor(color);
@@ -218,7 +223,10 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
     const auto &obj = std::get<JsonMap>(camera_json.value);
     const math::Vector2u vec2 = get_vec2u(obj.at("resolution"));
     const math::Point3D pos = get_vec3D(obj.at("position"));
-    const math::Vector3D rot = get_vec3D(obj.at("rotation"));
+    math::Vector3D rot = get_vec3D(obj.at("rotation"));
+    rot._x = rot._x * M_PI / 180.0;
+    rot._y = rot._y * M_PI / 180.0;
+    rot._z = rot._z * M_PI / 180.0;
     const uint fov = static_cast<uint>(get_double(obj.at("fov")));
 
     return std::make_unique<raytracer::Camera>(vec2, pos, rot, fov);

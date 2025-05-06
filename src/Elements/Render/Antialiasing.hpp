@@ -9,9 +9,11 @@
 
 #include <string>
 
+// clang-format off
 namespace raytracer {
-    typedef struct antialiasing {
-        std::string type;
-        unsigned int samples;
-    } Antialiasing;
-};
+typedef struct antialiasing {
+    std::string type;
+    unsigned int samples;
+} Antialiasing;
+};// namespace raytracer
+// clang-format on

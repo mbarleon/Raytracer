@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "../Parser/ParserTypes.hpp"
 #include "../Elements/Camera/Camera.hpp"
 #include "../Elements/Render/Render.hpp"
 #include "../Elements/Scene/Material/Material.hpp"
 #include "../Elements/Scene/Shapes/IShape.hpp"
+#include "../Parser/ParserTypes.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;
@@ -39,6 +39,7 @@ unit_static double get_double(const ParsedJson &proto);
 unit_static math::Vector3D get_vec3D(const ParsedJson &proto);
 unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials);
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials);
-unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto, const MaterialsList &materials);
+unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto,
+    const MaterialsList &materials);
 unit_static void create_material(const ParsedJson &proto, MaterialsList &materials);
 #endif

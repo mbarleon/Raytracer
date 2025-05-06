@@ -13,13 +13,7 @@
 * public
 */
 
-/**
-* @brief
-* @details
-* @return
-*/
-raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radius) :
-    _center(center), _radius(radius)
+raytracer::shape::Sphere::Sphere(const math::Point3D &center, const double radius) : _center(center), _radius(radius)
 {
     logger::debug("Sphere was built: ", center, ".");
 }
@@ -41,7 +35,8 @@ math::Vector3D raytracer::shape::Sphere::getPosition() const
 */
 math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point) const noexcept
 {
-    math::Vector3D normal = point - _center;
+    const math::Vector3D normal = point - _center;
+
     return normal.normalize();
 }
 

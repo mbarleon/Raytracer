@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include "Color.hpp"
-
+// clang-format off
 namespace raytracer {
-    typedef struct material {
-        double reflectivity;
-        double transparency;
-        double refractiveIndex;
-        double emissiveIntensity;
-        double shininess;
-    } Material;
-};
+typedef struct material {
+    double reflectivity;
+    double transparency;
+    double refractiveIndex;
+    double emissiveIntensity;
+    double shininess;
+} Material;
+};// namespace raytracer
+// clang-format on

@@ -7,14 +7,15 @@
 
 #pragma once
 #include "../Elements/Scene/Shapes/IShape.hpp"
-#include "Ray.hpp"
 #include "Vector3D.hpp"
 
+// clang-format off
 namespace math {
-    typedef struct Intersect {
-        std::shared_ptr<raytracer::shape::IShape> object;
-        Point3D point;
-        Vector3D normal; // normale au point
-        double distance;
-    } Intersect;
-};
+typedef struct Intersect {
+    std::shared_ptr<raytracer::shape::IShape> object;
+    Point3D point;
+    Vector3D normal;
+    double distance;
+} Intersect;
+};// namespace math
+// clang-format on

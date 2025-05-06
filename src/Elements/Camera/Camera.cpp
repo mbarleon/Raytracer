@@ -30,11 +30,11 @@ raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const mat
     const IShapesList &shapes, unsigned int depth, const Render &render)
 {
     // vecteur réfléchi R = I - 2*(I·N)*N
-    math::Vector3D I = ray._dir.normalize();
-    math::Vector3D N = intersect.normal;
-    math::Vector3D R = I - 2 * I.dot(N) * N;
+    const math::Vector3D I = ray._dir.normalize();
+    const math::Vector3D N = intersect.normal;
+    const math::Vector3D R = I - 2 * I.dot(N) * N;
 
-    math::Ray reflRay { intersect.point + N * EPSILON, R.normalize() };
+    const math::Ray reflRay { intersect.point + N * EPSILON, R.normalize() };
 
     return traceRay(reflRay, shapes, depth + 1, render);
 }
@@ -43,7 +43,7 @@ raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
     const Render &render)
 {
-    math::Vector3D I = ray._dir.normalize();
+    const math::Vector3D I = ray._dir.normalize();
     math::Vector3D N = intersect.normal;
     const Material &M = *intersect.object->getMaterial().get();
 
@@ -56,15 +56,15 @@ raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     }
 
     cosI = std::abs(cosI);
-    double eta = n1 / n2;
-    double k = 1 - eta * eta * (1 - cosI * cosI);
+    const double eta = n1 / n2;
+    const double k = 1 - eta * eta * (1 - cosI * cosI);
 
     if (k < 0)
         return RGBColor(0,0,0);
 
     // vecteur réfracté T = ηI + (ηcosI − √k)N
-    math::Vector3D T = (eta * I + (eta * cosI - std::sqrt(k)) * N).normalize();
-    math::Ray refrRay { intersect.point - N * EPSILON, T };
+    const math::Vector3D T = (eta * I + (eta * cosI - std::sqrt(k)) * N).normalize();
+    const math::Ray refrRay { intersect.point - N * EPSILON, T };
 
     return traceRay(refrRay, shapes, depth + 1, render);
 }
@@ -80,17 +80,17 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 {
     RGBColor result(0,0,0);
 
-    for (auto &light : shapes) {
+    for (const auto &light : shapes) {
         const Material &Lm = *light->getMaterial().get();
 
         if (Lm.emissiveIntensity <= 0.0)
             continue;
 
         math::Vector3D Ld = light->getPosition() - P;
-        double dist2 = Ld.length() * Ld.length();
+        const double dist2 = Ld.length() * Ld.length();
         Ld = Ld.normalize();
 
-        math::Ray shadowRay { P + N * EPSILON, Ld };
+        const math::Ray shadowRay { P + N * EPSILON, Ld };
         math::Intersect tmp;
         bool blocked = findClosestIntersection(shadowRay, shapes, tmp)
         && tmp.distance * tmp.distance < dist2
@@ -100,15 +100,15 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
             continue;
 
         // atténuation (1/d²) × intensité (candela)
-        double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
+        const double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
 
         // composante diffuse : diffuseColor × I × max(0, N·L)
-        double NdotL = std::max(0.0, N.dot(Ld));
-        RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
+        const double NdotL = std::max(0.0, N.dot(Ld));
+        const RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
 
         // composante spéculaire : blanc × I × (max(0,R·V)^shininess)
-        math::Vector3D R = reflect(-Ld, N);
-        double RdotV = std::max(0.0, R.dot(V));
+        const math::Vector3D R = reflect(-Ld, N);
+        const double RdotV = std::max(0.0, R.dot(V));
         RGBColor specular(1,1,1);
         specular = specular * (I * std::pow(RdotV, M.shininess));
 
@@ -121,9 +121,9 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
     const IShapesList & shapes, unsigned int depth, const Render &render)
 {
     // direction vers la caméra
-    math::Vector3D viewDir = -ray._dir;
+    const math::Vector3D viewDir = -ray._dir;
 
-    RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
+    const RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
         intersect.object.get()->getColor(), *intersect.object.get()->getMaterial(), shapes);
 
     RGBColor reflected(0,0,0);
@@ -134,9 +134,9 @@ raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, co
     if (intersect.object->getMaterial()->transparency > 0.0)
         refracted = computeRefraction(ray, intersect, shapes, depth, render);
 
-    double R = intersect.object->getMaterial().get()->reflectivity;
-    double T = intersect.object->getMaterial().get()->transparency;
-    double K = std::max(0.0, 1.0 - R - T);
+    const double R = intersect.object->getMaterial().get()->reflectivity;
+    const double T = intersect.object->getMaterial().get()->transparency;
+    const double K = std::max(0.0, 1.0 - R - T);
 
     return local * K + reflected * R + refracted * T;
 }
@@ -150,13 +150,12 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
 
     for (auto &shape : shapes) {
         if (shape->intersect(ray, intersectPoint)) {
-            double dist = (intersectPoint - ray._origin).length();
+            const double dist = (intersectPoint - ray._origin).length();
             if (dist < distMin) {
                 distMin = dist;
                 hit = true;
                 intersect.object = shape;
                 intersect.point = intersectPoint;
-                // calcul de la normale selon la forme (ex: sphère)
                 intersect.normal = shape->getNormalAt(intersectPoint);
                 intersect.distance = dist;
             }
@@ -193,8 +192,8 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
-            double u = (x + 0.5) / double(_resolution.x);
-            double v = (y + 0.5) / double(_resolution.y);
+            const double u = (x + 0.5) / double(_resolution.x);
+            const double v = (y + 0.5) / double(_resolution.y);
             generateRay(u, v, cameraRay);
 
             RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
@@ -241,8 +240,8 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 {
     cameraRay._origin = _position;
 
-    double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
-    double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);
+    const double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
+    const double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;
     cameraRay._dir._y = (1.0 - 2.0 * v) * fov_adjustment;

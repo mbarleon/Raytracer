@@ -7,12 +7,12 @@
 
 #include "Plane.hpp"
 #include "Logger.hpp"
+#include "Macro.hpp"
 #include <cmath>
 
 using namespace raytracer::shape;
 
-Plane::Plane(char axis, double position) noexcept
-    : _axis(axis), _position(position)
+Plane::Plane(char axis, double position) noexcept : _axis(axis), _position(position)
 {
     logger::debug("Plane built: axis=", axis, " position=", position);
 }
@@ -29,9 +29,8 @@ math::Vector3D Plane::getPosition() const
     }
 }
 
-math::Vector3D Plane::getNormalAt(const math::Point3D &point) const noexcept
+math::Vector3D Plane::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
 {
-    (void)point;
     switch (_axis) {
         case 'X':
             return math::Vector3D(1.0, 0.0, 0.0);
@@ -63,8 +62,9 @@ bool Plane::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexc
             t = (_position - ray._origin._z) / ray._dir._z;
             break;
     }
-    if (t < 0.0)
+    if (t < 0.0) {
         return false;
+    }
     intPoint = ray._origin + ray._dir * t;
     return true;
 }

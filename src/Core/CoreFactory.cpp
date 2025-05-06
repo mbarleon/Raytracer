@@ -6,12 +6,12 @@
 */
 
 #include "CoreFactory.hpp"
+#include "../../include/Logger.hpp"
+#include "../Elements/Scene/Shapes/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/Sphere.hpp"
-#include "../Elements/Scene/Shapes/Plane.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
-#include "../../include/Logger.hpp"
 #include <memory>
 
 /**
@@ -52,8 +52,7 @@ unit_static raytracer::RGBColor get_color(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
 
-    return raytracer::RGBColor(get_double(obj.at("r")),
-        get_double(obj.at("g")), get_double(obj.at("b")));
+    return raytracer::RGBColor(get_double(obj.at("r")), get_double(obj.at("g")), get_double(obj.at("b")));
 }
 
 /**
@@ -123,8 +122,8 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
         std::make_shared<raytracer::Material>(reflectivity, transparency, refractiveIndex, emissiveIntensity, shininess);
     materials[name] = material;
     raytracer::logger::debug("Material was built: { name: ", name, ", reflectivity: ", reflectivity,
-        ", transparency: ", transparency, ", refractiveIndex: ", refractiveIndex, ", emissiveIntensity: ",
-        emissiveIntensity, ", shininess: ", shininess, " }.");
+        ", transparency: ", transparency, ", refractiveIndex: ", refractiveIndex, ", emissiveIntensity: ", emissiveIntensity,
+        ", shininess: ", shininess, " }.");
 }
 
 /**
@@ -140,8 +139,7 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
     const raytracer::RGBColor color = get_color(obj.at("color"));
 
-    std::shared_ptr<raytracer::shape::Sphere> sphere =
-        std::make_shared<raytracer::shape::Sphere>(position, radius);
+    std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
     sphere.get()->setMaterial(material);
     sphere.get()->setColor(color);
     return sphere;
@@ -183,8 +181,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z')
         throw raytracer::exception::Error("Core", "Invalid plane axis");
-    std::shared_ptr<raytracer::shape::Plane> plane =
-        std::make_shared<raytracer::shape::Plane>(str[0], position);
+    std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
     plane.get()->setMaterial(material);
     plane.get()->setColor(color);
     return plane;
@@ -199,7 +196,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 /**
 * @brief Entry Point
 * @details Entry point
-* @return TODO
+* @return
 */
 std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 {
@@ -215,7 +212,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 /**
 * @brief Entry Point
 * @details Entry point
-* @return TODO
+* @return
 */
 std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
@@ -228,8 +225,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
         static_cast<unsigned int>(get_double(anti_obj.at("samples")))};
 
     const auto &out_obj = std::get<JsonMap>(obj.at("output").value);
-    const raytracer::RenderOutput output = {get_string(out_obj.at("file")),
-        get_string(out_obj.at("format"))};
+    const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
     const double mdepth = static_cast<uint>(get_double(obj.at("max-depth")));
     return std::make_unique<raytracer::Render>(bgColor, anti, output, mdepth);

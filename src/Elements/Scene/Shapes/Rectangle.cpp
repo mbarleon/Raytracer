@@ -12,13 +12,9 @@
 * public
 */
 
-/**
- * @brief
- * @details
- * @return
- */
 raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side,
-    const math::Vector3D &left_side) : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
+    const math::Vector3D &left_side)
+    : _origin(origin), _bottom_side(bottom_side), _left_side(left_side)
 {
     logger::debug("Rectangle was built: origin ", origin, " bottom_side ", bottom_side, " left_side ", left_side, ".");
 }
@@ -28,9 +24,8 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
  * @details
  * @return
  */
-bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
+bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D __attribute__((unused)) & intPoint) const noexcept
 {
-    (void)intPoint;
     const math::Vector3D normal = _bottom_side.cross(_left_side).normalize();
     const double denom = normal.dot(ray._dir);
 
@@ -38,7 +33,7 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D 
         return false;
     }
 
-    double t = normal.dot(_origin - ray._origin) / denom;
+    const double t = normal.dot(_origin - ray._origin) / denom;
 
     if (t < 0) {
         return false;
@@ -60,8 +55,8 @@ math::Vector3D raytracer::shape::Rectangle::getPosition() const
     return math::Vector3D();
 }
 
-math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D &point) const noexcept
+// TODO
+math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
 {
-    (void)point;
     return math::Vector3D();
 }

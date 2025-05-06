@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include "AShape.hpp"
 #include "../../../Maths/Vector3D.hpp"
-#include "Macro.hpp"
+#include "AShape.hpp"
 
 namespace raytracer::shape {
-class Plane final : public AShape {
+class Plane final : public AShape
+{
     public:
         Plane(char axis, double position) noexcept;
 

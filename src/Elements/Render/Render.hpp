@@ -11,11 +11,13 @@
 #include "Antialiasing.hpp"
 #include "Output.hpp"
 
+// clang-format off
 namespace raytracer {
-    typedef struct render {
+typedef struct render {
         RGBColor background;
         Antialiasing antialiasing;
         RenderOutput output;
         unsigned int maxDepth;
-    } Render;
-};
+} Render;
+};// namespace raytracer
+// clang-format on

@@ -4,9 +4,10 @@
             "type": "supersampling", // "none", "supersampling", "adaptive"
             "samples": 4 // for supersampling
         },
+        "background-color": { "r": 0, "g": 0, "b": 0 },
         "ambient-light": {
-            "color": { "r": 0.12, "g": 0.12, "b": 0.15 },
-            "intensity": 1.0
+            "color": { "r": 255, "g": 255, "b": 255 },
+            "intensity": 0.2
         },
         "max-depth": 10, // reflection and refraction limit
         "output": {
@@ -62,13 +63,13 @@
                     "position": { "x": 4.8, "y": 4.17, "z": -8.12 },
                     "radius": 2,
                     "material": "light",
-                    "color": { "r": 0.90, "g": 0.0, "b": 0.0 }
+                    "color": { "r": 255, "g": 0, "b": 0 }
                 },
                 {
                     "position": { "x": 3, "y": 4, "z": -4 },
                     "radius": 2,
                     "material": "ground",
-                    "color": { "r": 1.00, "g": 0.0, "b": 0.0 }
+                    "color": { "r": 0, "g": 0, "b": 255 }
                 }
             ],
             // "rectangles": [
@@ -85,7 +86,7 @@
                     "axis": "Y",
                     "position": -3,
                     "material": "ground",
-                    "color": { "r": 0.0, "g": 0.94, "b": 0.0 }
+                    "color": { "r": 0, "g": 255, "b": 0 }
                 }
             ]
             // "cylinders": [],

@@ -45,7 +45,7 @@ namespace raytracer {
         const IShapesList & shapes, unsigned int depth, const Render &render);
     RGBColor computeLighting(const math::Point3D &P, const math::Vector3D &N,
         const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M,
-        const IShapesList &shapes);
+        const IShapesList &shapes, const Render &render);
     inline math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N);
     RGBColor computeRefraction(const math::Ray &ray, const math::Intersect &intersect,
         const IShapesList &shapes, unsigned int depth, const Render &render);

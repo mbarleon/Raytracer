@@ -48,11 +48,26 @@ unit_static std::string get_string(const ParsedJson &proto)
 * @details private static
 * @return
 */
+unit_static double clamp_color(double component)
+{
+    if (component > 255.0)
+        component = 255.0;
+    if (component < 0.0)
+        component = 0.0;
+    return component / 255.0;
+}
+
+/**
+* @brief
+* @details private static
+* @return
+*/
 unit_static raytracer::RGBColor get_color(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
 
-    return raytracer::RGBColor(get_double(obj.at("r")), get_double(obj.at("g")), get_double(obj.at("b")));
+    return raytracer::RGBColor(clamp_color(get_double(obj.at("r"))),
+        clamp_color(get_double(obj.at("g"))), clamp_color(get_double(obj.at("b"))));
 }
 
 /**
@@ -222,6 +237,8 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const raytracer::Antialiasing anti = {get_string(anti_obj.at("type")),
         static_cast<unsigned int>(get_double(anti_obj.at("samples")))};
 
+    const raytracer::RGBColor background = get_color(obj.at("background-color"));
+
     const auto &ambi_obj = std::get<JsonMap>(obj.at("ambient-light").value);
     const raytracer::AmbiantLight ambi = {get_color(ambi_obj.at("color")),
         get_double(ambi_obj.at("intensity"))};
@@ -231,7 +248,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const auto &out_obj = std::get<JsonMap>(obj.at("output").value);
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::Render>(anti, ambi, mdepth, output);
+    return std::make_unique<raytracer::Render>(anti, background, ambi, mdepth, output);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

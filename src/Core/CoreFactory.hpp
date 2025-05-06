@@ -33,6 +33,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json);
     #include "../Elements/Scene/Shapes/Rectangle.hpp"
     #include "../Elements/Scene/Shapes/Sphere.hpp"
     #include "Macro.hpp"
+unit_static double clamp_color(double component);
 unit_static std::string get_string(const ParsedJson &proto);
 unit_static raytracer::RGBColor get_color(const ParsedJson &proto);
 unit_static double get_double(const ParsedJson &proto);

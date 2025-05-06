@@ -15,6 +15,7 @@
 namespace raytracer {
 typedef struct render {
 	Antialiasing antialiasing;
+	RGBColor background;
 	AmbiantLight ambiantLight;
 	unsigned int maxDepth;
 	RenderOutput output;

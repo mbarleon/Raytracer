@@ -57,12 +57,38 @@ void raytracer::shape::STLShape::_checkRead(const std::streamsize size) const
     }
 }
 
+void raytracer::shape::STLShape::_centerSTL()
+{
+    for (const auto &triangle : _triangles) {
+        for (const _Vertex verts[3] = {triangle._v1, triangle._v2, triangle._v3};
+            const auto &[_x, _y, _z] : verts) {
+            _min_x = std::min(_min_x, _x); _max_x = std::max(_max_x, _x);
+            _min_y = std::min(_min_y, _y); _max_y = std::max(_max_y, _y);
+            _min_z = std::min(_min_z, _z); _max_z = std::max(_max_z, _z);
+        }
+    }
+
+    _center_x = (_max_x - _min_x) / 2.0f;
+    _center_y = (_max_y - _min_y) / 2.0f;
+    _center_z = (_max_z - _min_z) / 2.0f;
+
+    for (auto &triangle : _triangles) {
+        for (_Vertex *verts[4] = {&triangle._vec, &triangle._v1, &triangle._v2, &triangle._v3};
+            auto *v : verts) {
+            v->_x -= _center_x;
+            v->_y -= _center_y;
+            v->_z -= _center_z;
+        }
+    }
+}
+
 constexpr raytracer::shape::STLShape::STLShape(const char *RESTRICT filename): _filename(filename)
 {
     _openFile();
     _countTriangles();
     _getTriangles();
     _file.close();
+    _centerSTL();
 }
 
 bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const _Triangle &triangle) noexcept

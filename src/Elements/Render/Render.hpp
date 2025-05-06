@@ -14,10 +14,10 @@
 // clang-format off
 namespace raytracer {
 typedef struct render {
-        RGBColor background;
-        Antialiasing antialiasing;
-        RenderOutput output;
-        unsigned int maxDepth;
+	RGBColor background;
+	Antialiasing antialiasing;
+	RenderOutput output;
+	unsigned int maxDepth;
 } Render;
 };// namespace raytracer
 // clang-format on

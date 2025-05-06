@@ -218,31 +218,29 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// static math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
-// {
-//     const double pitch = rot._x, yaw = rot._y, roll = rot._z;
-//     const double cosX = std::cos(pitch), sinX = std::sin(pitch);
-//     const double cosY = std::cos(yaw),   sinY = std::sin(yaw);
-//     const double cosZ = std::cos(roll),  sinZ = std::sin(roll);
+static math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
+{
+    const double pitch = rot._x, yaw = rot._y, roll = rot._z;
+    const double cosX = std::cos(pitch), sinX = std::sin(pitch);
+    const double cosY = std::cos(yaw),   sinY = std::sin(yaw);
+    const double cosZ = std::cos(roll),  sinZ = std::sin(roll);
 
-//     const double m00 = cosY * cosZ;
-//     const double m01 = cosZ * sinX * sinY - sinZ * cosX;
-//     const double m02 = cosZ * cosX * sinY + sinZ * sinX;
+    const double m00 = cosY * cosZ;
+    const double m01 = cosZ * sinX * sinY - sinZ * cosX;
+    const double m02 = cosZ * cosX * sinY + sinZ * sinX;
+    const double m10 = cosY * sinZ;
+    const double m11 = sinZ * sinX * sinY + cosZ * cosX;
+    const double m12 = sinZ * cosX * sinY - cosZ * sinX;
+    const double m20 = -sinY;
+    const double m21 = cosY * sinX;
+    const double m22 = cosY * cosX;
 
-//     const double m10 = cosY * sinZ;
-//     const double m11 = sinZ * sinX * sinY + cosZ * cosX;
-//     const double m12 = sinZ * cosX * sinY - cosZ * sinX;
-
-//     const double m20 = -sinY;
-//     const double m21 = cosY * sinX;
-//     const double m22 = cosY * cosX;
-
-//     return math::Vector3D(
-//         m00 * dir._x + m01 * dir._y + m02 * dir._z,
-//         m10 * dir._x + m11 * dir._y + m12 * dir._z,
-//         m20 * dir._x + m21 * dir._y + m22 * dir._z
-//     );
-// }
+    return math::Vector3D(
+        m00 * dir._x + m01 * dir._y + m02 * dir._z,
+        m10 * dir._x + m11 * dir._y + m12 * dir._z,
+        m20 * dir._x + m21 * dir._y + m22 * dir._z
+    );
+}
 
 void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) const noexcept
 {
@@ -255,7 +253,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
     cameraRay._dir._y = (1.0 - 2.0 * v) * fov_adjustment;
     cameraRay._dir._z = -1.0;
     cameraRay._dir = cameraRay._dir.normalize();
-    // cameraRay._dir = applyRotation(cameraRay._dir, _rotation).normalize();
+    cameraRay._dir = applyRotation(cameraRay._dir, _rotation).normalize();
 }
 
 // clang-format on

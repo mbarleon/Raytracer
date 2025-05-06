@@ -29,7 +29,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const math::Intersect &intersect,
     const IShapesList &shapes, unsigned int depth, const Render &render)
 {
-    // vecteur réfléchi R = I - 2*(I·N)*N
+    // reflected vector R = I - 2*(I·N)*N
     const math::Vector3D I = ray._dir.normalize();
     const math::Vector3D N = intersect.normal;
     const math::Vector3D R = I - 2 * I.dot(N) * N;
@@ -62,7 +62,7 @@ raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     if (k < 0)
         return RGBColor(0,0,0);
 
-    // vecteur réfracté T = ηI + (ηcosI − √k)N
+    // refracted vector T = ηI + (ηcosI − √k)N
     const math::Vector3D T = (eta * I + (eta * cosI - std::sqrt(k)) * N).normalize();
     const math::Ray refrRay { intersect.point - N * EPSILON, T };
 
@@ -71,7 +71,7 @@ raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
 
 inline math::Vector3D raytracer::reflect(const math::Vector3D &I, const math::Vector3D &N)
 {
-    // R = I - 2 * (I·N) * N
+    // reflect R = I - 2 * (I·N) * N
     return I - N * (2.0 * I.dot(N));
 }
 
@@ -99,14 +99,14 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
         if (blocked)
             continue;
 
-        // atténuation (1/d²) × intensité (candela)
+        // attenuation (1/d²) × intensity (lux)
         const double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
 
-        // composante diffuse : diffuseColor × I × max(0, N·L)
+        // diffuse component : diffuseColor × I × max(0, N·L)
         const double NdotL = std::max(0.0, N.dot(Ld));
         const RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
 
-        // composante spéculaire : blanc × I × (max(0,R·V)^shininess)
+        // specular component : blanc × I × (max(0,R·V)^shininess)
         const math::Vector3D R = reflect(-Ld, N);
         const double RdotV = std::max(0.0, R.dot(V));
         RGBColor specular(1,1,1);
@@ -120,7 +120,7 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
 raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
     const IShapesList & shapes, unsigned int depth, const Render &render)
 {
-    // direction vers la caméra
+    // turn direction to camera
     const math::Vector3D viewDir = -ray._dir;
 
     const RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
@@ -175,11 +175,11 @@ raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList 
     const shape::IShape &object = *intersect.object.get();
     const Material &material = *object.getMaterial().get();
 
-    // objet lumineux
+    // luminous object
     if (material.emissiveIntensity > 0.0)
         return object.getColor() * material.emissiveIntensity;
 
-    // objet simple, réflexions, réfractions...
+    // simple object, reflections, refractions...
     return computeColor(intersect, ray, shapes, depth, render);
 }
 
@@ -213,21 +213,21 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 // static math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
 // {
 //     const double pitch = rot._x, yaw = rot._y, roll = rot._z;
-//     double cosX = std::cos(pitch), sinX = std::sin(pitch);
-//     double cosY = std::cos(yaw),   sinY = std::sin(yaw);
-//     double cosZ = std::cos(roll),  sinZ = std::sin(roll);
+//     const double cosX = std::cos(pitch), sinX = std::sin(pitch);
+//     const double cosY = std::cos(yaw),   sinY = std::sin(yaw);
+//     const double cosZ = std::cos(roll),  sinZ = std::sin(roll);
 
-//     double m00 = cosY * cosZ;
-//     double m01 = cosZ * sinX * sinY - sinZ * cosX;
-//     double m02 = cosZ * cosX * sinY + sinZ * sinX;
+//     const double m00 = cosY * cosZ;
+//     const double m01 = cosZ * sinX * sinY - sinZ * cosX;
+//     const double m02 = cosZ * cosX * sinY + sinZ * sinX;
 
-//     double m10 = cosY * sinZ;
-//     double m11 = sinZ * sinX * sinY + cosZ * cosX;
-//     double m12 = sinZ * cosX * sinY - cosZ * sinX;
+//     const double m10 = cosY * sinZ;
+//     const double m11 = sinZ * sinX * sinY + cosZ * cosX;
+//     const double m12 = sinZ * cosX * sinY - cosZ * sinX;
 
-//     double m20 = -sinY;
-//     double m21 = cosY * sinX;
-//     double m22 = cosY * cosX;
+//     const double m20 = -sinY;
+//     const double m21 = cosY * sinX;
+//     const double m22 = cosY * cosX;
 
 //     return math::Vector3D(
 //         m00 * dir._x + m01 * dir._y + m02 * dir._z,

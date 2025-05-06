@@ -191,6 +191,8 @@ raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList 
     return computeColor(intersect, ray, shapes, depth, render);
 }
 
+#include <iomanip>
+
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const noexcept
 {
     std::ofstream ppm(render.output.file);
@@ -200,6 +202,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
+
             const double u = (x + 0.5) / double(_resolution.x);
             const double v = (y + 0.5) / double(_resolution.y);
             generateRay(u, v, cameraRay);
@@ -209,6 +212,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
             pixel.realign(1, 255);
             ppm << pixel << '\n';
         }
+        logger::progress_bar(static_cast<float>(_resolution.y), static_cast<float>(y + 1));
     }
 }
 

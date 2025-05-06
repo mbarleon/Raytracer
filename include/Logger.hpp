@@ -50,4 +50,12 @@ void debug([[maybe_unused]] Args &&...args)
 #endif
 }
 
+using uint32 = unsigned int;
+
+static constexpr uint32 PROGRESS_BAR_WIDTH = 50;
+static constexpr uint32 PROGRESS_BAR_SET_WIDTH = 3;
+static constexpr float HUNDRED_PERCENT = 100.0f;
+
+void progress_bar(const float total_wait, const float current_state);
+
 }// namespace raytracer::logger

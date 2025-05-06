@@ -5,8 +5,9 @@
 ** STLShape
 */
 
-#include <thread>
 #include <mutex>
+#include <ranges>
+#include <thread>
 #include "Error.hpp"
 #include "STLShape.hpp"
 
@@ -40,13 +41,13 @@ void raytracer::shape::STLShape::_getTriangles()
 {
     for (uint32_t i = 0; i < _n_triangles; ++i) {
         uint16_t control;
-        _Vertex vertex_array[4];
+        Vertex vertex_array[4];
 
         for (auto &vert : vertex_array) {
             _file.read(reinterpret_cast<char *>(&vert), sizeof(float) * 3);
             _checkRead(sizeof(float) * 3);
         }
-        _triangles.emplace_back(_Triangle(vertex_array));
+        _triangles.emplace_back(vertex_array);
         _file.read(reinterpret_cast<char *>(&control), sizeof(uint16_t));
         _checkRead(sizeof(uint16_t));
     }
@@ -67,7 +68,7 @@ void raytracer::shape::STLShape::_computeMinMax(const std::size_t chunk_size, co
     float local_max_x = -FLT_MAX, local_max_y = -FLT_MAX, local_max_z = -FLT_MAX;
 
     for (std::size_t i = start; i < end; ++i) {
-        for (const _Vertex verts[3] = {_triangles[i]._v1, _triangles[i]._v2, _triangles[i]._v3};
+        for (const Vertex verts[3] = {_triangles[i]._v1, _triangles[i]._v2, _triangles[i]._v3};
             const auto &[_x, _y, _z] : verts) {
             local_min_x = std::min(local_min_x, _x);
             local_max_x = std::max(local_max_x, _x);
@@ -93,12 +94,12 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
     const std::size_t end = std::min(start + chunk_size, _triangles.size());
 
     for (std::size_t i = start; i < end; ++i) {
-        _Triangle &tri = _triangles[i];
-        for (_Vertex *verts[4] = {&tri._vec, &tri._v1, &tri._v2, &tri._v3};
+        Triangle &tri = _triangles[i];
+        for (Vertex *verts[4] = {&tri._vec, &tri._v1, &tri._v2, &tri._v3};
             auto *v : verts) {
-            v->_x -= _center_x;
-            v->_y -= _center_y;
-            v->_z -= _center_z;
+            v->_x += static_cast<float>(_origin._x) - _center_x;
+            v->_y += static_cast<float>(_origin._y) - _center_y;
+            v->_z += static_cast<float>(_origin._z) - _center_z;
         }
     }
 }
@@ -139,7 +140,8 @@ void raytracer::shape::STLShape::_centerSTL()
     }
 }
 
-constexpr raytracer::shape::STLShape::STLShape(const char *RESTRICT filename): _filename(filename)
+constexpr raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const char *RESTRICT filename):
+    _origin(origin), _filename(filename)
 {
     _openFile();
     _countTriangles();
@@ -148,7 +150,7 @@ constexpr raytracer::shape::STLShape::STLShape(const char *RESTRICT filename): _
     _centerSTL();
 }
 
-bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const _Triangle &triangle) noexcept
+bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept
 {
     const math::Vector3D A(triangle._v1._x, triangle._v1._y, triangle._v1._z);
     const math::Vector3D B(triangle._v2._x, triangle._v2._y, triangle._v2._z);
@@ -162,7 +164,7 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
     const math::Vector3D AC = C - A;
 
     const math::Vector3D h = ray._dir.cross(AC);
-    const float a = AB.dot(h);
+    const auto a = static_cast<float>(AB.dot(h));
 
     if (a == 0.0f) {
         return false;
@@ -170,13 +172,13 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
 
     const float f = 1.0f / a;
     const math::Vector3D s = ray._origin - ray._dir;
-    const float u = f * s.dot(h);
+    const float u = f * static_cast<float>(s.dot(h));
     if (u < 0.0f || u > 1.0f) {
         return false;
     }
 
     const math::Vector3D q = s.cross(AB);
-    if (const float v = f * ray._dir.dot(q); v < 0.0f || u + v > 1.0f) {
+    if (const float v = f * static_cast<float>(ray._dir.dot(q)); v < 0.0f || u + v > 1.0f) {
         return false;
     }
 
@@ -185,10 +187,7 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
 
 bool raytracer::shape::STLShape::intersect(const math::Ray &ray) const noexcept override
 {
-    for (const auto &triangle : _triangles) {
-        if (_intersectTriangle(ray, triangle)) {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(_triangles, [&](const auto &triangle) {
+        return _intersectTriangle(ray, triangle);
+    });
 }

@@ -26,7 +26,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const math::Intersect &intersect,
+const raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const math::Intersect &intersect,
     const IShapesList &shapes, unsigned int depth, const Render &render)
 {
     // reflected vector R = I - 2*(I·N)*N
@@ -39,7 +39,7 @@ raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const mat
     return traceRay(reflRay, shapes, depth + 1, render);
 }
 
-raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
+const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
     const Render &render)
 {
@@ -69,13 +69,7 @@ raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
     return traceRay(refrRay, shapes, depth + 1, render);
 }
 
-inline math::Vector3D raytracer::reflect(const math::Vector3D &I, const math::Vector3D &N)
-{
-    // reflect R = I - 2 * (I·N) * N
-    return I - N * (2.0 * I.dot(N));
-}
-
-raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const math::Vector3D &N,
+const raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const math::Vector3D &N,
     const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M, const IShapesList &shapes,
     const Render &render)
 {
@@ -119,7 +113,7 @@ raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const mat
     return result;
 }
 
-raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
+const raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
     const IShapesList & shapes, unsigned int depth, const Render &render)
 {
     const RGBColor surfaceColor = intersect.object.get()->getColor();
@@ -173,7 +167,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     return hit;
 }
 
-raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
+const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
     unsigned int depth, const Render &render)
 {
     math::Intersect intersect;
@@ -191,8 +185,6 @@ raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList 
     // simple object, reflections, refractions...
     return computeColor(intersect, ray, shapes, depth, render);
 }
-
-#include <iomanip>
 
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const noexcept
 {
@@ -223,7 +215,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
+static const math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
 {
     const double pitch = rot._x, yaw = rot._y, roll = rot._z;
     const double cosX = std::cos(pitch), sinX = std::sin(pitch);

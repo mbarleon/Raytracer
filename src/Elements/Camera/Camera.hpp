@@ -43,6 +43,8 @@ namespace raytracer {
         unsigned int depth, const Render &render);
     const RGBColor computeDirectLighting(const math::Ray &ray,
         const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
+    const RGBColor computeAmbientOcclusion(const math::Intersect &intersect, int aoSamples,
+        const IShapesList &shapes);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {

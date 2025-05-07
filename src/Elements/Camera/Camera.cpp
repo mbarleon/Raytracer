@@ -9,6 +9,7 @@
 #include "Logger.hpp"
 #include <cmath>
 #include <fstream>
+#include <random>
 
 // clang-format off
 
@@ -25,6 +26,34 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
+    int aoSamples, const IShapesList &shapes)
+{
+    int unoccluded = 0;
+    const uint32_t seed = static_cast<uint32_t>(intersect.point._x * 73856093u) ^
+        static_cast<uint32_t>(intersect.point._y * 19349663u) ^
+        static_cast<uint32_t>(intersect.point._z * 83492791u);
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<> dist(0.0, 1.0);
+
+    for (int i = 0; i < aoSamples; ++i) {
+        // pick random direction
+        const double u1 = dist(gen);
+        const double u2 = dist(gen);
+        const double r = std::sqrt(1 - u1*u1), phi = 2 * M_PI * u2;
+        const math::Vector3D dir (r * std::cos(phi), r * std::sin(phi), u1);
+        // (transformer dir via base locale, omis ici pour la concision)
+        const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, dir);
+
+        math::Intersect tmp;
+        if (!findClosestIntersection(aoRay, shapes, tmp)) {
+            ++unoccluded;
+        }
+    }
+    const double visibility = double(unoccluded) / aoSamples;
+    return RGBColor(visibility, visibility, visibility);
+}
 
 const raytracer::RGBColor raytracer::computeDirectLighting(const math::Ray &ray,
     const math::Intersect &intersect, const IShapesList &shapes, const raytracer::Render &render)
@@ -112,9 +141,9 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
         return intersect.object->getColor() * mat.emissiveIntensity;
     }
 
-    const RGBColor ambient(0,0,0);
-    // RGBColor ambient = computeAmbientOcclusion(intersect, render.lighting.ambient * 100); 
-    // ambient = ambient * mat.ambientOcclusion;
+    const RGBColor ambient = computeAmbientOcclusion(intersect,
+        static_cast<int>(render.lighting.ambient * 100.0), shapes); 
+    //ambient = ambient * mat.ambientOcclusion;
 
     const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
 

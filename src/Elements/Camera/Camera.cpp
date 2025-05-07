@@ -26,122 +26,48 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const math::Intersect &intersect,
-    const IShapesList &shapes, unsigned int depth, const Render &render)
+const raytracer::RGBColor raytracer::computeDirectLighting(const math::Ray &ray,
+    const math::Intersect &intersect, const IShapesList &shapes, const raytracer::Render &render)
 {
-    // reflected vector R = I - 2*(I·N)*N
-    const math::Vector3D I = ray._dir.normalize();
-    const math::Vector3D N = intersect.normal;
-    const math::Vector3D R = I - 2 * I.dot(N) * N;
+    RGBColor Lo(0,0,0);
 
-    const math::Ray reflRay { intersect.point + N * EPSILON, R.normalize() };
+    for (const auto &lightObj : shapes) {
+        const auto &Lm = *lightObj->getMaterial();
 
-    return traceRay(reflRay, shapes, depth + 1, render);
-}
-
-const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
-    const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
-    const Render &render)
-{
-    const math::Vector3D I = ray._dir.normalize();
-    math::Vector3D N = intersect.normal;
-    const Material &M = *intersect.object->getMaterial().get();
-
-    double n1 = 1.0, n2 = M.refractiveIndex;
-    double cosI = N.dot(I);
-
-    if (cosI > 0) {
-        std::swap(n1, n2);
-        N = -N;
-    }
-
-    cosI = std::abs(cosI);
-    const double eta = n1 / n2;
-    const double k = 1 - eta * eta * (1 - cosI * cosI);
-
-    if (k < 0)
-        return render.background;
-
-    // refracted vector T = ηI + (ηcosI − √k)N
-    const math::Vector3D T = (eta * I + (eta * cosI - std::sqrt(k)) * N).normalize();
-    const math::Ray refrRay { intersect.point - N * EPSILON, T };
-
-    return traceRay(refrRay, shapes, depth + 1, render);
-}
-
-const raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const math::Vector3D &N,
-    const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M, const IShapesList &shapes,
-    const Render &render)
-{
-    RGBColor result = render.background;
-
-    for (const auto &light : shapes) {
-        const Material &Lm = *light->getMaterial().get();
-
-        if (Lm.emissiveIntensity <= 0.0)
+        if (Lm.emissiveIntensity <= 0.0) {
             continue;
+        }
 
-        math::Vector3D Ld = light->getPosition() - P;
-        const double dist2 = Ld.length() * Ld.length();
-        Ld = Ld.normalize();
+        const math::Vector3D toLight = lightObj->getPosition() - intersect.point;
+        const double dist2 = toLight.dot(toLight);
+        const math::Vector3D Ld = toLight.normalize();
 
-        const math::Ray shadowRay { P + N * EPSILON, Ld };
+        // shadows
+        const math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, Ld);
         math::Intersect tmp;
 
         if (findClosestIntersection(shadowRay, shapes, tmp)
-        && tmp.distance * tmp.distance < dist2
-        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0)
+        && tmp.object->getMaterial()->emissiveIntensity == 0.0
+        && tmp.distance*tmp.distance < dist2) {
             continue;
+        }
 
-        // attenuation (1/d²) × intensity (lux)
-        const double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
+        //  attenuation 1/(d²)
+        const double attenuation = Lm.emissiveIntensity / (4 * M_PI * dist2);
 
-        // diffuse component : diffuseColor × I × max(0, N·L)
-        const double NdotL = std::max(0.0, N.dot(Ld));
-        const double lambert = I * NdotL / M_PI * render.lighting.diffuse;
-        const RGBColor diffuse = surfaceColor * lambert;
+        // diffuse (Lambert) and specular (Phong)
+        const double NdotL = std::max(0.0, intersect.normal.dot(Ld));
+        const RGBColor diffuse = intersect.object->getColor() * (render.lighting.diffuse * attenuation * NdotL);
 
-        // specular component : blanc × I × (max(0,R·V)^shininess)
-        const math::Vector3D R = reflect(-Ld, N);
-        const double RdotV = std::max(0.0, R.dot(V));
-        const double phong = I * std::pow(RdotV, M.shininess) * render.lighting.specular;
-        RGBColor specular(1,1,1);
-        specular = specular * phong;
+        const math::Vector3D V = -ray._dir.normalize();
+        const math::Vector3D R = reflect(-Ld, intersect.normal).normalize();
+        const double RdotV = std::pow(std::max(0.0, R.dot(V)), intersect.object->getMaterial()->shininess);
+        const RGBColor specular = RGBColor(1,1,1) * (render.lighting.specular * attenuation * RdotV);
 
-        result = result + diffuse + specular;
+        Lo = Lo + diffuse + specular;
     }
-    return result;
-}
-
-const raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
-    const IShapesList & shapes, unsigned int depth, const Render &render)
-{
-    const RGBColor surfaceColor = intersect.object.get()->getColor();
-    RGBColor ambientTerm = RGBColor(
-        surfaceColor.r * 1.0,
-        surfaceColor.g * 1.0,
-        surfaceColor.b * 1.0
-    ) * render.lighting.ambient;
-
-    // turn direction to camera
-    const math::Vector3D viewDir = -ray._dir;
-
-    const RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
-        surfaceColor, *intersect.object.get()->getMaterial(), shapes, render);
-
-    RGBColor reflected(0,0,0);
-    if (intersect.object->getMaterial()->reflectivity > 0.0)
-        reflected = computeReflection(ray, intersect, shapes, depth, render);
-
-    RGBColor refracted(0,0,0);
-    if (intersect.object->getMaterial()->transparency > 0.0)
-        refracted = computeRefraction(ray, intersect, shapes, depth, render);
-
-    const double R = intersect.object->getMaterial().get()->reflectivity;
-    const double T = intersect.object->getMaterial().get()->transparency;
-    const double K = std::max(0.0, 1.0 - R - T);
-
-    return ambientTerm + local * K + reflected * R + refracted * T;
+    // Ici, on injecterait la logique ReSTIR : fusion des réservoirs entre pixels, resampling pondéré, etc.
+    return Lo;
 }
 
 bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
@@ -168,22 +94,39 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
 }
 
 const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
-    unsigned int depth, const Render &render)
+    unsigned int depth, const raytracer::Render &render)
 {
+    if (depth > render.maxDepth) {
+        return render.background;
+    }
+
     math::Intersect intersect;
 
-    if (depth > render.maxDepth || !findClosestIntersection(ray, shapes, intersect))
+    if (!findClosestIntersection(ray, shapes, intersect)) {
         return render.background;
+    }
 
-    const shape::IShape &object = *intersect.object.get();
-    const Material &material = *object.getMaterial().get();
+    const auto &mat = *intersect.object->getMaterial();
 
-    // luminous object
-    if (material.emissiveIntensity > 0.0)
-        return object.getColor() * material.emissiveIntensity;
+    if (mat.emissiveIntensity > 0.0) {
+        return intersect.object->getColor() * mat.emissiveIntensity;
+    }
 
-    // simple object, reflections, refractions...
-    return computeColor(intersect, ray, shapes, depth, render);
+    const RGBColor ambient(0,0,0);
+    // RGBColor ambient = computeAmbientOcclusion(intersect, render.lighting.ambient * 100); 
+    // ambient = ambient * mat.ambientOcclusion;
+
+    const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
+
+    const RGBColor reflectCol(0,0,0);
+    const RGBColor refractCol(0,0,0);
+    // if (mat.reflectivity > 0.0)
+    //     reflectCol = computeReflection(ray, intersect, shapes, depth, render) * mat.reflectivity;
+    // if (mat.transparency > 0.0)
+    //     refractCol = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
+
+    const double K = std::max(0.0, 1.0 - mat.reflectivity - mat.transparency);
+    return ambient + (direct * K) + reflectCol + refractCol;
 }
 
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const noexcept

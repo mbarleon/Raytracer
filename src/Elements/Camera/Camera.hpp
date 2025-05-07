@@ -41,20 +41,20 @@ namespace raytracer {
         math::Intersect &intersect);
     const RGBColor traceRay(const math::Ray &ray, const IShapesList &shapes,
         unsigned int depth, const Render &render);
-    const RGBColor computeColor(const math::Intersect &intersect, const math::Ray &ray,
-        const IShapesList & shapes, unsigned int depth, const Render &render);
-    const RGBColor computeLighting(const math::Point3D &P, const math::Vector3D &N,
-        const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M,
-        const IShapesList &shapes, const Render &render);
-    const RGBColor computeRefraction(const math::Ray &ray, const math::Intersect &intersect,
-        const IShapesList &shapes, unsigned int depth, const Render &render);
-    const RGBColor computeReflection(const math::Ray &ray, const math::Intersect &intersect,
-        const IShapesList &shapes, unsigned int depth, const Render &render);
+    const RGBColor computeDirectLighting(const math::Ray &ray,
+        const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {
         // reflect R = I - 2 * (I·N) * N
         return I - N * (2.0 * I.dot(N));
+    }
+
+    static inline math::Ray offsetRay(const math::Vector3D &origin,const math::Vector3D &normal,
+        const math::Vector3D &direction)
+    {
+        const math::Vector3D offset = (direction.dot(normal) > 0) ? normal : -normal;
+        return {origin + offset * EPSILON, direction};
     }
 };// namespace raytracer
 // clang-format on

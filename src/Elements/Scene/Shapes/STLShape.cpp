@@ -5,6 +5,7 @@
 ** STLShape
 */
 
+#include <cmath>
 #include <ranges>
 #include <future>
 #include <thread>

@@ -261,8 +261,6 @@ math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __att
     return normal.normalize();
 }
 
-// ...existing code...
-
 void raytracer::shape::STLShape::_buildBVH()
 {
     std::vector<size_t> indices(_triangles.size());

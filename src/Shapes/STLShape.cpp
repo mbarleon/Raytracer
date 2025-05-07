@@ -8,6 +8,7 @@
 #include <mutex>
 #include <ranges>
 #include <future>
+#include <thread>
 #include <numeric>
 #include <algorithm>
 #include "Error.hpp"
@@ -108,16 +109,19 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
 
 void raytracer::shape::STLShape::_centerSTL()
 {
-    if (NUM_THREADS <= 0) {
-        throw exception::Error("raytracer::shape::STLShape::_centerSTL", "Could not create threads");
-    }
 
     std::mutex mutex;
     std::vector<std::thread> threads;
-    const std::size_t chunk_size = (_triangles.size() + NUM_THREADS - 1) / NUM_THREADS;
+    const std::size_t num_threads = std::thread::hardware_concurrency();
 
-    threads.reserve(NUM_THREADS);
-    for (std::size_t t = 0; t < NUM_THREADS; ++t) {
+    if (num_threads <= 0) {
+        throw exception::Error("raytracer::shape::STLShape::_centerSTL", "Could not create threads");
+    }
+
+    const std::size_t chunk_size = (_triangles.size() + num_threads - 1) / num_threads;
+
+    threads.reserve(num_threads);
+    for (std::size_t t = 0; t < num_threads; ++t) {
         threads.emplace_back([this, chunk_size, t, &mutex] {
             _computeMinMax(chunk_size, t, mutex);
         });
@@ -131,7 +135,7 @@ void raytracer::shape::STLShape::_centerSTL()
     _center_y = (_max_y - _min_y) / 2.0f;
     _center_z = (_max_z - _min_z) / 2.0f;
 
-    for (std::size_t t = 0; t < NUM_THREADS; ++t) {
+    for (std::size_t t = 0; t < num_threads; ++t) {
         threads.emplace_back([this, chunk_size, t] {
             _moveTriangles(chunk_size, t);
         });
@@ -226,7 +230,7 @@ float raytracer::shape::STLShape::getAxis(const Vertex &v, const int axis)
     }
 }
 
-int raytracer::shape::STLShape::_buildBVH(const int start, const int count, const int depth, // NOLINT(*-no-recursion)
+int raytracer::shape::STLShape::_buildBVH(const int start, const int count, const unsigned int depth, // NOLINT(*-no-recursion)
     const unsigned int maxAsyncDepth)
 {
     int nodeIdx;
@@ -237,11 +241,12 @@ int raytracer::shape::STLShape::_buildBVH(const int start, const int count, cons
         _bvhNodes.emplace_back();
     }
 
-    auto &[n_bounds, n_left, n_right, n_start, n_count] = _bvhNodes[nodeIdx];
+    auto &[n_bounds, n_left, n_right, n_start, n_count] = _bvhNodes[static_cast<std::size_t>(nodeIdx)];
     AABB box;
-    for (int i = 0; i < count; ++i) {
-        box = i == 0 ? _computeAABB(_triangles[_triIndices[start + i]]) :
-        AABB::expand(box, _computeAABB(_triangles[_triIndices[start + i]]));
+    for (std::size_t i = 0; i < static_cast<std::size_t>(count); ++i) {
+        const auto s_start = static_cast<std::size_t>(start);
+        box = i == 0 ? _computeAABB(_triangles[static_cast<std::size_t>(_triIndices[s_start + i])]) :
+        AABB::expand(box, _computeAABB(_triangles[static_cast<std::size_t>(_triIndices[s_start + i])]));
     }
     n_bounds = box;
 
@@ -266,7 +271,8 @@ int raytracer::shape::STLShape::_buildBVH(const int start, const int count, cons
 
     std::sort(_triIndices.begin() + start, _triIndices.begin() + start + count,
         [&](const int a, const int b) {
-            return centroid(_triangles[a], axis) < centroid(_triangles[b], axis);
+            return centroid(_triangles[static_cast<std::size_t>(a)], axis) <
+                centroid(_triangles[static_cast<std::size_t>(b)], axis);
         });
 
     const int mid = count / 2;
@@ -287,7 +293,7 @@ int raytracer::shape::STLShape::_buildBVH(const int start, const int count, cons
     return nodeIdx;
 }
 
-constexpr raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const char *RESTRICT filename):
+raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const char *RESTRICT filename):
     _origin(origin), _filename(filename)
 {
     _openFile();
@@ -297,7 +303,7 @@ constexpr raytracer::shape::STLShape::STLShape(const math::Point3D &origin, cons
     _centerSTL();
     _triIndices.resize(_triangles.size());
     std::iota(_triIndices.begin(), _triIndices.end(), 0);
-    _buildBVH(0, static_cast<int>(_triIndices.size()));
+    _buildBVH(0, static_cast<int>(_triIndices.size()), 0, std::thread::hardware_concurrency());
 }
 
 bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept
@@ -337,14 +343,16 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
 
 bool raytracer::shape::STLShape::_traverseBVH(const int nodeIdx, const math::Ray &ray) const // NOLINT(*-no-recursion)
 {
-    const BVHNode &node = _bvhNodes[nodeIdx];
+    const BVHNode &node = _bvhNodes[static_cast<std::size_t>(nodeIdx)];
 
     if (!node.bounds.intersect(ray)) {
         return false;
     }
     if (node.isLeaf()) {
-        for (int i = 0; i < node.count; ++i) {
-            if (const Triangle &tri = _triangles[_triIndices[node.start + i]]; _intersectTriangle(ray, tri)) {
+        for (std::size_t i = 0; i < static_cast<std::size_t>(node.count); ++i) {
+            const auto s_start = static_cast<std::size_t>(node.start);
+            if (const Triangle &tri = _triangles[static_cast<std::size_t>(_triIndices[s_start + i])];
+                _intersectTriangle(ray, tri)) {
                 return true;
             }
         }

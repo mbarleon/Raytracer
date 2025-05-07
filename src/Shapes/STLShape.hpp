@@ -12,14 +12,13 @@
 
 #include <vector>
 #include <cfloat>
-#include <thread>
 #include <fstream>
 
 namespace raytracer::shape {
 class STLShape final: public AShape
 {
     public:
-        constexpr explicit STLShape(const math::Point3D &origin, const char *RESTRICT filename);
+        explicit STLShape(const math::Point3D &origin, const char *RESTRICT filename);
 
         [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
 
@@ -48,8 +47,6 @@ class STLShape final: public AShape
             [[nodiscard]] bool isLeaf() const { return left == -1 && right == -1; }
         };
 
-        static const unsigned int NUM_THREADS = std::thread::hardware_concurrency();
-
         void _openFile();
         void _centerSTL();
         void _getTriangles();
@@ -61,7 +58,7 @@ class STLShape final: public AShape
         void _moveTriangles(std::size_t chunk_size, std::size_t t);
         void _computeMinMax(std::size_t chunk_size, std::size_t t, std::mutex &mutex);
         static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept;
-        int _buildBVH(int start, int count, int depth = 0, unsigned int maxAsyncDepth = NUM_THREADS);
+        int _buildBVH(int start, int count, unsigned int depth, unsigned int maxAsyncDepth);
 
         std::ifstream _file;
         uint32_t _n_triangles = 0;

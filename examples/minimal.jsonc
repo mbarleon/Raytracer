@@ -20,7 +20,7 @@
         "resolution": { "width": 1920, "height": 1080 },
         "position": { "x": 0, "y": 20, "z": -100 },
         "rotation": { "x": 0, "y": 9.5, "z": 0 },
-        "fov": 72
+        "fov": 120
     },
 
     "scene": {
@@ -32,7 +32,7 @@
                 "refractive-index": 1.5, // indice de réfraction (1.0 = air)
                 "emissive-intensity": 0.0, // emission de lumière en candela
                 "shininess": 100.0
-            }, 
+            },
             {
                 "name": "ground",
                 "reflectivity": 0.10,
@@ -65,19 +65,29 @@
                 //     "material": "light",
                 //     "color": { "r": 255, "g": 0, "b": 0 }
                 // },
-                {
-                    "position": { "x": 60, "y": 40, "z": 5 },
-                    "radius": 25,
-                    "material": "ground",
-                    "color": { "r": 255, "g": 64, "b": 64 }
-                },
-                {
-                    "position": { "x": -40, "y": -10, "z": 20 },
-                    "radius": 35,
-                    "material": "ground",
-                    "color": { "r": 64, "g": 255, "b": 64 }
-                }
+                // {
+                //     "position": { "x": 60, "y": 40, "z": 5 },
+                //     "radius": 25,
+                //     "material": "ground",
+                //     "color": { "r": 255, "g": 64, "b": 64 }
+                // },
+                // {
+                //      "position": { "x": 60, "y": 40, "z": 5 },
+                //      "radius": 35,
+                //      "material": "ground",
+                //      "color": { "r": 64, "g": 255, "b": 64 }
+                // }
             ],
+            "stl": [
+                {
+                    "origin": { "x": 0, "y": 100, "z": 0 },
+                    "rotation": { "x": 90, "y": 90, "z": 90},
+                    "scale": 1,
+                    "filename": "test.stl",
+                    "material": "ground",
+                    "color": { "r": 255, "g": 255, "b": 255 }
+                }
+            ]
             // "rectangles": [
             //     {
             //         "origin": { "x": 60, "y": 5, "z": 40 },
@@ -87,14 +97,14 @@
             //         "color": { "r": 64, "g": 64, "b": 255 }
             //     }
             // ],
-            "planes": [
-                {
-                    "axis": "Y",
-                    "position": -20,
-                    "material": "ground",
-                    "color": { "r": 64, "g": 64, "b": 255 }
-                }
-            ]
+            // "planes": [
+            //     {
+            //         "axis": "Y",
+            //         "position": -20,
+            //         "material": "ground",
+            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //     }
+            // ],
             // "cylinders": [],
             // "cones": [],
             // "triangles": [],

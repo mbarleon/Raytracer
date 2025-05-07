@@ -28,7 +28,7 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            void render(const IShapesList &shapes, const Render &render) const noexcept;
+            void render(const IShapesList &shapes, const Render &render) const;
 
         private:
             math::Vector2u _resolution;

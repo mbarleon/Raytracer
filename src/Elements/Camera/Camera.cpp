@@ -10,6 +10,8 @@
 #include <cmath>
 #include <fstream>
 
+#include <thread>
+
 // clang-format off
 
 raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D &position,
@@ -191,25 +193,43 @@ raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList 
     return computeColor(intersect, ray, shapes, depth, render);
 }
 
-void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const noexcept
+void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const
 {
+    std::vector<std::thread> threads;
+    std::vector<std::string> rows(_resolution.y);
+    const std::size_t nproc = std::thread::hardware_concurrency();
+
+    if (nproc == 0) {
+        throw exception::Error("raytracer::Camera::render()", "No threads available");
+    }
+    threads.reserve(nproc);
+    auto worker = [&](const unsigned startY, const unsigned step) {
+        math::Ray cameraRay;
+        for (unsigned y = startY; y < _resolution.y; y += step) {
+            std::ostringstream rowBuffer;
+            for (unsigned x = 0; x < _resolution.x; ++x) {
+                const double u = (x + 0.5) / static_cast<double>(_resolution.x);
+                const double v = (y + 0.5) / static_cast<double>(_resolution.y);
+                generateRay(u, v, cameraRay);
+
+                RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
+                pixel.realign(1, 255);
+                rowBuffer << pixel << '\n';
+            }
+            rows[y] = rowBuffer.str();
+        }
+    };
+
+    for (std::size_t i = 0; i < nproc; ++i)
+        threads.emplace_back(worker, i, nproc);
+
+    for (auto &t : threads)
+        t.join();
+
     std::ofstream ppm(render.output.file);
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-
-    math::Ray cameraRay;
-
-    for (unsigned y = 0; y < _resolution.y; ++y) {
-        for (unsigned x = 0; x < _resolution.x; ++x) {
-            const double u = (x + 0.5) / double(_resolution.x);
-            const double v = (y + 0.5) / double(_resolution.y);
-            generateRay(u, v, cameraRay);
-
-            RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
-
-            pixel.realign(1, 255);
-            ppm << pixel << '\n';
-        }
-    }
+    for (const auto& row : rows)
+        ppm << row;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

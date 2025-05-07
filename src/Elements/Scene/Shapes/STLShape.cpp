@@ -369,10 +369,12 @@ bool raytracer::shape::STLShape::intersect(const math::Ray &ray, __attribute__((
 
 math::Vector3D raytracer::shape::STLShape::getPosition() const
 {
-    return math::Vector3D();
+    return math::Vector3D(_center_x, _center_y, _center_z);
 }
 
 math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
 {
-    return math::Vector3D();
+    const auto normal = point - math::Vector3D(_center_x, _center_y, _center_z);
+
+    return normal.normalize();
 }

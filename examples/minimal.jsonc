@@ -14,7 +14,7 @@
             "diffuse": 0.6,
             "specular": 0.5
         },
-        "max-depth": 50, // reflection and refraction limit
+        "max-depth": 10, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"

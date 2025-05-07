@@ -47,10 +47,11 @@ namespace raytracer {
         const IShapesList &shapes);
     const RGBColor computeRefraction(const math::Ray &incoming, const math::Intersect &intersect,
         const IShapesList &shapes, unsigned int depth, const Render &render);
+    const RGBColor computeReflection(const math::Ray &incoming, const math::Intersect &intersect,
+        const IShapesList &shapes, unsigned int depth, const Render &render);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {
-        // reflect R = I - 2 * (I·N) * N
         return I - N * (2.0 * I.dot(N));
     }
 

@@ -27,6 +27,20 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const raytracer::RGBColor raytracer::computeReflection(const math::Ray &incoming,
+    const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
+    const raytracer::Render &render)
+{
+    const math::Vector3D I = incoming._dir.normalize();
+    const math::Vector3D N = intersect.normal;
+
+    // R = I − 2*(I·N)*N
+    const math::Vector3D R = I - N * (2.0 * I.dot(N));
+    const math::Ray reflectedRay = offsetRay(intersect.point, N, R);
+
+    return traceRay(reflectedRay, shapes, depth + 1, render);
+}
+
 const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming,
     const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
     const raytracer::Render &render)
@@ -178,15 +192,16 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
 
     const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
 
-    const RGBColor reflectCol(0,0,0);
-    RGBColor refractCol(0,0,0);
-    // if (mat.reflectivity > 0.0)
-    //     reflectCol = computeReflection(ray, intersect, shapes, depth, render) * mat.reflectivity;
+    RGBColor reflected(0,0,0);
+    if (mat.reflectivity > 0.0)
+        reflected = computeReflection(ray, intersect, shapes, depth, render) * mat.reflectivity;
+
+    RGBColor refracted(0,0,0);
     if (mat.transparency > 0.0)
-        refractCol = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
+        refracted = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
 
     const double K = std::max(0.0, 1.0 - mat.reflectivity - mat.transparency);
-    return ambient + (direct * K) + reflectCol + refractCol;
+    return ambient + (direct * K) + reflected + refracted;
 }
 
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const noexcept

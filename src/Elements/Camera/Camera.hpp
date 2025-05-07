@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
+#include "../../Maths/Intersect.hpp"
+#include "../../Maths/Ray.hpp"
 #include "../../Maths/Vector2u.hpp"
 #include "../../Maths/Vector3D.hpp"
-#include "../../Maths/Ray.hpp"
-#include "../../Maths/Intersect.hpp"
-#include "../Scene/Shapes/IShape.hpp"
 #include "../Render/Render.hpp"
+#include "../Scene/Shapes/IShape.hpp"
 #include "Macro.hpp"
+#include <memory>
+#include <vector>
 
 // clang-format off
 using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
@@ -39,17 +39,27 @@ namespace raytracer {
 
     bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
         math::Intersect &intersect);
-    RGBColor traceRay(const math::Ray &ray, const IShapesList &shapes,
+    const RGBColor traceRay(const math::Ray &ray, const IShapesList &shapes,
         unsigned int depth, const Render &render);
-    RGBColor computeColor(const math::Intersect &intersect, const math::Ray &ray,
-        const IShapesList & shapes, unsigned int depth, const Render &render);
-    RGBColor computeLighting(const math::Point3D &P, const math::Vector3D &N,
-        const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M,
-        const IShapesList &shapes, const Render &render);
-    inline math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N);
-    RGBColor computeRefraction(const math::Ray &ray, const math::Intersect &intersect,
+    const RGBColor computeDirectLighting(const math::Ray &ray,
+        const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
+    const RGBColor computeAmbientOcclusion(const math::Intersect &intersect, int aoSamples,
+        const IShapesList &shapes);
+    const RGBColor computeRefraction(const math::Ray &incoming, const math::Intersect &intersect,
         const IShapesList &shapes, unsigned int depth, const Render &render);
-    RGBColor computeReflection(const math::Ray &ray, const math::Intersect &intersect,
+    const RGBColor computeReflection(const math::Ray &incoming, const math::Intersect &intersect,
         const IShapesList &shapes, unsigned int depth, const Render &render);
+
+    static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
+    {
+        return I - N * (2.0 * I.dot(N));
+    }
+
+    static inline math::Ray offsetRay(const math::Vector3D &origin,const math::Vector3D &normal,
+        const math::Vector3D &direction)
+    {
+        const math::Vector3D offset = (direction.dot(normal) > 0) ? normal : -normal;
+        return {origin + offset * EPSILON, direction};
+    }
 };// namespace raytracer
 // clang-format on

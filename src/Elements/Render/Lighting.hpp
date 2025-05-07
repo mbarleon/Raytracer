@@ -7,13 +7,12 @@
 
 #pragma once
 
-#include "../Scene/Material/Color.hpp"
-
 // clang-format off
 namespace raytracer {
-typedef struct ambiant_light {
-    RGBColor color;
-    double intensity;
-} AmbiantLight;
+typedef struct lighting {
+    double ambient;
+    double diffuse;
+    double specular;
+} Lighting;
 };// namespace raytracer
 // clang-format on

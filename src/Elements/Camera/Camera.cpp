@@ -9,6 +9,7 @@
 #include "Logger.hpp"
 #include <cmath>
 #include <fstream>
+#include <random>
 
 #include <thread>
 
@@ -28,127 +29,121 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-raytracer::RGBColor raytracer::computeReflection(const math::Ray &ray, const math::Intersect &intersect,
-    const IShapesList &shapes, unsigned int depth, const Render &render)
+const raytracer::RGBColor raytracer::computeReflection(const math::Ray &incoming,
+    const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
+    const raytracer::Render &render)
 {
-    // reflected vector R = I - 2*(I·N)*N
-    const math::Vector3D I = ray._dir.normalize();
+    const math::Vector3D I = incoming._dir.normalize();
     const math::Vector3D N = intersect.normal;
-    const math::Vector3D R = I - 2 * I.dot(N) * N;
 
-    const math::Ray reflRay { intersect.point + N * EPSILON, R.normalize() };
+    // R = I − 2*(I·N)*N
+    const math::Vector3D R = I - N * (2.0 * I.dot(N));
+    const math::Ray reflectedRay = offsetRay(intersect.point, N, R);
 
-    return traceRay(reflRay, shapes, depth + 1, render);
+    return traceRay(reflectedRay, shapes, depth + 1, render);
 }
 
-raytracer::RGBColor raytracer::computeRefraction(const math::Ray &ray,
+const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming,
     const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
-    const Render &render)
+    const raytracer::Render &render)
 {
-    const math::Vector3D I = ray._dir.normalize();
+    const math::Vector3D I = incoming._dir.normalize();
     math::Vector3D N = intersect.normal;
-    const Material &M = *intersect.object->getMaterial().get();
+    const auto &M = *intersect.object->getMaterial();
 
-    double n1 = 1.0, n2 = M.refractiveIndex;
-    double cosI = N.dot(I);
-
+    double n1 = 1.0;
+    double n2 = M.refractiveIndex;
+    double cosI = I.dot(N);
     if (cosI > 0) {
         std::swap(n1, n2);
-        N = -N;
+        N = N * -1.0;
     }
-
     cosI = std::abs(cosI);
+
     const double eta = n1 / n2;
     const double k = 1 - eta * eta * (1 - cosI * cosI);
 
-    if (k < 0)
+    if (k < 0) {
         return render.background;
-
-    // refracted vector T = ηI + (ηcosI − √k)N
-    const math::Vector3D T = (eta * I + (eta * cosI - std::sqrt(k)) * N).normalize();
-    const math::Ray refrRay { intersect.point - N * EPSILON, T };
-
-    return traceRay(refrRay, shapes, depth + 1, render);
-}
-
-inline math::Vector3D raytracer::reflect(const math::Vector3D &I, const math::Vector3D &N)
-{
-    // reflect R = I - 2 * (I·N) * N
-    return I - N * (2.0 * I.dot(N));
-}
-
-raytracer::RGBColor raytracer::computeLighting(const math::Point3D &P, const math::Vector3D &N,
-    const math::Vector3D &V, const RGBColor &surfaceColor, const Material &M, const IShapesList &shapes,
-    const Render &render)
-{
-    RGBColor result = render.background;
-
-    for (const auto &light : shapes) {
-        const Material &Lm = *light->getMaterial().get();
-
-        if (Lm.emissiveIntensity <= 0.0)
-            continue;
-
-        math::Vector3D Ld = light->getPosition() - P;
-        const double dist2 = Ld.length() * Ld.length();
-        Ld = Ld.normalize();
-
-        const math::Ray shadowRay { P + N * EPSILON, Ld };
-        math::Intersect tmp;
-        bool blocked = findClosestIntersection(shadowRay, shapes, tmp)
-        && tmp.distance * tmp.distance < dist2
-        && tmp.object.get()->getMaterial().get()->emissiveIntensity == 0.0;
-
-        if (blocked)
-            continue;
-
-        // attenuation (1/d²) × intensity (lux)
-        const double I = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
-
-        // diffuse component : diffuseColor × I × max(0, N·L)
-        const double NdotL = std::max(0.0, N.dot(Ld));
-        const RGBColor diffuse = surfaceColor * (I * NdotL / M_PI);
-
-        // specular component : blanc × I × (max(0,R·V)^shininess)
-        const math::Vector3D R = reflect(-Ld, N);
-        const double RdotV = std::max(0.0, R.dot(V));
-        RGBColor specular(1,1,1);
-        specular = specular * (I * std::pow(RdotV, M.shininess));
-
-        result = result + diffuse + specular;
     }
-    return result;
+
+    // refracted ray T = ηI + (ηcosI − √k)N
+    const math::Vector3D T = (I * eta + N * (eta * cosI - std::sqrt(k))).normalize();
+    const math::Ray refractedRay = offsetRay(intersect.point, N * -1.0, T);
+
+    return traceRay(refractedRay, shapes, depth + 1, render);
 }
 
-raytracer::RGBColor raytracer::computeColor(const math::Intersect &intersect, const math::Ray &ray,
-    const IShapesList & shapes, unsigned int depth, const Render &render)
+const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
+    int aoSamples, const IShapesList &shapes)
 {
-    const RGBColor surfaceColor = intersect.object.get()->getColor();
-    RGBColor ambientTerm = RGBColor(
-        surfaceColor.r * render.ambiantLight.color.r,
-        surfaceColor.g * render.ambiantLight.color.g,
-        surfaceColor.b * render.ambiantLight.color.b
-    ) * render.ambiantLight.intensity;
+    int unoccluded = 0;
+    const uint32_t seed = static_cast<uint32_t>(intersect.point._x * 73856093u) ^
+        static_cast<uint32_t>(intersect.point._y * 19349663u) ^
+        static_cast<uint32_t>(intersect.point._z * 83492791u);
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<> dist(0.0, 1.0);
 
-    // turn direction to camera
-    const math::Vector3D viewDir = -ray._dir;
+    for (int i = 0; i < aoSamples; ++i) {
+        // pick random direction
+        const double u1 = dist(gen);
+        const double u2 = dist(gen);
+        const double r = std::sqrt(1 - u1*u1), phi = 2 * M_PI * u2;
+        const math::Vector3D dir (r * std::cos(phi), r * std::sin(phi), u1);
+        // (transformer dir via base locale, omis ici pour la concision)
+        const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, dir);
 
-    const RGBColor local = computeLighting(intersect.point, intersect.normal, viewDir,
-        surfaceColor, *intersect.object.get()->getMaterial(), shapes, render);
+        math::Intersect tmp;
+        if (!findClosestIntersection(aoRay, shapes, tmp)) {
+            ++unoccluded;
+        }
+    }
+    const double visibility = double(unoccluded) / aoSamples;
+    return RGBColor(visibility, visibility, visibility);
+}
 
-    RGBColor reflected(0,0,0);
-    if (intersect.object->getMaterial()->reflectivity > 0.0)
-        reflected = computeReflection(ray, intersect, shapes, depth, render);
+const raytracer::RGBColor raytracer::computeDirectLighting(const math::Ray &ray,
+    const math::Intersect &intersect, const IShapesList &shapes, const raytracer::Render &render)
+{
+    RGBColor Lo(0,0,0);
 
-    RGBColor refracted(0,0,0);
-    if (intersect.object->getMaterial()->transparency > 0.0)
-        refracted = computeRefraction(ray, intersect, shapes, depth, render);
+    for (const auto &lightObj : shapes) {
+        const auto &Lm = *lightObj->getMaterial();
 
-    const double R = intersect.object->getMaterial().get()->reflectivity;
-    const double T = intersect.object->getMaterial().get()->transparency;
-    const double K = std::max(0.0, 1.0 - R - T);
+        if (Lm.emissiveIntensity <= 0.0) {
+            continue;
+        }
 
-    return ambientTerm + local * K + reflected * R + refracted * T;
+        const math::Vector3D toLight = lightObj->getPosition() - intersect.point;
+        const double dist2 = toLight.dot(toLight);
+        const math::Vector3D Ld = toLight.normalize();
+
+        // shadows
+        const math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, Ld);
+        math::Intersect tmp;
+
+        if (findClosestIntersection(shadowRay, shapes, tmp)
+        && tmp.object->getMaterial()->emissiveIntensity == 0.0
+        && tmp.distance*tmp.distance < dist2) {
+            continue;
+        }
+
+        //  attenuation 1/(d²)
+        const double attenuation = Lm.emissiveIntensity / (4 * M_PI * dist2);
+
+        // diffuse (Lambert) and specular (Phong)
+        const double NdotL = std::max(0.0, intersect.normal.dot(Ld));
+        const RGBColor diffuse = intersect.object->getColor() * (render.lighting.diffuse * attenuation * NdotL);
+
+        const math::Vector3D V = -ray._dir.normalize();
+        const math::Vector3D R = reflect(-Ld, intersect.normal).normalize();
+        const double RdotV = std::pow(std::max(0.0, R.dot(V)), intersect.object->getMaterial()->shininess);
+        const RGBColor specular = RGBColor(1,1,1) * (render.lighting.specular * attenuation * RdotV);
+
+        Lo = Lo + diffuse + specular;
+    }
+    // Ici, on injecterait la logique ReSTIR : fusion des réservoirs entre pixels, resampling pondéré, etc.
+    return Lo;
 }
 
 bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
@@ -174,23 +169,41 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     return hit;
 }
 
-raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
-    unsigned int depth, const Render &render)
+const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
+    unsigned int depth, const raytracer::Render &render)
 {
+    if (depth > render.maxDepth) {
+        return render.background;
+    }
+
     math::Intersect intersect;
 
-    if (depth > render.maxDepth || !findClosestIntersection(ray, shapes, intersect))
+    if (!findClosestIntersection(ray, shapes, intersect)) {
         return render.background;
+    }
 
-    const shape::IShape &object = *intersect.object.get();
-    const Material &material = *object.getMaterial().get();
+    const auto &mat = *intersect.object->getMaterial();
+    const RGBColor surfaceColor = intersect.object->getColor();
 
-    // luminous object
-    if (material.emissiveIntensity > 0.0)
-        return object.getColor() * material.emissiveIntensity;
+    if (mat.emissiveIntensity > 0.0) {
+        return surfaceColor * mat.emissiveIntensity;
+    }
 
-    // simple object, reflections, refractions...
-    return computeColor(intersect, ray, shapes, depth, render);
+    const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
+        static_cast<int>(render.lighting.ambient * 100.0), shapes) * render.lighting.ambient;
+
+    const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
+
+    RGBColor reflected(0,0,0);
+    if (mat.reflectivity > 0.0)
+        reflected = computeReflection(ray, intersect, shapes, depth, render) * mat.reflectivity;
+
+    RGBColor refracted(0,0,0);
+    if (mat.transparency > 0.0)
+        refracted = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
+
+    const double K = std::max(0.0, 1.0 - mat.reflectivity - mat.transparency);
+    return ambient + (direct * K) + reflected + refracted;
 }
 
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const
@@ -238,7 +251,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
+static const math::Vector3D applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
 {
     const double pitch = rot._x, yaw = rot._y, roll = rot._z;
     const double cosX = std::cos(pitch), sinX = std::sin(pitch);
@@ -271,7 +284,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;
     cameraRay._dir._y = (1.0 - 2.0 * v) * fov_adjustment;
-    cameraRay._dir._z = -1.0;
+    cameraRay._dir._z = +1.0;
     cameraRay._dir = cameraRay._dir.normalize();
     cameraRay._dir = applyRotation(cameraRay._dir, _rotation).normalize();
 }

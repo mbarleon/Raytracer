@@ -27,6 +27,11 @@ raytracer::RGBColor raytracer::RGBColor::operator+(const RGBColor &other) const
     return RGBColor(r + other.r, g + other.g, b + other.b);
 }
 
+raytracer::RGBColor raytracer::RGBColor::operator*(const RGBColor &other) const
+{
+    return RGBColor(r * other.r, g * other.g, b * other.b);
+}
+
 raytracer::RGBColor raytracer::RGBColor::operator*(double s) const
 {
     return RGBColor(r * s, g * s, b * s);

@@ -51,7 +51,7 @@ void raytracer::shape::STLShape::_readVertex(Vertex &vertex)
 void raytracer::shape::STLShape::_getTriangles()
 {
     for (uint32_t i = 0; i < _n_triangles; ++i) {
-        Vertex normal, v1, v2, v3;
+        Vertex normal{}, v1{}, v2{}, v3{};
         uint16_t control;
         _readVertex(normal);
         _readVertex(v1);
@@ -205,199 +205,6 @@ void raytracer::shape::STLShape::_centerSTL()
     }
 }
 
-raytracer::shape::STLShape::AABB raytracer::shape::STLShape::_computeAABB(const Triangle &tri)
-{
-    auto min3 = [](float a, float b, float c) {
-        return std::min({a, b, c});
-    };
-    auto max3 = [](float a, float b, float c) {
-        return std::max({a, b, c});
-    };
-    AABB box;
-    box.min = math::Point3D(
-        min3(tri._v1._x, tri._v2._x, tri._v3._x),
-        min3(tri._v1._y, tri._v2._y, tri._v3._y),
-        min3(tri._v1._z, tri._v2._z, tri._v3._z)
-    );
-    box.max = math::Point3D(
-        max3(tri._v1._x, tri._v2._x, tri._v3._x),
-        max3(tri._v1._y, tri._v2._y, tri._v3._y),
-        max3(tri._v1._z, tri._v2._z, tri._v3._z)
-    );
-    return box;
-}
-
-raytracer::shape::STLShape::AABB raytracer::shape::STLShape::AABB::expand(const AABB &a, const AABB &b)
-{
-    return {
-        math::Point3D(
-            std::min(a.min._x, b.min._x),
-            std::min(a.min._y, b.min._y),
-            std::min(a.min._z, b.min._z)
-        ),
-        math::Point3D(
-            std::max(a.max._x, b.max._x),
-            std::max(a.max._y, b.max._y),
-            std::max(a.max._z, b.max._z)
-        )
-    };
-}
-
-bool raytracer::shape::STLShape::AABB::intersect(const math::Ray &ray) const noexcept
-{
-    double t_min = (min._x - ray._origin._x) / ray._dir._x;
-    double t_max = (max._x - ray._origin._x) / ray._dir._x;
-
-    if (t_min > t_max) {
-        std::swap(t_min, t_max);
-    }
-
-    double ty_min = (min._y - ray._origin._y) / ray._dir._y;
-    double ty_max = (max._y - ray._origin._y) / ray._dir._y;
-
-    if (ty_min > ty_max) {
-        std::swap(ty_min, ty_max);
-    }
-    if (t_min > ty_max || ty_min > t_max) {
-        return false;
-    }
-    if (ty_min > t_min) {
-        t_min = ty_min;
-    }
-    if (ty_max < t_max) {
-        t_max = ty_max;
-    }
-
-    double tz_min = (min._z - ray._origin._z) / ray._dir._z;
-    double tz_max = (max._z - ray._origin._z) / ray._dir._z;
-
-    if (tz_min > tz_max) {
-        std::swap(tz_min, tz_max);
-    }
-    return !(t_min > tz_max || tz_min > t_max);
-}
-
-float raytracer::shape::STLShape::getAxis(const Vertex &v, const int axis)
-{
-    switch (axis) {
-        case 0:
-            return v._x;
-        case 1:
-            return v._y;
-        case 2:
-            return v._z;
-        default: throw exception::Error("raytracer::shape::STLShape::getAxis", "Invalid axis index");
-    }
-}
-
-float raytracer::shape::STLShape::_getVertex(const Vertex &v, const int axis) {
-    if (axis == 0) {
-        return v._x;
-    }
-    if (axis == 1) {
-        return v._y;
-    }
-    return v._z;
-}
-
-raytracer::shape::STLShape::AABB raytracer::shape::STLShape::_computeTriangleAABB(const Triangle &tri) {
-    AABB box;
-    box.min = math::Vector3D(
-        std::min({tri._v1._x, tri._v2._x, tri._v3._x}),
-        std::min({tri._v1._y, tri._v2._y, tri._v3._y}),
-        std::min({tri._v1._z, tri._v2._z, tri._v3._z})
-    );
-    box.max = math::Vector3D(
-        std::max({tri._v1._x, tri._v2._x, tri._v3._x}),
-        std::max({tri._v1._y, tri._v2._y, tri._v3._y}),
-        std::max({tri._v1._z, tri._v2._z, tri._v3._z})
-    );
-    return box;
-}
-
-double raytracer::shape::STLShape::_getVectorAxis(const math::Vector3D &v, const int axis)
-{
-    switch (axis) {
-        case 0:
-            return v._x;
-        case 1:
-            return v._y;
-        case 2:
-            return v._z;
-        default:
-            throw exception::Error("raytracer::shape::STLShape::_getVectorAxis", "Invalid axis");
-    }
-}
-
-int raytracer::shape::STLShape::_buildBVH(const int start, const int count, const unsigned int depth, const unsigned int maxAsyncDepth) {
-    int nodeIndex;
-    {
-        std::lock_guard lock(_bvhMutex);
-        nodeIndex = static_cast<int>(_bvhNodes.size());
-        _bvhNodes.emplace_back();
-    }
-
-    auto &node = _bvhNodes[static_cast<std::size_t>(nodeIndex)];
-
-    AABB bounds = _computeTriangleAABB(_triangles[static_cast<std::size_t>(_triIndices[static_cast<std::size_t>(start)])]);
-    for (int i = start + 1; i < count; ++i) {
-        const AABB triBox = _computeTriangleAABB(_triangles[static_cast<std::size_t>(_triIndices[static_cast<std::size_t>(i)])]);
-        bounds = AABB::expand(bounds, triBox);
-    }
-    node.bounds = bounds;
-
-    const int triCount = count - start;
-
-    if (triCount <= 4) {
-        node.start = start;
-        node.count = triCount;
-        return nodeIndex;
-    }
-
-    const auto diag = bounds.max - bounds.min;
-    int axis = 0;
-    if (diag._y > diag._x) {
-        axis = 1;
-    }
-    if (diag._z > _getVectorAxis(diag, axis)) {
-        axis = 2;
-    }
-
-    const float split = 0.5f * static_cast<float>(_getVectorAxis(bounds.min, axis) + _getVectorAxis(bounds.max, axis));
-
-    int mid = start;
-    for (auto i = static_cast<std::size_t>(start); i < static_cast<std::size_t>(count); ++i) {
-        const Triangle& tri = _triangles[static_cast<std::size_t>(_triIndices[i])];
-        const float center =
-            (_getVertex(tri._v1, axis) + _getVertex(tri._v2, axis) + _getVertex(tri._v3, axis)) / 3.0f;
-
-        if (center < split) {
-            std::swap(_triIndices[i], _triIndices[static_cast<std::size_t>(mid)]);
-            ++mid;
-        }
-    }
-
-    if (mid == start || mid == count) {
-        mid = start + triCount / 2;
-    }
-
-    int left, right;
-    if (depth < maxAsyncDepth) {
-        auto future = std::async(std::launch::async, [&]() {
-            return _buildBVH(start, mid, depth + 1, maxAsyncDepth);
-        });
-        right = _buildBVH(mid, count, depth + 1, maxAsyncDepth);
-        left = future.get();
-    } else {
-        left = _buildBVH(start, mid, depth + 1, maxAsyncDepth);
-        right = _buildBVH(mid, count, depth + 1, maxAsyncDepth);
-    }
-
-    node.left = left;
-    node.right = right;
-    return nodeIndex;
-}
-
 raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename, const float scale):
     _scale(scale), _origin(origin), _rotation(rotation), _filename(filename)
 {
@@ -406,9 +213,6 @@ raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Po
     _getTriangles();
     _file.close();
     _centerSTL();
-    _triIndices.resize(_triangles.size());
-    std::iota(_triIndices.begin(), _triIndices.end(), 0);
-    _buildBVH(0, static_cast<int>(_triIndices.size()), 0, std::thread::hardware_concurrency());
     logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale, ", number of triangles ", _triangles.size(), ".");
 }
 
@@ -447,31 +251,8 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
     return f * AC.dot(q) > 0.0f;
 }
 
-bool raytracer::shape::STLShape::_traverseBVH(const int nodeIdx, const math::Ray &ray) const // NOLINT(*-no-recursion)
-{
-    const BVHNode &node = _bvhNodes[static_cast<std::size_t>(nodeIdx)];
-
-    if (!node.bounds.intersect(ray)) {
-        return false;
-    }
-    if (node.isLeaf()) {
-        for (std::size_t i = 0; i < static_cast<std::size_t>(node.count); ++i) {
-            const auto s_start = static_cast<std::size_t>(node.start);
-            if (const Triangle &tri = _triangles[static_cast<std::size_t>(_triIndices[s_start + i])];
-                _intersectTriangle(ray, tri)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    return _traverseBVH(node.left, ray) || _traverseBVH(node.right, ray);
-}
-
 bool raytracer::shape::STLShape::intersect(const math::Ray &ray, __attribute__((unused)) math::Point3D &intPoint) const noexcept
 {
-    // return _traverseBVH(0, ray);
-
     for (const auto &triangle : _triangles) {
         if (_intersectTriangle(ray, triangle)) {
             return true;

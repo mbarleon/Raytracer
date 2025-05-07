@@ -18,6 +18,7 @@
  * @brief template function to extract a value of type <T> from ParsedJson
  * @details handles type checking and conversion for <T>
  *   with special handling for double (accepts int)
+ * @param proto ParsedJson object
  * @return value of type <T>
  */
 template<typename T>
@@ -42,6 +43,7 @@ T get_value(const ParsedJson &proto)
  * @param key the key in the JSON map (e.g., "spheres", "rectangles")
  * @param shapes the IShapesList to populate
  * @param creator the function to create the specific shape
+ * @param materials the MaterialsList to use for material creation
  */
 template<typename ShapeCreator>
 unit_static void emplace_shapes(const JsonMap &primitives, const std::string &key, IShapesList &shapes, ShapeCreator creator,
@@ -64,6 +66,7 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 /**
  * @brief get a string from ParsedJson
  * @details uses get_value template
+ * @param proto ParsedJson object
  * @return string value
  */
 unit_static std::string get_string(const ParsedJson &proto)
@@ -74,6 +77,7 @@ unit_static std::string get_string(const ParsedJson &proto)
 /**
  * @brief clamp_color
  * @details clamp color component to [0, 255] and normalize to [0, 1]
+ * @param component color component
  * @return Normalized color component
  */
 unit_static double clamp_color(double component)
@@ -90,36 +94,34 @@ unit_static double clamp_color(double component)
 /**
  * @brief get RGB color from ParsedJson
  * @details uses get_value for JsonMap and double extraction
+ * @param proto ParsedJson object
  * @return RGBColor object
  */
 unit_static raytracer::RGBColor get_color(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
-    const double r = clamp_color(get_value<double>(obj.at("r")));
-    const double g = clamp_color(get_value<double>(obj.at("g")));
-    const double b = clamp_color(get_value<double>(obj.at("b")));
 
-    return raytracer::RGBColor(r, b, g);
+    return raytracer::RGBColor(clamp_color(get_value<double>(obj.at("r"))), clamp_color(get_value<double>(obj.at("g"))),
+        clamp_color(get_value<double>(obj.at("b"))));
 }
 
 /**
  * @brief get 3D vector from ParsedJson
  * @details use get_value for JsonMap and double extraction
+ * @param proto ParsedJson object
  * @return Vector3D object
  */
 unit_static math::Vector3D get_vec3D(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
-    const double x = get_value<double>(obj.at("x"));
-    const double y = get_value<double>(obj.at("y"));
-    const double z = get_value<double>(obj.at("z"));
 
-    return math::Vector3D(x, y, z);
+    return math::Vector3D(get_value<double>(obj.at("x")), get_value<double>(obj.at("y")), get_value<double>(obj.at("z")));
 }
 
 /**
  * @brief get 2D unsigned vector from ParsedJson
  * @details uses get_value for JsonMap and double extraction
+ * @param proto ParsedJson object
  * @return Vector2u object
  */
 unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
@@ -134,6 +136,8 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
 /**
  * @brief get material from ParsedJson
  * @details uses get_string for material name lookup
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to search
  * @return shared pointer to Material
  */
 unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials)
@@ -150,6 +154,8 @@ unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &
 /**
  * @brief create a material from ParsedJson
  * @details uses get_value for all extractions
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to add the material to
  * @return none <|> adds material to MaterialsList
  */
 unit_static void create_material(const ParsedJson &proto, MaterialsList &materials)
@@ -173,6 +179,8 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
 /**
  * @brief create a sphere from ParsedJson
  * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to use for material creation
  * @return shared pointer to Sphere
  */
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials)
@@ -192,6 +200,8 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
 /**
  * @brief creeate a rectangle from ParsedJso
  * @details Uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to use for material creation
  * @return shared pointer to Rectangle
  */
 unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto, const MaterialsList &materials)
@@ -213,6 +223,8 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
 /**
  * @brief create a plane from ParsedJson
  * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to use for material creation
  * @return shared pointer to Plane
  */
 unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto, const MaterialsList &materials)
@@ -221,16 +233,10 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
     const double position = get_value<double>(obj.at("position"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
     const raytracer::RGBColor color = get_color(obj.at("color"));
-    std::string str = get_string(obj.at("axis"));
+    const std::string str = get_string(obj.at("axis"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z') {
         throw raytracer::exception::Error("Core", "Invalid plane axis");
-    }
-    if (str[0] == 'Y') {
-        str[0] = 'Z';
-    }
-    if (str[0] == 'Z') {
-        str[0] = 'Y';
     }
 
     const std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
@@ -243,6 +249,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 /**
  * @brief entry Point: Create camera
  * @details uses get_value for JsonMap and other extractions
+ * @param camera_json ParsedJson object
  * @return unique pointer to Camera
  */
 std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
@@ -264,6 +271,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 /**
  * @brief entry Point: Create render settings
  * @details uses get_value for JsonMap and other extractions
+ * @param render_json ParsedJson object
  * @return unique pointer to Render
  */
 std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
@@ -290,6 +298,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 /**
  * @brief material factory entry point
  * @details unchanged, relies on create_material
+ * @param json_scene ParsedJson object
  * @return MaterialsList
  */
 MaterialsList material_factory(const ParsedJson &json_scene)
@@ -314,6 +323,8 @@ MaterialsList material_factory(const ParsedJson &json_scene)
 /**
  * @brief primitive factory entry point
  * @details uses emplace_shapes template to handle spheres, rectangles, and planes
+ * @param json_primitives ParsedJson object
+ * @param materials MaterialsList to use for material creation
  * @return IShapesList
  */
 IShapesList primitive_factory(const ParsedJson &json_primitives, const MaterialsList &materials)

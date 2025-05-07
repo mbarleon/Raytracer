@@ -31,6 +31,7 @@ jobs:
             echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
           else
             echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
+            exit 1
           fi
       - name: Check executables
         run: |
@@ -45,10 +46,11 @@ jobs:
           EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
       - name: Check unit_tests
         run: |
-          if ./build.sh && ./build.sh --tests ; then
+          if ./build.sh --tests ; then
             echo "::notice file=build.sh::Unit tests successful (./build.sh --tests)."
           else
             echo "::error file=build.sh::/!\\ UNIT TESTS ERROR (./build.sh --tests)/!\\"
+            exit 1
           fi
         env:
           EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}

@@ -34,18 +34,39 @@ class STLShape final: public AShape
                 _vec(vec[0]), _v1(vec[1]), _v2(vec[2]), _v3(vec[3]) {}
         };
 
+        struct AABB {
+            math::Point3D min, max;
+            static AABB expand(const AABB &a, const AABB &b);
+            [[nodiscard]] bool intersect(const math::Ray& ray) const noexcept;
+        };
+
+        struct BVHNode {
+            AABB bounds;
+            int left = -1, right = -1;
+            int start = 0, count = 0;
+            [[nodiscard]] bool isLeaf() const { return left == -1 && right == -1; }
+        };
+
+        static const unsigned int NUM_THREADS = std::thread::hardware_concurrency();
+
         void _openFile();
         void _centerSTL();
         void _getTriangles();
         void _countTriangles();
         void _checkRead(std::streamsize size) const;
+        static AABB _computeAABB(const Triangle& tri);
+        static float getAxis(const Vertex &v, int axis);
+        bool _traverseBVH(int nodeIdx, const math::Ray& ray) const;
         void _moveTriangles(std::size_t chunk_size, std::size_t t);
         void _computeMinMax(std::size_t chunk_size, std::size_t t, std::mutex &mutex);
-        [[nodiscard]] static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept;
+        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept;
+        int _buildBVH(int start, int count, int depth = 0, unsigned int maxAsyncDepth = NUM_THREADS);
 
         std::ifstream _file;
         uint32_t _n_triangles = 0;
         const math::Point3D _origin;
+        std::vector<int> _triIndices;
+        std::vector<BVHNode> _bvhNodes;
         const char *RESTRICT _filename;
         std::vector<Triangle> _triangles;
         float _center_x = 0, _center_y = 0, _center_z = 0;

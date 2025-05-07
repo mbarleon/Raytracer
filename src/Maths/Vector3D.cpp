@@ -40,6 +40,11 @@ math::Vector3D &math::Vector3D::operator+=(const Vector3D &other)
     return *this;
 }
 
+math::Vector3D math::Vector3D::operator-() const
+{
+    return Vector3D(-_x, -_y, -_z);
+}
+
 math::Vector3D math::Vector3D::operator-(const Vector3D &other) const
 {
     return Vector3D(_x - other._x, _y - other._y, _z - other._z);
@@ -130,4 +135,9 @@ bool math::Vector3D::operator==(const Vector3D &other) const
 bool math::Vector3D::operator!=(const Vector3D &other) const
 {
     return _x != other._x || _y != other._y || _z != other._z;
+}
+
+std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
+{
+    return (os << "{" << self._x << ", " << self._y << ", " << self._z << "}");
 }

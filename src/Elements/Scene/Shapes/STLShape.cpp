@@ -362,7 +362,17 @@ bool raytracer::shape::STLShape::_traverseBVH(const int nodeIdx, const math::Ray
     return _traverseBVH(node.left, ray) || _traverseBVH(node.right, ray);
 }
 
-bool raytracer::shape::STLShape::intersect(const math::Ray &ray) const noexcept
+bool raytracer::shape::STLShape::intersect(const math::Ray &ray, __attribute__((unused)) math::Point3D &intPoint) const noexcept
 {
     return _traverseBVH(0, ray);
+}
+
+math::Vector3D raytracer::shape::STLShape::getPosition() const
+{
+    return math::Vector3D();
+}
+
+math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
+{
+    return math::Vector3D();
 }

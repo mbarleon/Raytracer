@@ -20,6 +20,9 @@ add_compile_options(-Wall -Wextra -Werror -pedantic -Wconversion)
 
 file(GLOB UTILS_SOURCE "src/Utils/*.cpp")
 
+#TODO: in the future, .so for shapes in a folder ./plugins/
+#INFO: Shapes are currently compiled with Core
+
 ########################################
 
 file (GLOB MAIN_SOURCE
@@ -34,7 +37,19 @@ file(GLOB CORE_SOURCE
 file (GLOB PARSER_SOURCE
     "src/Parser/*.cpp")
 
-add_executable(raytracer ${CORE_SOURCE} ${MATH_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${MAIN_SOURCE})
+file(GLOB_RECURSE SCENE_SOURCE
+    "src/Elements/*.cpp")
+
+
+add_executable(raytracer
+    ${UTILS_SOURCE}
+    ${MATH_SOURCE}
+    ${SCENE_SOURCE}
+    ${PARSER_SOURCE}
+    ${CORE_SOURCE}
+    ${MAIN_SOURCE}
+)
+
 
 ########################################
 
@@ -42,15 +57,17 @@ target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 ########################################
 
-file (GLOB SHAPE_SOURCE
-    "src/Shapes/*.cpp")
-
-########################################
-
 file(GLOB TEST_SOURCE
     "tests/*.cpp")
 
-add_executable(unit_tests ${CORE_SOURCE} ${MATH_SOURCE} ${SHAPE_SOURCE} ${UTILS_SOURCE} ${PARSER_SOURCE} ${TEST_SOURCE})
+add_executable(unit_tests
+    ${UTILS_SOURCE}
+    ${MATH_SOURCE}
+    ${SCENE_SOURCE}
+    ${PARSER_SOURCE}
+    ${CORE_SOURCE}
+    ${TEST_SOURCE}
+)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
     target_compile_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)

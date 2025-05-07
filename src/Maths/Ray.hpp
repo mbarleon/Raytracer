@@ -23,4 +23,4 @@ struct Ray {
     [[nodiscard]] Point3D at( double t) const noexcept;
 };
 // clang-format on
-}// namespace math
+};// namespace math

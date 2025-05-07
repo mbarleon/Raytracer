@@ -20,7 +20,10 @@ class STLShape final: public AShape
     public:
         explicit STLShape(const math::Point3D &origin, const char *RESTRICT filename);
 
-        [[nodiscard]] bool intersect(const math::Ray &ray) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept override;
+
+        math::Vector3D getPosition() const override;
+        math::Vector3D getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept override;
 
     private:
         struct Vertex {

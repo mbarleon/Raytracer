@@ -6,7 +6,9 @@
 */
 
 #include "Core.hpp"
-#include <iostream>
+#include "../Parser/Parser.hpp"
+#include "CoreFactory.hpp"
+#include <unordered_map>
 
 /*
 * public
@@ -17,11 +19,18 @@
  * @details Core entry-point, starts the raytracer program
  * @return void
  */
-void raytracer::Core::run()
+void raytracer::Core::run(const char *RESTRICT filename)
 {
-    std::cout << "Corrrrrrre goes brrrrrrrrrrrrrrrr" << std::endl;
-}
+    const parser::JsonValue jsonc = parser::parseJsonc(filename);
+    const auto &root = std::get<JsonMap>(jsonc);
+    const auto &render = root.at("render");
+    const auto &camera = root.at("camera");
+    const auto &scene = std::get<JsonMap>(root.at("scene").value);
+    const auto &primitives = scene.at("primitives");
 
-/*
-* private
-*/
+    _materials = material_factory(root.at("scene"));
+    _shapes = primitive_factory(primitives, _materials);
+    _render = create_render(render);
+    _camera = create_camera(camera);
+    _camera.get()->render(_shapes, *_render.get());
+}

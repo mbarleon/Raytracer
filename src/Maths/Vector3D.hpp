@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <ostream>
+
 namespace math {
 class Vector3D
 {
@@ -23,6 +25,7 @@ class Vector3D
         Vector3D operator+(const Vector3D &other) const;
         Vector3D &operator+=(const Vector3D &other);
 
+        Vector3D operator-() const;
         Vector3D operator-(const Vector3D &other) const;
         Vector3D &operator-=(const Vector3D &other);
 
@@ -45,6 +48,15 @@ class Vector3D
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;
 };
+
+/**
+ * @brief operator `<<` (iostream | ostream)
+ * @details this operator is declared outside Vector3D to avoid `friend` keyword.
+ * it allows you to std::cout << "vector: " << my_vector3D << std::endl;
+ * the vector is shown as: `{x, y, z}`
+ * @return the result (vector)
+ */
+std::ostream &operator<<(std::ostream &os, const Vector3D &self);
 
 /**
  * @brief operator `*` (scalar, vector)

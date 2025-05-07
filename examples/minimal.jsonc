@@ -1,0 +1,104 @@
+{
+    "render": {
+        "antialiasing": {
+            "type": "supersampling", // "none", "supersampling", "adaptive"
+            "samples": 4 // for supersampling
+        },
+        "background-color": { "r": 0, "g": 0, "b": 0 },
+        "ambient-light": {
+            "color": { "r": 255, "g": 255, "b": 255 },
+            "intensity": 0.7
+        },
+        "max-depth": 10, // reflection and refraction limit
+        "output": {
+            "file": "output.ppm",
+            "format": "ppm" // "ppm", "png", "jpg"
+        }
+    },
+
+    "camera": {
+        "resolution": { "width": 1920, "height": 1080 },
+        "position": { "x": 0, "y": 20, "z": -100 },
+        "rotation": { "x": 0, "y": 9.5, "z": 0 },
+        "fov": 72
+    },
+
+    "scene": {
+        "materials": [
+            {
+                "name": "glass",
+                "reflectivity": 0.05, // coefficient de réflexion [0,1]
+                "transparency": 0.95, // coefficient de transparence [0,1]
+                "refractive-index": 1.5, // indice de réfraction (1.0 = air)
+                "emissive-intensity": 0.0, // emission de lumière en candela
+                "shininess": 100.0
+            }, 
+            {
+                "name": "ground",
+                "reflectivity": 0.10,
+                "transparency": 0.0,
+                "refractive-index": 1.9,
+                "emissive-intensity": 0.0,
+                "shininess": 20.0
+            },
+            {
+                "name": "light",
+                "reflectivity": 0.0,
+                "transparency": 0.0,
+                "refractive-index": 0.0,
+                "emissive-intensity": 10.0,
+                "shininess": 50.0
+            }
+        ],
+
+        "primitives": {
+            "spheres": [
+                // {
+                //     "position": { "x": 0, "y": 0, "z": -6 },
+                //     "radius": 2,
+                //     "material": "glass",
+                //     "color": { "r": 0.95, "g": 0.97, "b": 1.00 }
+                // },
+                // {
+                //     "position": { "x": 400, "y": 100, "z": 500 },
+                //     "radius": 2,
+                //     "material": "light",
+                //     "color": { "r": 255, "g": 0, "b": 0 }
+                // },
+                {
+                    "position": { "x": 60, "y": 40, "z": 5 },
+                    "radius": 25,
+                    "material": "ground",
+                    "color": { "r": 255, "g": 64, "b": 64 }
+                },
+                {
+                    "position": { "x": -40, "y": -10, "z": 20 },
+                    "radius": 35,
+                    "material": "ground",
+                    "color": { "r": 64, "g": 255, "b": 64 }
+                }
+            ],
+            // "rectangles": [
+            //     {
+            //         "origin": { "x": 60, "y": 5, "z": 40 },
+            //         "bottom_side": { "x": 10, "y": 20, "z": 30 },
+            //         "left_side": { "x": 40, "y": 50, "z": 60 },
+            //         "material": "ground",
+            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //     }
+            // ],
+            "planes": [
+                {
+                    "axis": "Y",
+                    "position": -20,
+                    "material": "ground",
+                    "color": { "r": 64, "g": 64, "b": 255 }
+                }
+            ]
+            // "cylinders": [],
+            // "cones": [],
+            // "triangles": [],
+            // "scenes": [] // composite design pattern
+        }
+    }
+}

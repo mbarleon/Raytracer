@@ -181,14 +181,14 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
     }
 
     const auto &mat = *intersect.object->getMaterial();
+    const RGBColor surfaceColor = intersect.object->getColor();
 
     if (mat.emissiveIntensity > 0.0) {
-        return intersect.object->getColor() * mat.emissiveIntensity;
+        return surfaceColor * mat.emissiveIntensity;
     }
 
-    const RGBColor ambient = computeAmbientOcclusion(intersect,
-        static_cast<int>(render.lighting.ambient * 100.0), shapes); 
-    //ambient = ambient * mat.ambientOcclusion;
+    const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
+        static_cast<int>(render.lighting.ambient * 100.0), shapes) * render.lighting.ambient;
 
     const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
 

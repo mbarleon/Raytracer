@@ -10,11 +10,11 @@
             "b": 0
         },
         "lighting": {
-            "ambient": 0.4,
+            "ambient": 1.0,
             "diffuse": 0.6,
             "specular": 0.5
         },
-        "max-depth": 10, // reflection and refraction limit
+        "max-depth": 5, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
@@ -28,7 +28,7 @@
         "position": {
             "x": 0,
             "y": 20,
-            "z": -150
+            "z": -100
         },
         "rotation": {
             "x": 0,
@@ -60,7 +60,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 1000.0,
+                "emissive-intensity": 100.0,
                 "shininess": 50.0
             }
         ],
@@ -68,11 +68,11 @@
             "spheres": [
                 {
                     "position": {
-                        "x": 400,
-                        "y": 500,
-                        "z": 100
+                        "x": 80,
+                        "y": 40,
+                        "z": -30
                     },
-                    "radius": 500,
+                    "radius": 25,
                     "material": "light",
                     "color": {
                         "r": 255,

@@ -38,21 +38,32 @@ class STLShape final: public AShape
                 _vec(normal), _v1(v1), _v2(v2), _v3(v3) {}
         };
 
+        struct BVHNode {
+            float min[3], max[3];
+            int left = -1, right = -1;
+            std::vector<size_t> triangleIndices;
+        };
+
         void _openFile();
+        void _buildBVH();
         void _centerSTL();
         void _getTriangles();
         void _countTriangles();
         void _readVertex(Vertex &vertex);
         void _checkRead(std::streamsize size) const;
         void _moveTriangles(std::size_t chunk_size, std::size_t t);
+        bool _intersectBVH(const math::Ray& ray, int nodeIdx) const;
+        int _buildBVHRecursive(std::vector<size_t>& indices, int depth);
         void _computeMinMax(std::size_t chunk_size, std::size_t t, std::mutex &mutex);
         static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept;
+        static bool _rayAABB(const math::Ray& ray, const float min[3], const float max[3]) noexcept;
 
         const float _scale;
         std::ifstream _file;
         uint32_t _n_triangles = 0;
         const math::Point3D _origin;
         const math::Point3D _rotation;
+        std::vector<BVHNode> _bvhNodes;
         const char *RESTRICT _filename;
         std::vector<Triangle> _triangles;
         float _center_x = 0, _center_y = 0, _center_z = 0;

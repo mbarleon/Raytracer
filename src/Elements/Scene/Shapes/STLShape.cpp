@@ -169,17 +169,13 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
 
 void raytracer::shape::STLShape::_centerSTL()
 {
-
     std::mutex mutex;
     std::vector<std::thread> threads;
     const std::size_t num_threads = std::thread::hardware_concurrency();
-
     if (num_threads <= 0) {
         throw exception::Error("raytracer::shape::STLShape::_centerSTL", "Could not create threads");
     }
-
     const std::size_t chunk_size = (_triangles.size() + num_threads - 1) / num_threads;
-
     threads.reserve(num_threads);
     for (std::size_t t = 0; t < num_threads; ++t) {
         threads.emplace_back([this, chunk_size, t, &mutex] {
@@ -190,11 +186,9 @@ void raytracer::shape::STLShape::_centerSTL()
         thread.join();
     }
     threads.clear();
-
     _center_x = (_max_x + _min_x) / 2.0f;
     _center_y = (_max_y + _min_y) / 2.0f;
     _center_z = (_max_z + _min_z) / 2.0f;
-
     for (std::size_t t = 0; t < num_threads; ++t) {
         threads.emplace_back([this, chunk_size, t] {
             _moveTriangles(chunk_size, t);
@@ -213,6 +207,7 @@ raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Po
     _getTriangles();
     _file.close();
     _centerSTL();
+    _buildBVH();
     logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale, ", number of triangles ", _triangles.size(), ".");
 }
 
@@ -228,37 +223,30 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
 
     const math::Vector3D AB = B - A;
     const math::Vector3D AC = C - A;
-
     const math::Vector3D h = ray._dir.cross(AC);
     const auto a = static_cast<float>(AB.dot(h));
-
     if (a == 0.0f) {
         return false;
     }
-
     const float f = 1.0f / a;
     const math::Vector3D s = ray._origin - A;
     const float u = f * static_cast<float>(s.dot(h));
     if (u < 0.0f || u > 1.0f) {
         return false;
     }
-
     const math::Vector3D q = s.cross(AB);
     if (const float v = f * static_cast<float>(ray._dir.dot(q)); v < 0.0f || u + v > 1.0f) {
         return false;
     }
-
     return f * AC.dot(q) > 0.0f;
 }
 
 bool raytracer::shape::STLShape::intersect(const math::Ray &ray, __attribute__((unused)) math::Point3D &intPoint) const noexcept
 {
-    for (const auto &triangle : _triangles) {
-        if (_intersectTriangle(ray, triangle)) {
-            return true;
-        }
+    if (_bvhNodes.empty()) {
+        return false;
     }
-    return false;
+    return _intersectBVH(ray, 0);
 }
 
 math::Vector3D raytracer::shape::STLShape::getPosition() const
@@ -266,9 +254,113 @@ math::Vector3D raytracer::shape::STLShape::getPosition() const
     return math::Vector3D(_center_x, _center_y, _center_z);
 }
 
-math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
+math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __attribute__((unused)) &point) const noexcept
 {
     const auto normal = point - math::Vector3D(_center_x, _center_y, _center_z);
 
     return normal.normalize();
+}
+
+// ...existing code...
+
+void raytracer::shape::STLShape::_buildBVH()
+{
+    std::vector<size_t> indices(_triangles.size());
+    std::iota(indices.begin(), indices.end(), 0);
+    _bvhNodes.clear();
+    _buildBVHRecursive(indices, 0);
+}
+
+int raytracer::shape::STLShape::_buildBVHRecursive(std::vector<size_t> &indices, const int depth) // NOLINT(*-no-recursion)
+{
+    BVHNode node;
+    for (int i = 0; i < 3; ++i) {
+        node.min[i] = FLT_MAX;
+        node.max[i] = -FLT_MAX;
+    }
+    for (const size_t idx : indices) {
+        for (const auto &tri = _triangles[idx]; const auto &[_x, _y, _z] : {tri._v1, tri._v2, tri._v3}) {
+            node.min[0] = std::min(node.min[0], _x);
+            node.max[0] = std::max(node.max[0], _x);
+            node.min[1] = std::min(node.min[1], _y);
+            node.max[1] = std::max(node.max[1], _y);
+            node.min[2] = std::min(node.min[2], _z);
+            node.max[2] = std::max(node.max[2], _z);
+        }
+    }
+    if (indices.size() <= 4) {
+        node.triangleIndices = indices;
+        _bvhNodes.push_back(node);
+        return static_cast<int>(_bvhNodes.size() - 1);
+    }
+    const int axis = depth % 3;
+    std::ranges::sort(indices.begin(), indices.end(), [&](const size_t a, const size_t b) {
+        float ca = (_triangles[a]._v1._x + _triangles[a]._v2._x + _triangles[a]._v3._x) / 3.0f;
+        float cb = (_triangles[b]._v1._x + _triangles[b]._v2._x + _triangles[b]._v3._x) / 3.0f;
+        if (axis == 1) {
+            ca = (_triangles[a]._v1._y + _triangles[a]._v2._y + _triangles[a]._v3._y) / 3.0f;
+            cb = (_triangles[b]._v1._y + _triangles[b]._v2._y + _triangles[b]._v3._y) / 3.0f;
+        } else if (axis == 2) {
+            ca = (_triangles[a]._v1._z + _triangles[a]._v2._z + _triangles[a]._v3._z) / 3.0f;
+            cb = (_triangles[b]._v1._z + _triangles[b]._v2._z + _triangles[b]._v3._z) / 3.0f;
+        }
+        return ca < cb;
+    });
+    const size_t mid = indices.size() / 2;
+    std::vector left(indices.begin(), indices.begin() + static_cast<long>(mid));
+    std::vector right(indices.begin() + static_cast<long>(mid), indices.end());
+    const int nodeIdx = static_cast<int>(_bvhNodes.size());
+    _bvhNodes.push_back(node);
+    _bvhNodes[static_cast<std::size_t>(nodeIdx)].left = _buildBVHRecursive(left, depth + 1);
+    _bvhNodes[static_cast<std::size_t>(nodeIdx)].right = _buildBVHRecursive(right, depth + 1);
+    return nodeIdx;
+}
+
+bool raytracer::shape::STLShape::_rayAABB(const math::Ray &ray, const float min[3], const float max[3]) noexcept
+{
+    float t_min = (min[0] - static_cast<float>(ray._origin._x)) / static_cast<float>(ray._dir._x);
+    float t_max = (max[0] - static_cast<float>(ray._origin._x)) / static_cast<float>(ray._dir._x);
+    if (t_min > t_max) {
+        std::swap(t_min, t_max);
+    }
+    float ty_min = (min[1] - static_cast<float>(ray._origin._y)) / static_cast<float>(ray._dir._y);
+    float ty_max = (max[1] - static_cast<float>(ray._origin._y)) / static_cast<float>(ray._dir._y);
+    if (ty_min > ty_max) {
+        std::swap(ty_min, ty_max);
+    }
+    if (t_min > ty_max || ty_min > t_max) {
+        return false;
+    }
+    if (ty_min > t_min) {
+        t_min = ty_min;
+    }
+    if (ty_max < t_max) {
+        t_max = ty_max;
+    }
+    float tz_min = (min[2] - static_cast<float>(ray._origin._z)) / static_cast<float>(ray._dir._z);
+    float tz_max = (max[2] - static_cast<float>(ray._origin._z)) / static_cast<float>(ray._dir._z);
+    if (tz_min > tz_max) {
+        std::swap(tz_min, tz_max);
+    }
+    if (t_min > tz_max || tz_min > t_max) {
+        return false;
+    }
+    return true;
+}
+
+bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx) const  // NOLINT(*-no-recursion)
+{
+    if (nodeIdx < 0) {
+        return false;
+    }
+    const auto &[min, max, left, right, triangleIndices] = _bvhNodes[static_cast<std::size_t>(nodeIdx)];
+    if (!_rayAABB(ray, min, max)) {
+        return false;
+    }
+    if (!triangleIndices.empty()) {
+        return std::ranges::any_of(triangleIndices, [&](const size_t idx) {
+            return _intersectTriangle(ray, _triangles[idx]);
+        });
+    }
+    return _intersectBVH(ray, left) || _intersectBVH(ray, right);
 }

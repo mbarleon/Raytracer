@@ -27,6 +27,37 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming,
+    const math::Intersect &intersect, const IShapesList &shapes, unsigned int depth,
+    const raytracer::Render &render)
+{
+    const math::Vector3D I = incoming._dir.normalize();
+    math::Vector3D N = intersect.normal;
+    const auto &M = *intersect.object->getMaterial();
+
+    double n1 = 1.0;
+    double n2 = M.refractiveIndex;
+    double cosI = I.dot(N);
+    if (cosI > 0) {
+        std::swap(n1, n2);
+        N = N * -1.0;
+    }
+    cosI = std::abs(cosI);
+
+    const double eta = n1 / n2;
+    const double k = 1 - eta * eta * (1 - cosI * cosI);
+
+    if (k < 0) {
+        return render.background;
+    }
+
+    // refracted ray T = ηI + (ηcosI − √k)N
+    const math::Vector3D T = (I * eta + N * (eta * cosI - std::sqrt(k))).normalize();
+    const math::Ray refractedRay = offsetRay(intersect.point, N * -1.0, T);
+
+    return traceRay(refractedRay, shapes, depth + 1, render);
+}
+
 const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
     int aoSamples, const IShapesList &shapes)
 {
@@ -148,11 +179,11 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
     const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
 
     const RGBColor reflectCol(0,0,0);
-    const RGBColor refractCol(0,0,0);
+    RGBColor refractCol(0,0,0);
     // if (mat.reflectivity > 0.0)
     //     reflectCol = computeReflection(ray, intersect, shapes, depth, render) * mat.reflectivity;
-    // if (mat.transparency > 0.0)
-    //     refractCol = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
+    if (mat.transparency > 0.0)
+        refractCol = computeRefraction(ray, intersect, shapes, depth, render) * mat.transparency;
 
     const double K = std::max(0.0, 1.0 - mat.reflectivity - mat.transparency);
     return ambient + (direct * K) + reflectCol + refractCol;

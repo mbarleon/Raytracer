@@ -45,6 +45,8 @@ namespace raytracer {
         const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
     const RGBColor computeAmbientOcclusion(const math::Intersect &intersect, int aoSamples,
         const IShapesList &shapes);
+    const RGBColor computeRefraction(const math::Ray &incoming, const math::Intersect &intersect,
+        const IShapesList &shapes, unsigned int depth, const Render &render);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {

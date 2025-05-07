@@ -12,6 +12,7 @@
 
 #include <vector>
 #include <cfloat>
+#include <thread>
 #include <fstream>
 
 namespace raytracer::shape {
@@ -72,6 +73,7 @@ class STLShape final: public AShape
         float _center_x = 0, _center_y = 0, _center_z = 0;
         float _min_x = FLT_MAX, _min_y = FLT_MAX, _min_z = FLT_MAX;
         float _max_x = FLT_MIN, _max_y = FLT_MIN, _max_z = FLT_MIN;
+
         static constexpr unsigned int STL_COMMENT_LENGTH = 80;
 };
 }//namespace raytracer::shape

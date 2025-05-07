@@ -7,7 +7,6 @@
 
 #include <mutex>
 #include <ranges>
-#include <thread>
 #include <future>
 #include <numeric>
 #include <algorithm>

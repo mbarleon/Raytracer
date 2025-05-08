@@ -10,8 +10,9 @@
 #include <cmath>
 #include <fstream>
 #include <random>
-
+#include <mutex>
 #include <thread>
+#include <atomic>
 
 // clang-format off
 
@@ -105,8 +106,8 @@ const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Interse
 }
 
 const raytracer::RGBColor raytracer::computeDirectLighting(const ImagePixel &pixel,
-    const math::Ray &ray, const math::Intersect &intersect,
-    const IShapesList &shapes, const IShapesList &lights, const raytracer::Render &render,
+    const math::Ray &ray, const math::Intersect &intersect, const IShapesList &shapes,
+    const IShapesList &lights, const raytracer::Render &render,
     std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
 {
     const uint32_t seed = static_cast<uint32_t>(pixel.coordinates.x * 73856093u) ^
@@ -208,7 +209,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
         }
     }
     for (const auto &light : lights) {
-        if (light->intersect(ray, intersectPoint)) {
+        if (light->intersect(ray, intersectPoint, cullBackFaces)) {
             const double dist = (intersectPoint - ray._origin).length();
             if (dist < distMin) {
                 distMin = dist;
@@ -223,9 +224,9 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     return hit;
 }
 
-const raytracer::RGBColor raytracer::traceRay(const ImagePixel &pixel,
-    const math::Ray &ray, const IShapesList &shapes, const IShapesList &lights,
-    unsigned int depth, const raytracer::Render &render, const bool cullBackFaces,
+const raytracer::RGBColor raytracer::traceRay(const ImagePixel &pixel, const math::Ray &ray,
+    const IShapesList &shapes, const IShapesList &lights, unsigned int depth,
+    const raytracer::Render &render, const bool cullBackFaces,
     std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
 {
     if (depth > render.maxDepth) {
@@ -283,15 +284,26 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
     std::mutex progress_bar_mutex;
 
     const auto worker = [&](const unsigned startY, const unsigned step) {
+        std::vector<std::vector<ReSTIR_Tank>> tank_grid;
         math::Ray cameraRay;
+        ImagePixel camPixel;
+
+        tank_grid.resize(_resolution.y);
+        for (size_t row = 0; row < _resolution.y; ++row) {
+            tank_grid[row].resize(_resolution.x);
+        }
+        camPixel.image = _resolution;
+
         for (unsigned y = startY; y < _resolution.y; y += step) {
             std::ostringstream rowBuffer;
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                const double u = (x + 0.5) / static_cast<double>(_resolution.x);
-                const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-
+                const double u = (x + 0.5) / double(_resolution.x);
+                const double v = (y + 0.5) / double(_resolution.y);
                 generateRay(u, v, cameraRay);
-                RGBColor pixel = traceRay(cameraRay, shapes, 0, render, false);
+                camPixel.coordinates = {x, y};
+
+                RGBColor pixel = traceRay(camPixel, cameraRay, shapes, lights, 0, render, false, tank_grid);
+
                 pixel.realign(1, 255);
                 rowBuffer << pixel << '\n';
             }
@@ -317,30 +329,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
 
     std::ofstream ppm(render.output.file);
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-
-    std::vector<std::vector<ReSTIR_Tank>> tank_grid;
-    math::Ray cameraRay;
-    ImagePixel camPixel;
-
-    tank_grid.resize(_resolution.y);
-    for (size_t row = 0; row < _resolution.y; ++row) {
-        tank_grid[row].resize(_resolution.x);
-    }
-    camPixel.image = _resolution;
-    for (unsigned y = 0; y < _resolution.y; ++y) {
-        for (unsigned x = 0; x < _resolution.x; ++x) {
-            const double u = (x + 0.5) / double(_resolution.x);
-            const double v = (y + 0.5) / double(_resolution.y);
-            generateRay(u, v, cameraRay);
-            camPixel.coordinates = {x, y};
-
-            RGBColor pixel = traceRay(camPixel, cameraRay, shapes, lights, 0, render, tank_grid);
-
-            pixel.realign(1, 255);
-            ppm << pixel << '\n';
-        }
-        logger::progress_bar(static_cast<float>(_resolution.y), static_cast<float>(y + 1));
-    for (const auto& row : rows) {
+    for (const auto &row : rows) {
         ppm << row;
     }
 }

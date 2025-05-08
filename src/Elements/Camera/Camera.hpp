@@ -47,18 +47,15 @@ namespace raytracer {
         const Render &render, bool cullBackFaces, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
     const RGBColor computeDirectLighting(const ImagePixel &pixel,
         const math::Ray &ray, const math::Intersect &intersect, const IShapesList &shapes,
-        const IShapesList &lights, const Render &render,
-        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+        const IShapesList &lights, const Render &render, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
     const RGBColor computeAmbientOcclusion(const math::Intersect &intersect,
         unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights);
-    const RGBColor computeRefraction(const ImagePixel &pixel,
-        const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
-        const IShapesList &lights, unsigned int depth, const Render &render,
-        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
-    const RGBColor computeReflection(const ImagePixel &pixel,
-        const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
-        const IShapesList &lights, unsigned int depth, const Render &render,
-        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+    const RGBColor computeRefraction(const ImagePixel &pixel, const math::Ray &incoming,
+        const math::Intersect &intersect, const IShapesList &shapes, const IShapesList &lights,
+        unsigned int depth, const Render &render, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+    const RGBColor computeReflection(const ImagePixel &pixel, const math::Ray &incoming,
+        const math::Intersect &intersect, const IShapesList &shapes, const IShapesList &lights,
+        unsigned int depth, const Render &render, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {

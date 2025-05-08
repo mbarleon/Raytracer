@@ -57,3 +57,5 @@ cmake-build-debug/
 
 # Temporary image exclusion
 *.ppm
+*.png
+*.stl

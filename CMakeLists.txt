@@ -53,6 +53,12 @@ add_executable(raytracer
 
 ########################################
 
+option(ENABLE_DEBUG "Enable debug definition" OFF)
+
+if(ENABLE_DEBUG)
+    target_compile_definitions(raytracer PRIVATE DEBUG=1)
+endif()
+
 target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 ########################################

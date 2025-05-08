@@ -45,7 +45,8 @@ math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point)
 * @details
 * @return
 */
-bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
+bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &intPoint,
+    __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     const math::Vector3D o_c = ray._origin - _center;
 

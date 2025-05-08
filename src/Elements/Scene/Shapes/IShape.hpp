@@ -21,11 +21,11 @@ class IShape
         virtual void setMaterial(const std::shared_ptr<Material> &material) = 0;
         virtual void setColor(RGBColor color) = 0;
 
-        virtual std::shared_ptr<Material> getMaterial() const = 0;
-        virtual RGBColor getColor() const = 0;
-        virtual math::Vector3D getPosition() const = 0;
-        virtual math::Vector3D getNormalAt(const math::Point3D &point) const noexcept = 0;
+        [[nodiscard]] virtual std::shared_ptr<Material> getMaterial() const = 0;
+        [[nodiscard]] virtual RGBColor getColor() const = 0;
+        [[nodiscard]] virtual math::Vector3D getPosition() const = 0;
+        [[nodiscard]] virtual math::Vector3D getNormalAt(const math::Point3D &point) const noexcept = 0;
 
-        [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept = 0;
+        [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept = 0;
 };
 };// namespace raytracer::shape

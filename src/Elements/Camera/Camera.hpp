@@ -31,7 +31,7 @@ namespace raytracer {
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
             void render(const IShapesList &shapes, const IShapesList &lights,
-                const Render &render) const noexcept;
+                const Render &render) const;
 
         private:
             math::Vector2u _resolution;
@@ -41,10 +41,10 @@ namespace raytracer {
     };
 
     bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-        const IShapesList &lights, math::Intersect &intersect);
+        const IShapesList &lights, math::Intersect &intersect, bool cullBackFaces);
     const RGBColor traceRay(const ImagePixel &pixel, const math::Ray &ray,
         const IShapesList &shapes, const IShapesList &lights, unsigned int depth,
-        const Render &render, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+        const Render &render, bool cullBackFaces, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
     const RGBColor computeDirectLighting(const ImagePixel &pixel,
         const math::Ray &ray, const math::Intersect &intersect, const IShapesList &shapes,
         const IShapesList &lights, const Render &render,

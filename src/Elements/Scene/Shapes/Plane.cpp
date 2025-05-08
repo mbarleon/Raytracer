@@ -41,7 +41,7 @@ math::Vector3D Plane::getNormalAt(const math::Point3D __attribute__((unused)) & 
     }
 }
 
-bool Plane::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
+bool Plane::intersect(const math::Ray &ray, math::Point3D &intPoint, __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     double t;
 

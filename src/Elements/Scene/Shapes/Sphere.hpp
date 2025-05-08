@@ -18,7 +18,7 @@ class Sphere final : public AShape
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
 
-        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept override;
 
     private:
         math::Point3D _center;

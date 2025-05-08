@@ -9,9 +9,11 @@
 #include "../../include/Logger.hpp"
 #include "../Elements/Scene/Shapes/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle.hpp"
+#include "../Elements/Scene/Shapes/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
+
 #include <memory>
 
 /**
@@ -247,6 +249,33 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 }
 
 /**
+* @brief
+* @details private static
+* @return
+*/
+unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJson &proto, const MaterialsList &materials)
+{
+    const auto &obj = std::get<JsonMap>(proto.value);
+    const math::Vector3D origin = get_vec3D(obj.at("origin"));
+    const math::Vector3D rotation = get_vec3D(obj.at("rotation"));
+    const std::string filename = get_string(obj.at("filename"));
+    const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
+    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::RGBColor color = get_color(obj.at("color"));
+
+    auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
+    stl->setMaterial(material);
+    stl->setColor(color);
+    return stl;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
  * @brief entry Point: Create camera
  * @details uses get_value for JsonMap and other extractions
  * @param camera_json ParsedJson object
@@ -342,6 +371,7 @@ IShapesList primitive_factory(const ParsedJson &json_primitives, const Materials
     emplace_shapes(primitives, "spheres", shapes, create_sphere, materials);
     emplace_shapes(primitives, "rectangles", shapes, create_rectangle, materials);
     emplace_shapes(primitives, "planes", shapes, create_plane, materials);
+    emplace_shapes(primitives, "stl", shapes, create_stl, materials);
 
     return shapes;
 }

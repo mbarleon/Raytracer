@@ -22,7 +22,7 @@ class STLShape final: public AShape
     public:
         explicit STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename, float scale);
 
-        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept override;
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept override;
@@ -59,8 +59,8 @@ class STLShape final: public AShape
         static bool _rayAABB(const math::Ray& ray, const float min[3], const float max[3]) noexcept;
         std::optional<size_t> _findTriangleInBVH(const math::Point3D &point, int nodeIdx) const;
         static bool _pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept;
-        bool _intersectBVH(const math::Ray& ray, int nodeIdx, math::Point3D &intPoint) const;
-        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint) noexcept;
+        bool _intersectBVH(const math::Ray& ray, int nodeIdx, math::Point3D &intPoint, bool cullBackFaces) const;
+        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint, const bool cullBackFaces) noexcept;
 
 
         const float _scale;

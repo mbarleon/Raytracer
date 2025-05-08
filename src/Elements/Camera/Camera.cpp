@@ -40,7 +40,7 @@ const raytracer::RGBColor raytracer::computeReflection(const math::Ray &incoming
     const math::Vector3D R = I - N * (2.0 * I.dot(N));
     const math::Ray reflectedRay = offsetRay(intersect.point, N, R);
 
-    return traceRay(reflectedRay, shapes, depth + 1, render);
+    return traceRay(reflectedRay, shapes, depth + 1, render, false);
 }
 
 const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming,
@@ -71,7 +71,7 @@ const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming
     const math::Vector3D T = (I * eta + N * (eta * cosI - std::sqrt(k))).normalize();
     const math::Ray refractedRay = offsetRay(intersect.point, N * -1.0, T);
 
-    return traceRay(refractedRay, shapes, depth + 1, render);
+    return traceRay(refractedRay, shapes, depth + 1, render, false);
 }
 
 const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
@@ -94,7 +94,7 @@ const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Interse
         const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, dir);
 
         math::Intersect tmp;
-        if (!findClosestIntersection(aoRay, shapes, tmp)) {
+        if (!findClosestIntersection(aoRay, shapes, tmp, false)) {
             ++unoccluded;
         }
     }
@@ -122,7 +122,7 @@ const raytracer::RGBColor raytracer::computeDirectLighting(const math::Ray &ray,
         const math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, Ld);
         math::Intersect tmp;
 
-        if (findClosestIntersection(shadowRay, shapes, tmp)
+        if (findClosestIntersection(shadowRay, shapes, tmp, true)
         && tmp.object->getMaterial()->emissiveIntensity == 0.0
         && tmp.distance*tmp.distance < dist2) {
             continue;
@@ -147,14 +147,14 @@ const raytracer::RGBColor raytracer::computeDirectLighting(const math::Ray &ray,
 }
 
 bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-    math::Intersect &intersect)
+    math::Intersect &intersect, const bool cullBackFaces)
 {
     double distMin = std::numeric_limits<double>::infinity();
     math::Point3D intersectPoint;
     bool hit = false;
 
     for (auto &shape : shapes) {
-        if (shape->intersect(ray, intersectPoint)) {
+        if (shape->intersect(ray, intersectPoint, cullBackFaces)) {
             const double dist = (intersectPoint - ray._origin).length();
             if (dist < distMin) {
                 distMin = dist;
@@ -170,7 +170,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
 }
 
 const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShapesList &shapes,
-    unsigned int depth, const raytracer::Render &render)
+    unsigned int depth, const raytracer::Render &render, const bool cullBackFaces)
 {
     if (depth > render.maxDepth) {
         return render.background;
@@ -178,7 +178,7 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
 
     math::Intersect intersect;
 
-    if (!findClosestIntersection(ray, shapes, intersect)) {
+    if (!findClosestIntersection(ray, shapes, intersect, cullBackFaces)) {
         return render.background;
     }
 
@@ -225,7 +225,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
                 const double v = (y + 0.5) / static_cast<double>(_resolution.y);
                 generateRay(u, v, cameraRay);
 
-                RGBColor pixel = traceRay(cameraRay, shapes, 0, render);
+                RGBColor pixel = traceRay(cameraRay, shapes, 0, render, false);
                 pixel.realign(1, 255);
                 rowBuffer << pixel << '\n';
             }

@@ -225,15 +225,17 @@ raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Po
     logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale, ", number of triangles ", _triangles.size(), ".");
 }
 
-bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint) noexcept
+bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint, const bool cullBackFaces) noexcept
 {
     const math::Vector3D A(triangle._v1._x, triangle._v1._y, triangle._v1._z);
     const math::Vector3D B(triangle._v2._x, triangle._v2._y, triangle._v2._z);
     const math::Vector3D C(triangle._v3._x, triangle._v3._y, triangle._v3._z);
 
-    // if (const math::Vector3D N(triangle._vec._x, triangle._vec._y, triangle._vec._z); ray._dir.dot(N) > 0.0f) {
-       // return false;
-    // }
+    if (cullBackFaces) {
+        if (const math::Vector3D N(triangle._vec._x, triangle._vec._y, triangle._vec._z); ray._dir.dot(N) > 0.0f) {
+            return false;
+        }
+    }
 
     const math::Vector3D AB = B - A;
     const math::Vector3D AC = C - A;
@@ -252,7 +254,7 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
     if (const float v = f * static_cast<float>(ray._dir.dot(q)); v < 0.0f || u + v > 1.0f) {
         return false;
     }
-    if (const float t = f * static_cast<float>(AC.dot(q)); t > 0.0f) {
+    if (const float t = f * static_cast<float>(AC.dot(q)); t >= 0.0f) {
         intPoint = ray._origin + ray._dir * t;
         return true;
     }
@@ -260,12 +262,12 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
     return false;
 }
 
-bool raytracer::shape::STLShape::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
+bool raytracer::shape::STLShape::intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept
 {
     if (_bvhNodes.empty()) {
         return false;
     }
-    return _intersectBVH(ray, 0, intPoint);
+    return _intersectBVH(ray, 0, intPoint, cullBackFaces);
 }
 
 math::Vector3D raytracer::shape::STLShape::getPosition() const
@@ -368,7 +370,8 @@ bool raytracer::shape::STLShape::_rayAABB(const math::Ray &ray, const float min[
     return true;
 }
 
-bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx, math::Point3D &intPoint) const // NOLINT(*-no-recursion)
+bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx, math::Point3D &intPoint, // NOLINT(*-no-recursion)
+    const bool cullBackFaces) const
 {
     if (nodeIdx < 0) {
         return false;
@@ -379,10 +382,10 @@ bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int n
     }
     if (!triangleIndices.empty()) {
         return std::ranges::any_of(triangleIndices, [&](const size_t idx) {
-            return _intersectTriangle(ray, _triangles[idx], intPoint);
+            return _intersectTriangle(ray, _triangles[idx], intPoint, cullBackFaces);
         });
     }
-    return _intersectBVH(ray, left, intPoint) || _intersectBVH(ray, right, intPoint);
+    return _intersectBVH(ray, left, intPoint, cullBackFaces) || _intersectBVH(ray, right, intPoint, cullBackFaces);
 }
 
 bool raytracer::shape::STLShape::_pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept

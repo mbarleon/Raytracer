@@ -66,68 +66,68 @@
             }
         ],
         "primitives": {
-            "spheres": [
-                {
-                    "position": {
-                        "x": 80,
-                        "y": 40,
-                        "z": -30
-                    },
-                    "radius": 25,
-                    "material": "light",
-                    "color": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 0
-                    }
-                },
-                {
-                    "position": {
-                        "x": 60,
-                        "y": 40,
-                        "z": 5
-                    },
-                    "radius": 25,
-                    "material": "ground",
-                    "color": {
-                        "r": 255,
-                        "g": 64,
-                        "b": 64
-                    }
-                },
-                {
-                    "position": {
-                        "x": -40,
-                        "y": -10,
-                        "z": 20
-                    },
-                    "radius": 35,
-                    "material": "ground",
-                    "color": {
-                        "r": 64,
-                        "g": 255,
-                        "b": 64
-                    }
-                }
-            ],
-            "planes": [
-                {
-                    "axis": "Y",
-                    "position": -20,
-                    "material": "ground",
-                    "color": {
-                        "r": 64,
-                        "g": 64,
-                        "b": 255
-                    }
-                }
-            ],
+//            "spheres": [
+//                {
+//                    "position": {
+//                        "x": 80,
+//                        "y": 40,
+//                        "z": -30
+//                    },
+//                    "radius": 25,
+//                    "material": "light",
+//                    "color": {
+//                        "r": 255,
+//                        "g": 255,
+//                        "b": 0
+//                    }
+//                },
+//                {
+//                    "position": {
+//                        "x": 60,
+//                        "y": 40,
+//                        "z": 5
+//                    },
+//                    "radius": 25,
+//                    "material": "ground",
+//                    "color": {
+//                        "r": 255,
+//                        "g": 64,
+//                        "b": 64
+//                    }
+//                },
+//                {
+//                    "position": {
+//                        "x": -40,
+//                        "y": -10,
+//                        "z": 20
+//                    },
+//                    "radius": 35,
+//                    "material": "ground",
+//                    "color": {
+//                        "r": 64,
+//                        "g": 255,
+//                        "b": 64
+//                    }
+//                }
+//            ],
+//            "planes": [
+//                {
+//                    "axis": "Y",
+//                    "position": -20,
+//                    "material": "ground",
+//                    "color": {
+//                        "r": 64,
+//                        "g": 64,
+//                        "b": 255
+//                    }
+//                }
+//            ],
             "stl": [
                 {
                     "origin": { "x": 0, "y": 80, "z": 0 },
                     "rotation": { "x": 90, "y": 90, "z": 90},
                     "scale": 0.5,
-                    "filename": "test.stl",
+                    "filename": "simplify_test.stl",
                     "material": "ground",
                     "color": { "r": 255, "g": 255, "b": 255 }
                 }

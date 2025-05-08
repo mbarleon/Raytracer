@@ -24,7 +24,8 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
  * @details
  * @return
  */
-bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D __attribute__((unused)) & intPoint) const noexcept
+bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D __attribute__((unused)) & intPoint,
+    __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     const math::Vector3D normal = _bottom_side.cross(_left_side).normalize();
     const double denom = normal.dot(ray._dir);

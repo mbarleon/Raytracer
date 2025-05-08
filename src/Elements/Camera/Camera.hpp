@@ -28,7 +28,7 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            void render(const IShapesList &shapes, const Render &render) const noexcept;
+            void render(const IShapesList &shapes, const Render &render) const;
 
         private:
             math::Vector2u _resolution;
@@ -38,9 +38,9 @@ namespace raytracer {
     };
 
     bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-        math::Intersect &intersect);
+        math::Intersect &intersect, bool cullBackFaces);
     const RGBColor traceRay(const math::Ray &ray, const IShapesList &shapes,
-        unsigned int depth, const Render &render);
+        unsigned int depth, const Render &render, bool cullBackFaces);
     const RGBColor computeDirectLighting(const math::Ray &ray,
         const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
     const RGBColor computeAmbientOcclusion(const math::Intersect &intersect, int aoSamples,

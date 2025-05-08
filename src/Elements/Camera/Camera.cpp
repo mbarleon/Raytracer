@@ -206,6 +206,7 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
     return ambient + (direct * K) + reflected + refracted;
 }
 
+//TODO: maybe add computations on shaders if possible?
 void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const
 {
     std::vector<std::thread> threads;
@@ -215,34 +216,50 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
     if (nproc == 0) {
         throw exception::Error("raytracer::Camera::render()", "No threads available");
     }
+
     threads.reserve(nproc);
-    auto worker = [&](const unsigned startY, const unsigned step) {
+
+    std::atomic<unsigned> lines_done(0);
+    std::mutex progress_bar_mutex;
+
+    const auto worker = [&](const unsigned startY, const unsigned step) {
         math::Ray cameraRay;
         for (unsigned y = startY; y < _resolution.y; y += step) {
             std::ostringstream rowBuffer;
             for (unsigned x = 0; x < _resolution.x; ++x) {
                 const double u = (x + 0.5) / static_cast<double>(_resolution.x);
                 const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-                generateRay(u, v, cameraRay);
 
+                generateRay(u, v, cameraRay);
                 RGBColor pixel = traceRay(cameraRay, shapes, 0, render, false);
                 pixel.realign(1, 255);
                 rowBuffer << pixel << '\n';
             }
             rows[y] = rowBuffer.str();
+
+            const unsigned done = lines_done.fetch_add(1) + 1;
+
+            if (done % 10 == 0 || done == _resolution.y) {
+                const std::lock_guard<std::mutex> lock(progress_bar_mutex);
+
+                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution.y));
+            }
         }
     };
 
-    for (std::size_t i = 0; i < nproc; ++i)
+    for (std::size_t i = 0; i < nproc; ++i) {
         threads.emplace_back(worker, i, nproc);
+    }
 
-    for (auto &t : threads)
+    for (auto &t : threads) {
         t.join();
+    }
 
     std::ofstream ppm(render.output.file);
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-    for (const auto& row : rows)
+    for (const auto& row : rows) {
         ppm << row;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

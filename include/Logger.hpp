@@ -12,8 +12,6 @@
 
 #if defined(UNIT_TESTS)
     #undef DEBUG
-#else
-    #define DEBUG
 #endif
 
 #ifdef DEBUG

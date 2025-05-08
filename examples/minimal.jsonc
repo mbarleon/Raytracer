@@ -44,7 +44,6 @@
         },
         "fov": 72
     },
-
     "scene": {
         "materials": [
             {
@@ -96,7 +95,37 @@
                     },
                     "radius": 25,
                     "material": "ground",
-                    "color": { "r": 255, "g": 255, "b": 255 }
+                    "color": {
+                        "r": 255,
+                        "g": 64,
+                        "b": 64
+                    }
+                },
+                {
+                    "position": {
+                        "x": -40,
+                        "y": -10,
+                        "z": 20
+                    },
+                    "radius": 35,
+                    "material": "ground",
+                    "color": {
+                        "r": 64,
+                        "g": 255,
+                        "b": 64
+                    }
+                }
+            ],
+            "planes": [
+                {
+                    "axis": "Y",
+                    "position": -20,
+                    "material": "ground",
+                    "color": {
+                        "r": 64,
+                        "g": 64,
+                        "b": 255
+                    }
                 }
             ]
         }

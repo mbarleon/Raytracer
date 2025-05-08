@@ -212,14 +212,14 @@ raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Po
     logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale, ", number of triangles ", _triangles.size(), ".");
 }
 
-bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept
+bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint) noexcept
 {
     const math::Vector3D A(triangle._v1._x, triangle._v1._y, triangle._v1._z);
     const math::Vector3D B(triangle._v2._x, triangle._v2._y, triangle._v2._z);
     const math::Vector3D C(triangle._v3._x, triangle._v3._y, triangle._v3._z);
 
     // if (const math::Vector3D N(triangle._vec._x, triangle._vec._y, triangle._vec._z); ray._dir.dot(N) > 0.0f) {
-    //    return false;
+       // return false;
     // }
 
     const math::Vector3D AB = B - A;
@@ -239,15 +239,20 @@ bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const 
     if (const float v = f * static_cast<float>(ray._dir.dot(q)); v < 0.0f || u + v > 1.0f) {
         return false;
     }
-    return f * AC.dot(q) > 0.0f;
+    if (const float t = f * static_cast<float>(AC.dot(q)); t > 0.0f) {
+        intPoint = ray._origin + ray._dir * t;
+        return true;
+    }
+
+    return false;
 }
 
-bool raytracer::shape::STLShape::intersect(const math::Ray &ray, __attribute__((unused)) math::Point3D &intPoint) const noexcept
+bool raytracer::shape::STLShape::intersect(const math::Ray &ray, math::Point3D &intPoint) const noexcept
 {
     if (_bvhNodes.empty()) {
         return false;
     }
-    return _intersectBVH(ray, 0);
+    return _intersectBVH(ray, 0, intPoint);
 }
 
 math::Vector3D raytracer::shape::STLShape::getPosition() const
@@ -255,11 +260,14 @@ math::Vector3D raytracer::shape::STLShape::getPosition() const
     return math::Vector3D(_center_x, _center_y, _center_z);
 }
 
-math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D __attribute__((unused)) &point) const noexcept
+math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D &point) const noexcept
 {
-    const auto normal = point - math::Vector3D(_center_x, _center_y, _center_z);
 
-    return normal.normalize();
+    if (const std::optional<std::size_t> size = _findTriangleInBVH(point, 0); size.has_value()) {
+        const auto &[_x, _y, _z] = _triangles[size.value()]._vec;
+        return math::Vector3D(_x, _y, _z).normalize();
+    }
+    return math::Vector3D(_center_x, _center_y, _center_z).normalize();
 }
 
 void raytracer::shape::STLShape::_buildBVH()
@@ -347,7 +355,7 @@ bool raytracer::shape::STLShape::_rayAABB(const math::Ray &ray, const float min[
     return true;
 }
 
-bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx) const  // NOLINT(*-no-recursion)
+bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx, math::Point3D &intPoint) const // NOLINT(*-no-recursion)
 {
     if (nodeIdx < 0) {
         return false;
@@ -358,8 +366,67 @@ bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int n
     }
     if (!triangleIndices.empty()) {
         return std::ranges::any_of(triangleIndices, [&](const size_t idx) {
-            return _intersectTriangle(ray, _triangles[idx]);
+            return _intersectTriangle(ray, _triangles[idx], intPoint);
         });
     }
-    return _intersectBVH(ray, left) || _intersectBVH(ray, right);
+    return _intersectBVH(ray, left, intPoint) || _intersectBVH(ray, right, intPoint);
+}
+
+bool raytracer::shape::STLShape::_pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept
+{
+    return (point._x >= min[0] && point._x <= max[0] &&
+            point._y >= min[1] && point._y <= max[1] &&
+            point._z >= min[2] && point._z <= max[2]);
+}
+
+std::optional<size_t> raytracer::shape::STLShape::_findTriangleInBVH(const math::Point3D &point, const int nodeIdx) const // NOLINT(*-no-recursion)
+{
+    if (nodeIdx < 0) {
+        return std::nullopt;
+    }
+
+    const auto &[min, max, left, right, triangleIndices] = _bvhNodes[static_cast<std::size_t>(nodeIdx)];
+
+    if (!_pointInAABB(point, min, max)) {
+        return std::nullopt;
+    }
+
+    for (const auto &idx : triangleIndices) {
+        if (_pointInTriangle(point, _triangles[idx])) {
+            return idx;
+        }
+    }
+
+    if (const auto leftResult = _findTriangleInBVH(point, left)) {
+        return leftResult;
+    }
+    return _findTriangleInBVH(point, right);
+}
+
+bool raytracer::shape::STLShape::_pointInTriangle(const math::Point3D &point, const Triangle &triangle)
+{
+    const math::Vector3D A(triangle._v1._x, triangle._v1._y, triangle._v1._z);
+    const math::Vector3D B(triangle._v2._x, triangle._v2._y, triangle._v2._z);
+    const math::Vector3D C(triangle._v3._x, triangle._v3._y, triangle._v3._z);
+
+    const math::Vector3D v0 = B - A;
+    const math::Vector3D v1 = C - A;
+    const math::Vector3D v2 = point - A;
+
+    const auto dot00 = static_cast<float>(v0.dot(v0));
+    const auto dot01 = static_cast<float>(v0.dot(v1));
+    const auto dot02 = static_cast<float>(v0.dot(v2));
+    const auto dot11 = static_cast<float>(v1.dot(v1));
+    const auto dot12 = static_cast<float>(v1.dot(v2));
+
+    const float denom = dot00 * dot11 - dot01 * dot01;
+    if (denom == 0.0f) {
+        return false;
+    }
+
+    const float invDenom = 1.0f / denom;
+    const float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    const float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    return (u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f);
 }

@@ -52,11 +52,15 @@ class STLShape final: public AShape
         void _readVertex(Vertex &vertex);
         void _checkRead(std::streamsize size) const;
         void _moveTriangles(std::size_t chunk_size, std::size_t t);
-        bool _intersectBVH(const math::Ray& ray, int nodeIdx) const;
         int _buildBVHRecursive(std::vector<size_t>& indices, int depth);
         void _computeMinMax(std::size_t chunk_size, std::size_t t, std::mutex &mutex);
-        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle) noexcept;
+        static bool _pointInTriangle(const math::Point3D &point, const Triangle &triangle);
         static bool _rayAABB(const math::Ray& ray, const float min[3], const float max[3]) noexcept;
+        std::optional<size_t> _findTriangleInBVH(const math::Point3D &point, int nodeIdx) const;
+        static bool _pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept;
+        bool _intersectBVH(const math::Ray& ray, int nodeIdx, math::Point3D &intPoint) const;
+        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint) noexcept;
+
 
         const float _scale;
         std::ifstream _file;

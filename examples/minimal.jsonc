@@ -121,17 +121,17 @@
                         "b": 255
                     }
                 }
+            ],
+            "stl": [
+                {
+                    "origin": { "x": 0, "y": 80, "z": 0 },
+                    "rotation": { "x": 90, "y": 90, "z": 90},
+                    "scale": 0.5,
+                    "filename": "test.stl",
+                    "material": "ground",
+                    "color": { "r": 255, "g": 255, "b": 255 }
+                }
             ]
-//            "stl": [
-//                {
-//                    "origin": { "x": 0, "y": 100, "z": 0 },
-//                    "rotation": { "x": 90, "y": 90, "z": 90},
-//                    "scale": 1,
-//                    "filename": "test.stl",
-//                    "material": "ground",
-//                    "color": { "r": 255, "g": 255, "b": 255 }
-//                }
-//            ]
         }
     }
 }

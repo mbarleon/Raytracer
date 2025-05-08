@@ -429,11 +429,11 @@ bool raytracer::shape::STLShape::_pointInTriangle(const math::Point3D &point, co
     const math::Vector3D v1 = C - A;
     const math::Vector3D v2 = point - A;
 
-    const auto dot00 = static_cast<float>(v0.dot(v0));
-    const auto dot01 = static_cast<float>(v0.dot(v1));
-    const auto dot02 = static_cast<float>(v0.dot(v2));
-    const auto dot11 = static_cast<float>(v1.dot(v1));
-    const auto dot12 = static_cast<float>(v1.dot(v2));
+    const float dot00 = static_cast<float>(v0.dot(v0));
+    const float dot01 = static_cast<float>(v0.dot(v1));
+    const float dot02 = static_cast<float>(v0.dot(v2));
+    const float dot11 = static_cast<float>(v1.dot(v1));
+    const float dot12 = static_cast<float>(v1.dot(v2));
 
     const float denom = dot00 * dot11 - dot01 * dot01;
     if (denom == 0.0f) {

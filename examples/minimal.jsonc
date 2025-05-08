@@ -5,20 +5,20 @@
             "samples": 4 // for supersampling
         },
         "ambient-occlusion": {
-            "samples": 1,
+            "samples": 40, // 40 for realism, 1 for fast testing
             "restir": {
                 "spatial": {
-                    "radius": 1.0,
-                    "samples": 4
+                    "radius": 1,
+                    "samples": 8
                 },
                 "temporal": {
                     "samples": 1
                 }
             }
         },
-        "max-depth": 5, // reflection and refraction limit
+        "max-depth": 10, // reflection and refraction limit
         "lighting": {
-            "ambient": 1.0,
+            "ambient": 0.6,
             "diffuse": 0.6,
             "specular": 0.5
         },
@@ -35,7 +35,7 @@
         "position": {
             "x": 0,
             "y": 20,
-            "z": -100
+            "z": -200
         },
         "rotation": {
             "x": 0,
@@ -67,7 +67,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 100.0,
+                "emissive-intensity": 1000.0,
                 "shininess": 50.0
             }
         ],
@@ -75,9 +75,9 @@
             "spheres": [
                 {
                     "position": {
-                        "x": 80,
-                        "y": 80,
-                        "z": -30
+                        "x": 60,
+                        "y": 150,
+                        "z": 5
                     },
                     "radius": 25,
                     "material": "light",

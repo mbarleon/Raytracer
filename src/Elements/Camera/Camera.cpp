@@ -247,7 +247,7 @@ const raytracer::RGBColor raytracer::traceRay(const ImagePixel &pixel, const mat
     }
 
     const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
-        static_cast<int>(render.occlusion.samples * 100.0), shapes, lights) * render.lighting.ambient;
+        static_cast<int>(render.occlusion.samples * 100.0), shapes, lights) * (render.lighting.ambient + 0.5);
 
     const RGBColor direct = computeDirectLighting(pixel, ray, intersect, shapes, lights,
         render, tank_grid);

@@ -4,17 +4,24 @@
             "type": "supersampling", // "none", "supersampling", "adaptive"
             "samples": 4 // for supersampling
         },
-        "background-color": {
-            "r": 0,
-            "g": 0,
-            "b": 0
+        "ambient-occlusion": {
+            "samples": 16,
+            "restir": {
+                "spatial": {
+                    "radius": 1.0,
+                    "samples": 4
+                },
+                "temporal": {
+                    "samples": 1
+                }
+            }
         },
+        "max-depth": 5, // reflection and refraction limit
         "lighting": {
             "ambient": 1.0,
             "diffuse": 0.6,
             "specular": 0.5
         },
-        "max-depth": 5, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
@@ -66,68 +73,28 @@
             }
         ],
         "primitives": {
-//            "spheres": [
-//                {
-//                    "position": {
-//                        "x": 80,
-//                        "y": 40,
-//                        "z": -30
-//                    },
-//                    "radius": 25,
-//                    "material": "light",
-//                    "color": {
-//                        "r": 255,
-//                        "g": 255,
-//                        "b": 0
-//                    }
-//                },
-//                {
-//                    "position": {
-//                        "x": 60,
-//                        "y": 40,
-//                        "z": 5
-//                    },
-//                    "radius": 25,
-//                    "material": "ground",
-//                    "color": {
-//                        "r": 255,
-//                        "g": 64,
-//                        "b": 64
-//                    }
-//                },
-//                {
-//                    "position": {
-//                        "x": -40,
-//                        "y": -10,
-//                        "z": 20
-//                    },
-//                    "radius": 35,
-//                    "material": "ground",
-//                    "color": {
-//                        "r": 64,
-//                        "g": 255,
-//                        "b": 64
-//                    }
-//                }
-//            ],
-//            "planes": [
-//                {
-//                    "axis": "Y",
-//                    "position": -20,
-//                    "material": "ground",
-//                    "color": {
-//                        "r": 64,
-//                        "g": 64,
-//                        "b": 255
-//                    }
-//                }
-//            ],
-            "stl": [
+            "spheres": [
                 {
-                    "origin": { "x": 0, "y": 80, "z": 0 },
-                    "rotation": { "x": 90, "y": 90, "z": 90},
-                    "scale": 0.5,
-                    "filename": "simplify_test.stl",
+                    "position": {
+                        "x": 80,
+                        "y": 80,
+                        "z": -30
+                    },
+                    "radius": 25,
+                    "material": "light",
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 0
+                    }
+                },
+                {
+                    "position": {
+                        "x": 60,
+                        "y": 40,
+                        "z": 5
+                    },
+                    "radius": 25,
                     "material": "ground",
                     "color": { "r": 255, "g": 255, "b": 255 }
                 }

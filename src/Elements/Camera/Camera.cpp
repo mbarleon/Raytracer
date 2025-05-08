@@ -64,7 +64,7 @@ const raytracer::RGBColor raytracer::computeRefraction(const math::Ray &incoming
     const double k = 1 - eta * eta * (1 - cosI * cosI);
 
     if (k < 0) {
-        return render.background;
+        return RGBColor(0,0,0);
     }
 
     // refracted ray T = ηI + (ηcosI − √k)N
@@ -173,13 +173,13 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
     unsigned int depth, const raytracer::Render &render, const bool cullBackFaces)
 {
     if (depth > render.maxDepth) {
-        return render.background;
+        return RGBColor(0,0,0);
     }
 
     math::Intersect intersect;
 
     if (!findClosestIntersection(ray, shapes, intersect, cullBackFaces)) {
-        return render.background;
+        return RGBColor(0,0,0);
     }
 
     const auto &mat = *intersect.object->getMaterial();
@@ -190,7 +190,7 @@ const raytracer::RGBColor raytracer::traceRay(const math::Ray &ray, const IShape
     }
 
     const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
-        static_cast<int>(render.lighting.ambient * 100.0), shapes) * render.lighting.ambient;
+        static_cast<int>(render.occlusion.samples * 100.0), shapes) * render.lighting.ambient;
 
     const RGBColor direct = computeDirectLighting(ray, intersect, shapes, render);
 

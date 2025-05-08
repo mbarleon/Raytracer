@@ -314,8 +314,8 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const auto &rest_obj = get_value<JsonMap>(ambi_obj.at("restir"));
     const auto &rest_sp_obj = get_value<JsonMap>(rest_obj.at("spatial"));
     const auto &rest_tm_obj = get_value<JsonMap>(rest_obj.at("temporal"));
-    const raytracer::SpacialReSTIR sp_rest = {get_value<double>(rest_sp_obj.at("radius")), static_cast<unsigned int>(get_value<int>(rest_sp_obj.at("samples")))};
-    const raytracer::TemporalReSTIR tm_rest = {static_cast<unsigned int>(get_value<int>(rest_tm_obj.at("samples")))};
+    const struct raytracer::spatial_restir sp_rest = {get_value<double>(rest_sp_obj.at("radius")), static_cast<unsigned int>(get_value<int>(rest_sp_obj.at("samples")))};
+    const struct raytracer::temporal_restir tm_rest = {static_cast<unsigned int>(get_value<int>(rest_tm_obj.at("samples")))};
     const raytracer::ReSTIR rest = {sp_rest, tm_rest};
     const raytracer::AmbientOcclusion ambi = {static_cast<unsigned int>(get_value<int>(ambi_obj.at("samples"))), rest};
 

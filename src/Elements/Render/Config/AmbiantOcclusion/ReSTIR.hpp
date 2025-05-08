@@ -2,16 +2,25 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** Spatial
+** ReSTIR
 */
 
 #pragma once
 
 // clang-format off
 namespace raytracer {
-typedef struct spatial_restir {
+struct spatial_restir {
     double radius;
     unsigned int samples;
-} SpacialReSTIR;
+};
+
+struct temporal_restir {
+    unsigned int samples;
+};
+
+typedef struct restir {
+    struct spatial_restir spatial;
+    struct temporal_restir temporal;
+} ReSTIR;
 };// namespace raytracer
 // clang-format on

@@ -60,7 +60,7 @@ class STLShape final: public AShape
         std::optional<size_t> _findTriangleInBVH(const math::Point3D &point, int nodeIdx) const;
         static bool _pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept;
         bool _intersectBVH(const math::Ray& ray, int nodeIdx, math::Point3D &intPoint, bool cullBackFaces) const;
-        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint, const bool cullBackFaces) noexcept;
+        static bool _intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint, bool cullBackFaces) noexcept;
 
 
         const float _scale;

@@ -61,13 +61,13 @@ void raytracer::shape::STLShape::_getTriangles()
         _file.read(reinterpret_cast<char *>(&control), sizeof(uint16_t));
         _checkRead(sizeof(uint16_t));
 
-        float ux = v2._x - v1._x, uy = v2._y - v1._y, uz = v2._z - v1._z;
-        float vx = v3._x - v1._x, vy = v3._y - v1._y, vz = v3._z - v1._z;
+        const float ux = v2._x - v1._x, uy = v2._y - v1._y, uz = v2._z - v1._z;
+        const float vx = v3._x - v1._x, vy = v3._y - v1._y, vz = v3._z - v1._z;
         normal._x = uy * vz - uz * vy;
         normal._y = uz * vx - ux * vz;
         normal._z = ux * vy - uy * vx;
 
-        if (float len = std::sqrt(normal._x * normal._x + normal._y * normal._y + normal._z * normal._z);
+        if (const float len = std::sqrt(normal._x * normal._x + normal._y * normal._y + normal._z * normal._z);
             len > 0.0f) {
             normal._x /= len;
             normal._y /= len;
@@ -444,5 +444,5 @@ bool raytracer::shape::STLShape::_pointInTriangle(const math::Point3D &point, co
     const float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
     const float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-    return (u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.0f);
+    return u >= 0.0f && v >= 0.0f && u + v <= 1.0f;
 }

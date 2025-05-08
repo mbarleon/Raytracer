@@ -5,7 +5,7 @@
             "samples": 4 // for supersampling
         },
         "ambient-occlusion": {
-            "samples": 16,
+            "samples": 1,
             "restir": {
                 "spatial": {
                     "radius": 1.0,

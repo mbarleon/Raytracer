@@ -2,19 +2,18 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** ReSTIR
+** Render
 */
-
-#include "ReSTIR/Spatial.hpp"
-#include "ReSTIR/Temporal.hpp"
 
 #pragma once
 
+#include "AmbiantOcclusion/ReSTIR.hpp"
+
 // clang-format off
 namespace raytracer {
-typedef struct restir {
-    SpacialReSTIR spacial;
-    TemporalReSTIR temporal;
-} ReSTIR;
+typedef struct ambient_occlusion {
+    unsigned int samples;
+    ReSTIR restir;
+} AmbientOcclusion;
 };// namespace raytracer
 // clang-format on

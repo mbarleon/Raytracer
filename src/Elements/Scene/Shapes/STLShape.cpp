@@ -60,6 +60,19 @@ void raytracer::shape::STLShape::_getTriangles()
         _readVertex(v3);
         _file.read(reinterpret_cast<char *>(&control), sizeof(uint16_t));
         _checkRead(sizeof(uint16_t));
+
+        float ux = v2._x - v1._x, uy = v2._y - v1._y, uz = v2._z - v1._z;
+        float vx = v3._x - v1._x, vy = v3._y - v1._y, vz = v3._z - v1._z;
+        normal._x = uy * vz - uz * vy;
+        normal._y = uz * vx - ux * vz;
+        normal._z = ux * vy - uy * vx;
+
+        if (float len = std::sqrt(normal._x * normal._x + normal._y * normal._y + normal._z * normal._z);
+            len > 0.0f) {
+            normal._x /= len;
+            normal._y /= len;
+            normal._z /= len;
+        }
         _triangles.emplace_back(normal, v1, v2, v3);
     }
     if (_n_triangles != _triangles.size()) {

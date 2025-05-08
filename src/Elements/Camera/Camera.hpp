@@ -13,6 +13,8 @@
 #include "../../Maths/Vector3D.hpp"
 #include "../Render/Render.hpp"
 #include "../Scene/Shapes/IShape.hpp"
+#include "../Render/Structs/ReSTIR_Tank.hpp"
+#include "ImagePixel.hpp"
 #include "Macro.hpp"
 #include <memory>
 #include <vector>
@@ -28,7 +30,8 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            void render(const IShapesList &shapes, const Render &render) const noexcept;
+            void render(const IShapesList &shapes, const IShapesList &lights,
+                const Render &render) const noexcept;
 
         private:
             math::Vector2u _resolution;
@@ -38,17 +41,24 @@ namespace raytracer {
     };
 
     bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-        math::Intersect &intersect);
-    const RGBColor traceRay(const math::Ray &ray, const IShapesList &shapes,
-        unsigned int depth, const Render &render);
-    const RGBColor computeDirectLighting(const math::Ray &ray,
-        const math::Intersect &intersect, const IShapesList &shapes, const Render &render);
-    const RGBColor computeAmbientOcclusion(const math::Intersect &intersect, int aoSamples,
-        const IShapesList &shapes);
-    const RGBColor computeRefraction(const math::Ray &incoming, const math::Intersect &intersect,
-        const IShapesList &shapes, unsigned int depth, const Render &render);
-    const RGBColor computeReflection(const math::Ray &incoming, const math::Intersect &intersect,
-        const IShapesList &shapes, unsigned int depth, const Render &render);
+        const IShapesList &lights, math::Intersect &intersect);
+    const RGBColor traceRay(const ImagePixel &pixel, const math::Ray &ray,
+        const IShapesList &shapes, const IShapesList &lights, unsigned int depth,
+        const Render &render, std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+    const RGBColor computeDirectLighting(const ImagePixel &pixel,
+        const math::Ray &ray, const math::Intersect &intersect, const IShapesList &shapes,
+        const IShapesList &lights, const Render &render,
+        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+    const RGBColor computeAmbientOcclusion(const math::Intersect &intersect,
+        unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights);
+    const RGBColor computeRefraction(const ImagePixel &pixel,
+        const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
+        const IShapesList &lights, unsigned int depth, const Render &render,
+        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
+    const RGBColor computeReflection(const ImagePixel &pixel,
+        const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
+        const IShapesList &lights, unsigned int depth, const Render &render,
+        std::vector<std::vector<ReSTIR_Tank>> &tank_grid);
 
     static inline const math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N)
     {

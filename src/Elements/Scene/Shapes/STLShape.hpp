@@ -14,6 +14,7 @@
 #include <vector>
 #include <cfloat>
 #include <fstream>
+#include <optional>
 
 namespace raytracer::shape {
 class STLShape final: public AShape

@@ -48,3 +48,13 @@ Test(rectangle, parallel_ray)
 
     cr_assert_not(result, "Parallel ray should not intersect");
 }
+
+Test(rectangle, getPosition)
+{
+    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
+    const math::Vector3D position = rect.getPosition();
+
+    cr_assert_eq(position._x, 0);
+    cr_assert_eq(position._y, 0);
+    cr_assert_eq(position._z, 0);
+}

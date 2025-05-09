@@ -5,15 +5,13 @@
 ** STLShape
 */
 
-#include <cmath>
-#include <ranges>
-#include <future>
-#include <thread>
-#include <numeric>
-#include <algorithm>
+#include "STLShape.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
-#include "STLShape.hpp"
+#include <algorithm>
+#include <cmath>
+#include <numeric>
+#include <thread>
 
 void raytracer::shape::STLShape::_openFile()
 {
@@ -35,7 +33,8 @@ void raytracer::shape::STLShape::_countTriangles()
     try {
         _triangles.reserve(_n_triangles);
     } catch (__attribute__((unused)) const std::bad_alloc &e) {
-        throw exception::Error("raytracer::shape::STLShape::_countTriangles", "Could not allocate memory for ", std::string(_filename));
+        throw exception::Error("raytracer::shape::STLShape::_countTriangles", "Could not allocate memory for ",
+            std::string(_filename));
     }
 }
 
@@ -67,8 +66,7 @@ void raytracer::shape::STLShape::_getTriangles()
         normal._y = uz * vx - ux * vz;
         normal._z = ux * vy - uy * vx;
 
-        if (const float len = std::sqrt(normal._x * normal._x + normal._y * normal._y + normal._z * normal._z);
-            len > 0.0f) {
+        if (const float len = std::sqrt(normal._x * normal._x + normal._y * normal._y + normal._z * normal._z); len > 0.0f) {
             normal._x /= len;
             normal._y /= len;
             normal._z /= len;
@@ -83,8 +81,8 @@ void raytracer::shape::STLShape::_getTriangles()
 void raytracer::shape::STLShape::_checkRead(const std::streamsize size) const
 {
     if (!_file || _file.gcount() != size) {
-        throw exception::Error("raytracer::shape::STLShape::_checkRead", "Could not read ",
-            std::to_string(size), " bytes from file ",  std::string(_filename));
+        throw exception::Error("raytracer::shape::STLShape::_checkRead", "Could not read ", std::to_string(size),
+            " bytes from file ", std::string(_filename));
     }
 }
 
@@ -131,43 +129,48 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
 
     for (std::size_t i = start; i < end; ++i) {
         Triangle &tri = _triangles[i];
-        for (Vertex *verts[3] = {&tri._v1, &tri._v2, &tri._v3};
-            auto *v : verts) {
+        for (Vertex *verts[3] = {&tri._v1, &tri._v2, &tri._v3}; auto *v : verts) {
             float x = v->_x - _center_x;
             float y = v->_y - _center_y;
             float z = v->_z - _center_z;
 
             const float y1 = cy * y - sy * z;
             const float z1 = sy * y + cy * z;
-            y = y1; z = z1;
+            y = y1;
+            z = z1;
 
             const float x1 = cz * x + sz * z;
             const float z2 = -sz * x + cz * z;
-            x = x1; z = z2;
+            x = x1;
+            z = z2;
 
             const float x2 = cx * x - sx * y;
             const float y2 = sx * x + cx * y;
-            x = x2; y = y2;
+            x = x2;
+            y = y2;
 
             v->_x = (x + static_cast<float>(_origin._x)) * _scale;
             v->_y = (y + static_cast<float>(_origin._y)) * _scale;
             v->_z = (z + static_cast<float>(_origin._z)) * _scale;
-            }
+        }
         float nx = tri._vec._x;
         float ny = tri._vec._y;
         float nz = tri._vec._z;
 
         const float ny1 = cy * ny - sy * nz;
         const float nz1 = sy * ny + cy * nz;
-        ny = ny1; nz = nz1;
+        ny = ny1;
+        nz = nz1;
 
         const float nx1 = cz * nx + sz * nz;
         const float nz2 = -sz * nx + cz * nz;
-        nx = nx1; nz = nz2;
+        nx = nx1;
+        nz = nz2;
 
         const float nx2 = cx * nx - sx * ny;
         const float ny2 = sx * nx + cx * ny;
-        nx = nx2; ny = ny2;
+        nx = nx2;
+        ny = ny2;
 
         if (const float len = std::sqrt(nx * nx + ny * ny + nz * nz); len > 0.0f) {
             tri._vec._x = nx / len;
@@ -192,9 +195,7 @@ void raytracer::shape::STLShape::_centerSTL()
     const std::size_t chunk_size = (_triangles.size() + num_threads - 1) / num_threads;
     threads.reserve(num_threads);
     for (std::size_t t = 0; t < num_threads; ++t) {
-        threads.emplace_back([this, chunk_size, t, &mutex] {
-            _computeMinMax(chunk_size, t, mutex);
-        });
+        threads.emplace_back([this, chunk_size, t, &mutex] { _computeMinMax(chunk_size, t, mutex); });
     }
     for (auto &thread : threads) {
         thread.join();
@@ -204,17 +205,16 @@ void raytracer::shape::STLShape::_centerSTL()
     _center_y = (_max_y + _min_y) / 2.0f;
     _center_z = (_max_z + _min_z) / 2.0f;
     for (std::size_t t = 0; t < num_threads; ++t) {
-        threads.emplace_back([this, chunk_size, t] {
-            _moveTriangles(chunk_size, t);
-        });
+        threads.emplace_back([this, chunk_size, t] { _moveTriangles(chunk_size, t); });
     }
     for (auto &thread : threads) {
         thread.join();
     }
 }
 
-raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename, const float scale):
-    _scale(scale), _origin(origin), _rotation(rotation), _filename(filename)
+raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename,
+    const float scale)
+    : _scale(scale), _origin(origin), _rotation(rotation), _filename(filename)
 {
     _openFile();
     _countTriangles();
@@ -222,10 +222,12 @@ raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Po
     _file.close();
     _centerSTL();
     _buildBVH();
-    logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale, ", number of triangles ", _triangles.size(), ".");
+    logger::debug("STL object was built: origin ", origin, ", rotation: ", rotation, ", scale: ", _scale,
+        ", number of triangles ", _triangles.size(), ".");
 }
 
-bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint, const bool cullBackFaces) noexcept
+bool raytracer::shape::STLShape::_intersectTriangle(const math::Ray &ray, const Triangle &triangle, math::Point3D &intPoint,
+    const bool cullBackFaces) noexcept
 {
     const math::Vector3D A(triangle._v1._x, triangle._v1._y, triangle._v1._z);
     const math::Vector3D B(triangle._v2._x, triangle._v2._y, triangle._v2._z);
@@ -293,7 +295,7 @@ void raytracer::shape::STLShape::_buildBVH()
     _buildBVHRecursive(indices, 0);
 }
 
-int raytracer::shape::STLShape::_buildBVHRecursive(std::vector<size_t> &indices, const int depth) // NOLINT(*-no-recursion)
+int raytracer::shape::STLShape::_buildBVHRecursive(std::vector<size_t> &indices, const int depth)// NOLINT(*-no-recursion)
 {
     BVHNode node;
     for (int i = 0; i < 3; ++i) {
@@ -370,7 +372,8 @@ bool raytracer::shape::STLShape::_rayAABB(const math::Ray &ray, const float min[
     return true;
 }
 
-bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx, math::Point3D &intPoint, // NOLINT(*-no-recursion)
+bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int nodeIdx,
+    math::Point3D &intPoint,// NOLINT(*-no-recursion)
     const bool cullBackFaces) const
 {
     if (nodeIdx < 0) {
@@ -381,21 +384,20 @@ bool raytracer::shape::STLShape::_intersectBVH(const math::Ray &ray, const int n
         return false;
     }
     if (!triangleIndices.empty()) {
-        return std::ranges::any_of(triangleIndices, [&](const size_t idx) {
-            return _intersectTriangle(ray, _triangles[idx], intPoint, cullBackFaces);
-        });
+        return std::ranges::any_of(triangleIndices,
+            [&](const size_t idx) { return _intersectTriangle(ray, _triangles[idx], intPoint, cullBackFaces); });
     }
     return _intersectBVH(ray, left, intPoint, cullBackFaces) || _intersectBVH(ray, right, intPoint, cullBackFaces);
 }
 
 bool raytracer::shape::STLShape::_pointInAABB(const math::Point3D &point, const float min[3], const float max[3]) noexcept
 {
-    return (point._x >= min[0] && point._x <= max[0] &&
-            point._y >= min[1] && point._y <= max[1] &&
-            point._z >= min[2] && point._z <= max[2]);
+    return (point._x >= min[0] && point._x <= max[0] && point._y >= min[1] && point._y <= max[1] && point._z >= min[2]
+        && point._z <= max[2]);
 }
 
-std::optional<size_t> raytracer::shape::STLShape::_findTriangleInBVH(const math::Point3D &point, const int nodeIdx) const // NOLINT(*-no-recursion)
+std::optional<size_t> raytracer::shape::STLShape::_findTriangleInBVH(const math::Point3D &point,
+    const int nodeIdx) const// NOLINT(*-no-recursion)
 {
     if (nodeIdx < 0) {
         return std::nullopt;

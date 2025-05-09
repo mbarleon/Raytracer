@@ -32,4 +32,5 @@ Test(test_vector2u_print, test_vector2u_valid_print_operator)
     std::cout << vec2 << std::endl;
     std::cout.rdbuf(old);
     cr_assert(buffer.str().find("24") != std::string::npos);
+    cr_assert(buffer.str().find("53") != std::string::npos);
 }

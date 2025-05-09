@@ -6,7 +6,6 @@
 */
 
 #include "Color.hpp"
-#include <numeric>
 
 std::ostream &raytracer::operator<<(std::ostream &os, const RGBColor &self)
 {

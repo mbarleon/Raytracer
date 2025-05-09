@@ -7,12 +7,13 @@
 
 #include "Camera.hpp"
 #include "Logger.hpp"
+#include <atomic>
 #include <cmath>
 #include <fstream>
-#include <random>
 #include <mutex>
+#include <random>
+#include <sys/stat.h>
 #include <thread>
-#include <atomic>
 
 // clang-format off
 
@@ -120,10 +121,10 @@ const raytracer::RGBColor raytracer::computeDirectLighting(const ImagePixel &pix
     if (lightCount == 0)
         return RGBColor(0,0,0);
 
-    const int N = render.occlusion.restir.spatial.samples;
+    const unsigned int N = render.occlusion.restir.spatial.samples;
     std::uniform_int_distribution<unsigned long int> lightDist(0, lightCount - 1);
 
-    for (int i = 0; i < N; ++i) {
+    for (unsigned int i = 0; i < N; ++i) {
         // pick random light
         const auto lightObj = lights[lightDist(gen)];
         const auto &Lm = *lightObj->getMaterial();
@@ -175,12 +176,12 @@ const raytracer::RGBColor raytracer::computeDirectLighting(const ImagePixel &pix
                 continue;
             }
 
-            const int nx = pixel.coordinates.x + dx;
-            const int ny = pixel.coordinates.y + dy;
+            const int nx = static_cast<int>(pixel.coordinates.x) + dx;
+            const int ny = static_cast<int>(pixel.coordinates.y) + dy;
 
             if (!(nx < 0 || ny < 0 || nx >= static_cast<int>(pixel.image.x) ||
             ny >= static_cast<int>(pixel.image.y))) {
-                tank.merge(tank_grid[ny][nx], gen);
+                tank.merge(tank_grid[static_cast<std::size_t>(ny)][static_cast<std::size_t>(nx)], gen);
             }
         }
     }
@@ -247,7 +248,7 @@ const raytracer::RGBColor raytracer::traceRay(const ImagePixel &pixel, const mat
     }
 
     const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
-        static_cast<int>(render.occlusion.samples * 100.0), shapes, lights) * (render.lighting.ambient + 0.5);
+        static_cast<unsigned int>(render.occlusion.samples * 100.0), shapes, lights) * (render.lighting.ambient + 0.5);
 
     const RGBColor direct = computeDirectLighting(pixel, ray, intersect, shapes, lights,
         render, tank_grid);
@@ -297,8 +298,8 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
         for (unsigned y = startY; y < _resolution.y; y += step) {
             std::ostringstream rowBuffer;
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                const double u = (x + 0.5) / double(_resolution.x);
-                const double v = (y + 0.5) / double(_resolution.y);
+                const double u = (x + 0.5) / static_cast<double>(_resolution.x);
+                const double v = (y + 0.5) / static_cast<double>(_resolution.y);
                 generateRay(u, v, cameraRay);
                 camPixel.coordinates = {x, y};
 

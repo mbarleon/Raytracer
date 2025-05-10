@@ -164,6 +164,13 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                     // collect light sample from path tracing
                     math::Intersect intersect;
                     if (findClosestIntersection(cameraRay, shapes, lights, intersect, false)) {
+                        const auto &mat = *intersect.object->getMaterial();
+                        if (mat.emissiveIntensity > 0.0) {
+                            const RGBColor selfEmission = intersect.object->getColor() * mat.emissiveIntensity;
+                            restirGrid[y][x].add({selfEmission, 1.0}, 1.0, rng);
+                            continue;
+                        }
+
                         const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
                         const double weight = 1.0 / std::max(sample.pdf, EPSILON);
                         restirGrid[y][x].add(sample, weight, rng);

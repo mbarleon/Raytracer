@@ -51,7 +51,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 10000.0,
+                "emissive-intensity": 50000.0,
                 "shininess": 50.0
             }
         ],

@@ -6,6 +6,7 @@
 */
 
 #include "Color.hpp"
+#include <cmath>
 
 std::ostream &raytracer::operator<<(std::ostream &os, const RGBColor &self)
 {
@@ -17,6 +18,10 @@ raytracer::RGBColor::RGBColor() : r(0), g(0), b(0)
 {
 }
 
+raytracer::RGBColor::RGBColor(double all) : r(all), g(all), b(all)
+{
+}
+
 raytracer::RGBColor::RGBColor(double red, double green, double blue) : r(red), g(green), b(blue)
 {
 }
@@ -24,6 +29,11 @@ raytracer::RGBColor::RGBColor(double red, double green, double blue) : r(red), g
 raytracer::RGBColor raytracer::RGBColor::operator+(const RGBColor &other) const
 {
     return RGBColor(r + other.r, g + other.g, b + other.b);
+}
+
+raytracer::RGBColor raytracer::RGBColor::operator-(const RGBColor other) const
+{
+    return RGBColor(r - other.r, g - other.g, b - other.b);
 }
 
 raytracer::RGBColor raytracer::RGBColor::operator*(const RGBColor &other) const
@@ -39,6 +49,11 @@ raytracer::RGBColor raytracer::RGBColor::operator*(double s) const
 raytracer::RGBColor raytracer::RGBColor::operator/(double s) const
 {
     return RGBColor(r / s, g / s, b / s);
+}
+
+double raytracer::RGBColor::length() const
+{
+    return std::sqrt(r * r + g * g + b * b);
 }
 
 void raytracer::RGBColor::realign(double oldMaximum, int maximum)

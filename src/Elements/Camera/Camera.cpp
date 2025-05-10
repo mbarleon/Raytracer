@@ -57,7 +57,7 @@ const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Interse
         }
     }
     const double visibility = double(unoccluded) / aoSamples;
-    return RGBColor(visibility, visibility, visibility);
+    return RGBColor(visibility);
 }
 
 raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
@@ -65,7 +65,7 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const IShapesList &lights, const raytracer::Render &render, std::mt19937 &rng)
 {
     LightSample outSample;
-    outSample.radiance = RGBColor(0, 0, 0);
+    outSample.radiance = RGBColor(0);
     outSample.pdf = EPSILON;
 
     const size_t lightCount = lights.size();
@@ -111,14 +111,15 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const math::Vector3D halfDir = (toLightDir + viewDir).normalize();
     const double NdotH = std::max(0.0, intersect.normal.dot(halfDir));
     const double specFactor = std::pow(NdotH, intersect.object->getMaterial()->shininess);
-    const RGBColor specular = RGBColor(1,1,1)
+    const RGBColor specular = RGBColor(1)
         * (render.lighting.specular * attenuation * specFactor);
 
     // ambient occlusion
     const RGBColor aoFactor = computeAmbientOcclusion(intersect, render.occlusion.samples, shapes, lights, rng);
 
     // output LightSample
-    outSample.radiance = (diffuse * aoFactor) + specular;
+    const RGBColor aoBlended = diffuse * (aoFactor * render.lighting.ambient + RGBColor(1.0 - render.lighting.ambient));
+    outSample.radiance = aoBlended + specular;
     outSample.pdf = 1.0 / static_cast<double>(lightCount);
     return outSample;
 }
@@ -206,7 +207,8 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                         for (unsigned i = 0; i < render.occlusion.restir.spatial.samples; ++i) {
                             const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
                             const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                            restirGrid[y][x].add(sample, weight, rng);
+                            const double clampedWeight = std::min(weight, 10.0);
+                            restirGrid[y][x].add(sample, clampedWeight, rng);
                         }
                     }
                 }
@@ -248,7 +250,13 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
 
                     if (!(nx < 0 || ny < 0 || nx >= static_cast<int>(_resolution.x)
                     || ny >= static_cast<int>(_resolution.y))) {
-                        restirGrid[y][x].merge(restirGrid[ny][nx], rng);
+                        const RGBColor myEstimate = restirGrid[y][x].estimate();
+                        const RGBColor neighborEstimate = restirGrid[ny][nx].estimate();
+                        const double colorDist = (myEstimate - neighborEstimate).length();
+
+                        if (colorDist < 0.5) {
+                            restirGrid[y][x].merge(restirGrid[ny][nx], rng);
+                        }
                     }
                 }
 

@@ -31,6 +31,35 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
+    unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights,
+    std::mt19937 &rng)
+{
+    int unoccluded = 0;
+    std::uniform_real_distribution<> dist(0.0, 1.0);
+
+    math::Vector3D tangent, bitangent;
+    buildOrthonormalBasis(intersect.normal, tangent, bitangent);
+
+    for (unsigned int i = 0; i < aoSamples; ++i) {
+        const double u1 = dist(rng);
+        const double u2 = dist(rng);
+        const math::Vector3D localDir = cosineSampleHemisphere(u1, u2);
+        const math::Vector3D worldDir =
+            localDir._x * tangent +
+            localDir._y * bitangent +
+            localDir._z * intersect.normal;
+        const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, worldDir);
+
+        math::Intersect tmp;
+        if (!findClosestIntersection(aoRay, shapes, lights, tmp, false)) {
+            ++unoccluded;
+        }
+    }
+    const double visibility = double(unoccluded) / aoSamples;
+    return RGBColor(visibility, visibility, visibility);
+}
+
 raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const math::Intersect &intersect, const IShapesList &shapes,
     const IShapesList &lights, const raytracer::Render &render, std::mt19937 &rng)
@@ -84,9 +113,12 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const double specFactor = std::pow(NdotH, intersect.object->getMaterial()->shininess);
     const RGBColor specular = RGBColor(1,1,1)
         * (render.lighting.specular * attenuation * specFactor);
+    
+    // ambient occlusion
+    const RGBColor aoFactor = computeAmbientOcclusion(intersect, render.occlusion.samples, shapes, lights, rng);
 
     // output LightSample
-    outSample.radiance = diffuse + specular;
+    outSample.radiance = (diffuse * aoFactor) + specular;
     outSample.pdf = 1.0 / static_cast<double>(lightCount);
     return outSample;
 }
@@ -207,10 +239,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
 
                 // ReSTIR spatial propagation
                 for (unsigned j = 0; j < render.occlusion.samples; ++j) {
-                    int dy = offsetDist(rng);
-                    int dx = offsetDist(rng);
-                    int ny = static_cast<int>(y) + dy;
-                    int nx = static_cast<int>(x) + dx;
+                    const double jitterX = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
+                    const double jitterY = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
+                    const int nx = static_cast<int>(x + jitterX);
+                    const int ny = static_cast<int>(y + jitterY);
 
                     if (!(nx < 0 || ny < 0 || nx >= static_cast<int>(_resolution.x)
                     || ny >= static_cast<int>(_resolution.y))) {

@@ -5,7 +5,7 @@
             "samples": 4 // for supersampling
         },
         "ambient-occlusion": {
-            "samples": 1, // 40 for realism, 1 for fast testing
+            "samples": 40, // 40 for realism, 1 for fast testing
             "restir": {
                 "spatial": { "radius": 1, "samples": 8 },
                 "temporal": { "samples": 1 }
@@ -14,8 +14,8 @@
         "max-depth": 10, // reflection and refraction limit
         "lighting": {
             "ambient": 1.0,
-            "diffuse": 1.0,
-            "specular": 1.0
+            "diffuse": 0.6,
+            "specular": 0.4
         },
         "output": {
             "file": "output.ppm",
@@ -51,7 +51,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 50000.0,
+                "emissive-intensity": 100000.0,
                 "shininess": 50.0
             }
         ],

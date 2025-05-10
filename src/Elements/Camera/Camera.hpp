@@ -40,8 +40,9 @@ namespace raytracer {
             uint _fov = DEFAULT_FIELD_OF_VIEW;
     };
 
-    RGBColor findReSTIRNearColor(unsigned int x, unsigned int y,
-        const std::vector<std::vector<ReSTIR_Tank>> &restirGrid);
+    const RGBColor computeAmbientOcclusion(const math::Intersect &intersect,
+        unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights,
+        std::mt19937 &rng);
     LightSample sampleDirectLight(const math::Ray &incoming, const math::Intersect &intersect,
         const IShapesList &shapes, const IShapesList &lights, const Render &render,
         std::mt19937 &rng);
@@ -53,11 +54,44 @@ namespace raytracer {
         return I - N * (2.0 * I.dot(N));
     }
 
-    static inline math::Ray offsetRay(const math::Vector3D &origin,const math::Vector3D &normal,
+    static inline math::Ray offsetRay(const math::Vector3D &origin, const math::Vector3D &normal,
         const math::Vector3D &direction)
     {
         const math::Vector3D offset = (direction.dot(normal) > 0) ? normal : -normal;
         return {origin + offset * EPSILON, direction};
+    }
+
+    static inline math::Vector3D sampleHemisphereDirectionFromShape(const shape::IShape &shape,
+        const math::Vector3D &origin, const math::Vector3D &normal, std::mt19937 &rng)
+    {
+        const math::Point3D sample = shape.getRandomPointOnSurface(rng);
+        math::Vector3D dir = (sample - origin).normalize();
+
+        if (dir.dot(normal) < 0.0) {
+            dir = -dir;
+        }
+        return dir;
+    }
+
+    static inline math::Vector3D cosineSampleHemisphere(double u1, double u2)
+    {
+        const double r = std::sqrt(1.0 - u1 * u1);
+        const double phi = 2.0 * M_PI * u2;
+        return math::Vector3D(
+            r * std::cos(phi),
+            r * std::sin(phi),
+            u1
+        );
+    }
+
+    static inline void buildOrthonormalBasis(const math::Vector3D &n, math::Vector3D &t, math::Vector3D &b)
+    {
+        if (std::fabs(n._x) > std::fabs(n._z)) {
+            t = math::Vector3D(-n._y, n._x, 0.0).normalize();
+        } else {
+            t = math::Vector3D(0.0, -n._z, n._y).normalize();
+        }
+        b = n.cross(t);
     }
 };// namespace raytracer
 // clang-format on

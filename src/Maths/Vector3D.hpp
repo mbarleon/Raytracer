@@ -22,6 +22,7 @@ class Vector3D
         explicit Vector3D(double x, double y, double z);
 
         [[nodiscard]] double length() const;
+        [[nodiscard]] double lengthSquared() const;
 
         Vector3D operator+(const Vector3D &other) const;
         Vector3D &operator+=(const Vector3D &other);
@@ -45,7 +46,7 @@ class Vector3D
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
-        void realign(double oldMaximum, int maximum);
+        void realign();
 
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;

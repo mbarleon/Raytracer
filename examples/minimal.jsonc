@@ -8,7 +8,7 @@
             "samples": 1, // 40 for absolute realism, 1 for fast rendering
             "radius": 1
         },
-        "max-depth": 10, // reflection and refraction limit
+        "max-depth": 1, // reflection and refraction limit
         "lighting": {
             "ambient": 0.6,
             "diffuse": 0.6,

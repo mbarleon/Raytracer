@@ -69,13 +69,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
                     // collect light sample from path tracing
                     LightSample sample;
                     sample.pdf = EPSILON;
-
-                    math::Intersect intersect;
-                    if (findClosestIntersection(cameraRay, shapes, intersect, true)) {
-                        sample.radiance = intersect.object->getColor();
-                    } else {
-                        sample.radiance = getBackgroundColor(cameraRay._dir);
-                    }
+                    sample.radiance = getRayColor(cameraRay, shapes, render, 0);
                     const double weight = 1.0 / std::max(sample.pdf, EPSILON);
                     const double clampedWeight = std::min(weight, 10.0);
                     restirGrid[y][x].add(sample, clampedWeight, rng);
@@ -105,8 +99,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             math::RGBColor pixel = restirGrid[y][x].estimate();
-            pixel.realign(1.0, 255);
-            ppm << pixel._x << ' ' << pixel._y << ' ' << pixel._z << '\n';
+            pixel.realign();
+            ppm << static_cast<int>(pixel._x) << ' '
+                << static_cast<int>(pixel._y) << ' '
+                << static_cast<int>(pixel._z) << '\n';
         }        
     }
 }

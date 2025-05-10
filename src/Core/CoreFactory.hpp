@@ -30,8 +30,8 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json);
 std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json);
 
 #if defined(UNIT_TESTS)
-    #include "../Elements/Scene/Shapes/Rectangle.hpp"
-    #include "../Elements/Scene/Shapes/Sphere.hpp"
+    #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
+    #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
     #include "Macro.hpp"
 unit_static double clamp_color(double component);
 unit_static std::string get_string(const ParsedJson &proto);

@@ -23,10 +23,15 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
                 hit = true;
                 intersect.object = shape;
                 intersect.point = intersectPoint;
-                intersect.normal = shape->getNormalAt(intersectPoint);
                 intersect.distance = dist;
             }
         }
+    }
+    if (hit) {
+        const math::Vector3D direction = intersect.normal + getRandomReflectUnitSphere().normalize();
+
+        intersect.normal = intersect.object->getNormalAt(intersectPoint);
+        intersect.reflected = {intersect.point, direction};
     }
     return hit;
 }

@@ -15,6 +15,7 @@ typedef struct Intersect {
     std::shared_ptr<raytracer::shape::IShape> object;
     Point3D point;
     Vector3D normal;
+    Ray reflected;
     double distance;
 } Intersect;
 };// namespace math

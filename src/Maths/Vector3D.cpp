@@ -31,6 +31,11 @@ double math::Vector3D::length() const
     return std::sqrt(_x * _x + _y * _y + _z * _z);
 }
 
+double math::Vector3D::lengthSquared() const
+{
+    return _x * _x + _y * _y + _z * _z;
+}
+
 math::Vector3D math::Vector3D::operator+(const Vector3D &other) const
 {
     return Vector3D(_x + other._x, _y + other._y, _z + other._z);
@@ -146,12 +151,18 @@ std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
     return (os << "{" << self._x << ", " << self._y << ", " << self._z << "}");
 }
 
-void math::Vector3D::realign(double oldMaximum, int maximum)
+void math::Vector3D::realign()
 {
-    _x = std::min(oldMaximum, std::max(0.0, _x));
-    _y = std::min(oldMaximum, std::max(0.0, _y));
-    _z = std::min(oldMaximum, std::max(0.0, _z));
-    _x = std::min(maximum, std::max(0, int(_x * maximum)));
-    _y = std::min(maximum, std::max(0, int(_y * maximum)));
-    _z = std::min(maximum, std::max(0, int(_z * maximum)));
+    _x = sqrt(_x);
+    _y = sqrt(_y);
+    _z = sqrt(_z);
+    if (_x > 0.999)
+        _x = 0.999;
+    if (_y > 0.999)
+        _y = 0.999;
+    if (_z > 0.999)
+        _z = 0.999;
+    _x *= 256;
+    _y *= 256;
+    _z *= 256;
 }

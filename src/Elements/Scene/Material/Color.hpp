@@ -21,6 +21,7 @@ typedef struct RGBColor {
     RGBColor operator+(const RGBColor &other) const;
     RGBColor operator*(const RGBColor &other) const;
     RGBColor operator*(double s) const;
+    RGBColor operator/(double s) const;
     void realign(double oldMaximum, int maximum);
 } RGBColor;
 

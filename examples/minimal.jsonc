@@ -7,7 +7,7 @@
         "ambient-occlusion": {
             "samples": 1, // 40 for realism, 1 for fast testing
             "restir": {
-                "spatial": { "radius": 1, "samples": 8 },
+                "spatial": { "radius": 3, "samples": 8 },
                 "temporal": { "samples": 1 }
             }
         },

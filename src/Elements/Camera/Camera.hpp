@@ -40,6 +40,11 @@ namespace raytracer {
             uint _fov = DEFAULT_FIELD_OF_VIEW;
     };
 
+    RGBColor findReSTIRNearColor(unsigned int x, unsigned int y,
+        const std::vector<std::vector<ReSTIR_Tank>> &restirGrid);
+    LightSample sampleDirectLight(const math::Ray &incoming, const math::Intersect &intersect,
+        const IShapesList &shapes, const IShapesList &lights, const Render &render,
+        std::mt19937 &rng);
     bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
         const IShapesList &lights, math::Intersect &intersect, bool cullBackFaces);
 

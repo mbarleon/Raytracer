@@ -33,6 +33,27 @@ math::Vector3D raytracer::shape::Sphere::getPosition() const
 * @details
 * @return
 */
+math::Point3D raytracer::shape::Sphere::getRandomPointOnSurface(std::mt19937 &rng) const
+{
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+    std::uniform_real_distribution<double> angleDist(0.0, 2.0 * M_PI);
+
+    const double z = dist(rng);
+    const double theta = angleDist(rng);
+    const double r = std::sqrt(1.0 - z * z);
+
+    const double x = r * std::cos(theta);
+    const double y = r * std::sin(theta);
+
+    const math::Vector3D dir(x, y, z);
+    return getPosition() + dir * _radius;
+}
+
+/**
+* @brief
+* @details
+* @return
+*/
 math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point) const noexcept
 {
     const math::Vector3D normal = point - _center;

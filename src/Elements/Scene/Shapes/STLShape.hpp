@@ -26,6 +26,7 @@ class STLShape final: public AShape
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept override;
+        math::Point3D getRandomPointOnSurface(std::mt19937 &rng) const override;
 
     private:
         struct Vertex {

@@ -7,7 +7,7 @@
         "ambient-occlusion": {
             "samples": 1, // 40 for realism, 1 for fast testing
             "restir": {
-                "spatial": { "radius": 3, "samples": 8 },
+                "spatial": { "radius": 1, "samples": 8 },
                 "temporal": { "samples": 1 }
             }
         },
@@ -15,7 +15,7 @@
         "lighting": {
             "ambient": 1.0,
             "diffuse": 1.0,
-            "specular": 0.0
+            "specular": 1.0
         },
         "output": {
             "file": "output.ppm",
@@ -24,7 +24,7 @@
     },
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 20, "z": -100 },
+        "position": { "x": 0, "y": 20, "z": -140 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
@@ -51,7 +51,7 @@
                 "reflectivity": 0.0,
                 "transparency": 0.0,
                 "refractive-index": 0.0,
-                "emissive-intensity": 1000.0,
+                "emissive-intensity": 10000.0,
                 "shininess": 50.0
             }
         ],

@@ -51,6 +51,7 @@ bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D 
     return proj_bottom >= 0 && proj_bottom <= bottom_length && proj_left >= 0 && proj_left <= left_length;
 }
 
+// TODO
 math::Vector3D raytracer::shape::Rectangle::getPosition() const
 {
     return math::Vector3D();
@@ -60,4 +61,10 @@ math::Vector3D raytracer::shape::Rectangle::getPosition() const
 math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
 {
     return math::Vector3D();
+}
+
+// TODO
+math::Point3D raytracer::shape::Rectangle::getRandomPointOnSurface(std::mt19937 __attribute__((unused)) &rng) const
+{
+    return math::Point3D();
 }

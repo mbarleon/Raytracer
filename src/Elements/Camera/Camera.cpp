@@ -36,7 +36,7 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const IShapesList &lights, const raytracer::Render &render, std::mt19937 &rng)
 {
     LightSample outSample;
-    outSample.radiance = RGBColor(0.0, 0.0, 0.0);
+    outSample.radiance = RGBColor(0, 0, 0);
     outSample.pdf = EPSILON;
 
     const size_t lightCount = lights.size();
@@ -44,15 +44,19 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     if (lightCount == 0)
         return outSample;
 
+    // pick random light source
     std::uniform_int_distribution<size_t> lightDist(0, lightCount - 1);
-
     const size_t lightIdx = lightDist(rng);
     const auto &lightObj = lights[lightIdx];
     const auto &Lm = *lightObj->getMaterial();
 
-    const math::Point3D dest = lightObj->getPosition() - intersect.point;
-    const math::Vector3D toLightDir = dest.normalize();
-    const double dist2 = dest.dot(dest);
+    // pick random point on surface
+    const math::Point3D lightSurfacePoint = lightObj->getRandomPointOnSurface(rng);
+
+    // distance calculation
+    const math::Vector3D toLight = lightSurfacePoint - intersect.point;
+    const double dist2 = toLight.dot(toLight);
+    const math::Vector3D toLightDir = toLight.normalize();
 
     // shadow ray
     const math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, toLightDir);
@@ -60,7 +64,7 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     if (findClosestIntersection(shadowRay, shapes, lights, occIsect, true)) {
         if (occIsect.object->getMaterial()->emissiveIntensity <= 0.0 &&
         occIsect.distance * occIsect.distance < dist2) {
-            outSample.pdf = 1.0 / double(lightCount);
+            outSample.pdf = 1.0 / static_cast<double>(lightCount);
             return outSample;
         }
     }
@@ -82,9 +86,7 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
         * (render.lighting.specular * attenuation * specFactor);
 
     // output LightSample
-    (void)specular;
-    (void)diffuse;
-    outSample.radiance = RGBColor(1, 1, 1); //diffuse + specular;
+    outSample.radiance = diffuse + specular;
     outSample.pdf = 1.0 / static_cast<double>(lightCount);
     return outSample;
 }

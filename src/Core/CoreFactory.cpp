@@ -311,14 +311,8 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
         static_cast<unsigned int>(get_value<double>(anti_obj.at("samples")))};
 
     const auto &ambi_obj = get_value<JsonMap>(obj.at("ambient-occlusion"));
-    const auto &rest_obj = get_value<JsonMap>(ambi_obj.at("restir"));
-    const auto &rest_sp_obj = get_value<JsonMap>(rest_obj.at("spatial"));
-    const auto &rest_tm_obj = get_value<JsonMap>(rest_obj.at("temporal"));
-    const struct raytracer::spatial_restir sp_rest = {static_cast<unsigned int>(get_value<int>(rest_sp_obj.at("radius"))),
-        static_cast<unsigned int>(get_value<int>(rest_sp_obj.at("samples")))};
-    const struct raytracer::temporal_restir tm_rest = {static_cast<unsigned int>(get_value<int>(rest_tm_obj.at("samples")))};
-    const raytracer::ReSTIR rest = {sp_rest, tm_rest};
-    const raytracer::AmbientOcclusion ambi = {static_cast<unsigned int>(get_value<int>(ambi_obj.at("samples"))), rest};
+    const raytracer::AmbientOcclusion ambi = {static_cast<unsigned int>(get_value<int>(ambi_obj.at("samples"))),
+        static_cast<unsigned int>(get_value<int>(ambi_obj.at("radius")))};
 
     const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 

@@ -183,9 +183,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
 
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                for (unsigned N = 0; N < render.occlusion.restir.spatial.samples; ++N) {
-                    if ((x % render.occlusion.restir.spatial.radius != 0) ||
-                    (y % render.occlusion.restir.spatial.radius != 0))
+                for (unsigned N = 0; N < render.occlusion.samples; ++N) {
+                    if ((x % render.occlusion.radius != 0) ||
+                    (y % render.occlusion.radius != 0))
                         continue;
 
                     const double u = (x + 0.5) / static_cast<double>(_resolution.x);
@@ -204,12 +204,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                             continue;
                         }
 
-                        for (unsigned i = 0; i < render.occlusion.restir.spatial.samples; ++i) {
-                            const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
-                            const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                            const double clampedWeight = std::min(weight, 10.0);
-                            restirGrid[y][x].add(sample, clampedWeight, rng);
-                        }
+                        const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
+                        const double weight = 1.0 / std::max(sample.pdf, EPSILON);
+                        const double clampedWeight = std::min(weight, 10.0);
+                        restirGrid[y][x].add(sample, clampedWeight, rng);
                     }
                 }
             }
@@ -232,8 +230,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
     // image generation
     linesDone.store(0);
     const auto imageWorker = [&](unsigned threadId) {
-        std::uniform_int_distribution<int> offsetDist(-render.occlusion.restir.spatial.radius,
-            render.occlusion.restir.spatial.radius);
+        std::uniform_int_distribution<int> offsetDist(-render.occlusion.radius, render.occlusion.radius);
 
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             std::ostringstream rowBuffer;
@@ -242,7 +239,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                 std::mt19937 rng(x + y * _resolution.x);
 
                 // ReSTIR spatial propagation
-                for (unsigned j = 0; j < render.occlusion.samples; ++j) {
+                for (unsigned j = 0; j < render.occlusion.radius; ++j) {
                     const double jitterX = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
                     const double jitterY = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
                     const int nx = static_cast<int>(x + jitterX);

@@ -7,13 +7,11 @@
 
 #pragma once
 
-#include "AmbiantOcclusion/ReSTIR.hpp"
-
 // clang-format off
 namespace raytracer {
 typedef struct ambient_occlusion {
     unsigned int samples;
-    ReSTIR restir;
+    unsigned int radius;
 } AmbientOcclusion;
 };// namespace raytracer
 // clang-format on

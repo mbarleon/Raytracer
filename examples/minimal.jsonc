@@ -5,15 +5,12 @@
             "samples": 4 // for supersampling
         },
         "ambient-occlusion": {
-            "samples": 40, // 40 for realism, 1 for fast testing
-            "restir": {
-                "spatial": { "radius": 1, "samples": 8 },
-                "temporal": { "samples": 1 }
-            }
+            "samples": 10, // 40 for absolute realism, 1 for fast testing
+            "radius": 1
         },
         "max-depth": 10, // reflection and refraction limit
         "lighting": {
-            "ambient": 1.0,
+            "ambient": 0.6,
             "diffuse": 0.6,
             "specular": 0.4
         },

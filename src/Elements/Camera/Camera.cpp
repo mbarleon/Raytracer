@@ -113,7 +113,7 @@ raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
     const double specFactor = std::pow(NdotH, intersect.object->getMaterial()->shininess);
     const RGBColor specular = RGBColor(1,1,1)
         * (render.lighting.specular * attenuation * specFactor);
-    
+
     // ambient occlusion
     const RGBColor aoFactor = computeAmbientOcclusion(intersect, render.occlusion.samples, shapes, lights, rng);
 
@@ -203,9 +203,11 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                             continue;
                         }
 
-                        const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
-                        const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                        restirGrid[y][x].add(sample, weight, rng);
+                        for (unsigned i = 0; i < render.occlusion.restir.spatial.samples; ++i) {
+                            const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
+                            const double weight = 1.0 / std::max(sample.pdf, EPSILON);
+                            restirGrid[y][x].add(sample, weight, rng);
+                        }
                     }
                 }
             }

@@ -34,3 +34,11 @@ raytracer::RGBColor raytracer::restir_tank::estimate() const
 {
     return sample.radiance;
 }
+
+void raytracer::restir_tank::clear()
+{
+    sample.radiance = RGBColor(0.0);
+    sample.pdf = 0.0;
+    weightSum = 0.0;
+    count = 0;
+}

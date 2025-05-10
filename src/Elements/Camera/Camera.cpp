@@ -14,6 +14,7 @@
 #include <random>
 #include <sys/stat.h>
 #include <thread>
+#include <algorithm>
 
 // clang-format off
 
@@ -161,6 +162,48 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     return hit;
 }
 
+void raytracer::applyGaussianBlurToReSTIRGrid(std::vector<std::vector<raytracer::ReSTIR_Tank>> &restirGrid,
+    int radius = 2, double sigma = 1.0)
+{
+    const int height = static_cast<int>(restirGrid.size());
+    const int width = static_cast<int>(restirGrid[0].size());
+
+    std::vector<double> kernel(2 * radius + 1);
+    double sumK = 0.0;
+    for (int i = -radius; i <= radius; ++i) {
+        double val = std::exp(-(i * i) / (2.0 * sigma * sigma));
+        kernel[i + radius] = val;
+        sumK += val;
+    }
+    for (double& k : kernel) {
+        k /= sumK;
+    }
+    std::vector<std::vector<RGBColor>> tmpRadiance(height, std::vector<RGBColor>(width));
+    std::mt19937 rngVoid(0);
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            RGBColor acc(0);
+            for (int dx = -radius; dx <= radius; ++dx) {
+                int xx = std::clamp(x + dx, 0, width - 1);
+                acc = acc + restirGrid[y][xx].estimate() * kernel[dx + radius];
+            }
+            tmpRadiance[y][x] = acc;
+        }
+    }
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            RGBColor acc(0);
+            for (int dy = -radius; dy <= radius; ++dy) {
+                int yy = std::clamp(y + dy, 0, height - 1);
+                acc = acc + tmpRadiance[yy][x] * kernel[dy + radius];
+            }
+            restirGrid[y][x].clear();
+            restirGrid[y][x].add({acc, 1.0}, 1.0, rngVoid);
+        }
+    }
+}
+
 void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lights,
     const Render &render) const
 {
@@ -171,7 +214,6 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
     }
 
     std::vector<std::thread> threads;
-    std::vector<std::string> rows(_resolution.y);
     std::mutex progressBarMutex;
 
     threads.reserve(nproc);
@@ -228,65 +270,17 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
         t.join();
     }
 
+    // applyGaussianBlurToReSTIRGrid(restirGrid, static_cast<int>(render.occlusion.radius));
+
     // image generation
-    linesDone.store(0);
-    const auto imageWorker = [&](unsigned threadId) {
-        std::uniform_int_distribution<int> offsetDist(-render.occlusion.radius, render.occlusion.radius);
-
-        for (unsigned y = threadId; y < _resolution.y; y += nproc) {
-            std::ostringstream rowBuffer;
-
-            for (unsigned x = 0; x < _resolution.x; ++x) {
-                std::mt19937 rng(x + y * _resolution.x);
-
-                // ReSTIR spatial propagation
-                for (unsigned j = 0; j < render.occlusion.radius; ++j) {
-                    const double jitterX = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
-                    const double jitterY = offsetDist(rng) + std::uniform_real_distribution<double>(-0.5, 0.5)(rng);
-                    const int nx = static_cast<int>(x + jitterX);
-                    const int ny = static_cast<int>(y + jitterY);
-
-                    if (!(nx < 0 || ny < 0 || nx >= static_cast<int>(_resolution.x)
-                    || ny >= static_cast<int>(_resolution.y))) {
-                        const RGBColor myEstimate = restirGrid[y][x].estimate();
-                        const RGBColor neighborEstimate = restirGrid[ny][nx].estimate();
-                        const double colorDist = (myEstimate - neighborEstimate).length();
-                        const double spatialDist = std::sqrt((nx - x)*(nx - x) + (ny - y)*(ny - y)) / render.occlusion.radius;
-                        const double score = colorDist + 0.3 * spatialDist;
-                        if (score < 0.6) {
-                            restirGrid[y][x].merge(restirGrid[ny][nx], rng);
-                        }
-                    }
-                }
-
-                // pixel draw
-                RGBColor pixel = restirGrid[y][x].estimate();
-                pixel.realign(1.0, 255);
-                rowBuffer << pixel << '\n';
-            }
-
-            rows[y] = rowBuffer.str();
-
-            const unsigned done = linesDone.fetch_add(1) + 1;
-            if (done % 10 == 0 || done == _resolution.y) {
-                const std::lock_guard<std::mutex> lock(progressBarMutex);
-                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution.y));
-            }
-        }
-    };
-
-    threads.clear();
-    for (size_t i = 0; i < nproc; ++i) {
-        threads.emplace_back(imageWorker, i);
-    }
-    for (auto &t : threads) {
-        t.join();
-    }
-
     std::ofstream ppm(render.output.file);
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-    for (const auto &row : rows) {
-        ppm << row;
+    for (unsigned y = 0; y < _resolution.y; ++y) {
+        for (unsigned x = 0; x < _resolution.x; ++x) {
+            RGBColor pixel = restirGrid[y][x].estimate();
+            pixel.realign(1.0, 255);
+            ppm << pixel << '\n';
+        }        
     }
 }
 

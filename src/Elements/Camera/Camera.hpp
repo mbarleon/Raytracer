@@ -40,6 +40,8 @@ namespace raytracer {
             uint _fov = DEFAULT_FIELD_OF_VIEW;
     };
 
+    void applyGaussianBlurToReSTIRGrid(std::vector<std::vector<ReSTIR_Tank>> &restirGrid,
+        int radius, double sigma);
     const RGBColor computeAmbientOcclusion(const math::Intersect &intersect,
         unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights,
         std::mt19937 &rng);

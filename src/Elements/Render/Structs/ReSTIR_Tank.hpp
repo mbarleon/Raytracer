@@ -23,5 +23,6 @@ typedef struct restir_tank {
     void add(const LightSample &candidate, double w, std::mt19937 &gen);
     void merge(const struct restir_tank &other, std::mt19937 &gen);
     RGBColor estimate() const;
+    void clear();
 } ReSTIR_Tank;
 };

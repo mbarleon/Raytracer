@@ -17,9 +17,9 @@ class Rectangle final : public AShape
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
-        math::Point3D getRandomPointOnSurface(std::mt19937 &rng) const override;
 
-        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint,
+            bool cullBackFaces) const noexcept override;
 
     private:
         math::Point3D _origin;

@@ -7,10 +7,10 @@
 
 #include "CoreFactory.hpp"
 #include "../../include/Logger.hpp"
-#include "../Elements/Scene/Shapes/Plane.hpp"
-#include "../Elements/Scene/Shapes/Rectangle.hpp"
-#include "../Elements/Scene/Shapes/STLShape.hpp"
-#include "../Elements/Scene/Shapes/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Plane/Plane.hpp"
+#include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
+#include "../Elements/Scene/Shapes/STL/STLShape.hpp"
+#include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -99,11 +99,11 @@ unit_static double clamp_color(double component)
  * @param proto ParsedJson object
  * @return RGBColor object
  */
-unit_static raytracer::RGBColor get_color(const ParsedJson &proto)
+unit_static math::RGBColor get_color(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
 
-    return raytracer::RGBColor(clamp_color(get_value<double>(obj.at("r"))), clamp_color(get_value<double>(obj.at("g"))),
+    return math::RGBColor(clamp_color(get_value<double>(obj.at("r"))), clamp_color(get_value<double>(obj.at("g"))),
         clamp_color(get_value<double>(obj.at("b"))));
 }
 
@@ -191,7 +191,7 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const double radius = get_value<double>(obj.at("radius"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
-    const raytracer::RGBColor color = get_color(obj.at("color"));
+    const math::RGBColor color = get_color(obj.at("color"));
     const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
 
     sphere.get()->setMaterial(material);
@@ -213,7 +213,7 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
-    const raytracer::RGBColor color = get_color(obj.at("color"));
+    const math::RGBColor color = get_color(obj.at("color"));
     const std::shared_ptr<raytracer::shape::Rectangle> rectangle =
         std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
 
@@ -234,7 +234,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
     const auto &obj = get_value<JsonMap>(proto);
     const double position = get_value<double>(obj.at("position"));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
-    const raytracer::RGBColor color = get_color(obj.at("color"));
+    const math::RGBColor color = get_color(obj.at("color"));
     const std::string str = get_string(obj.at("axis"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z') {
@@ -261,7 +261,7 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     const std::string filename = get_string(obj.at("filename"));
     const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
     const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
-    const raytracer::RGBColor color = get_color(obj.at("color"));
+    const math::RGBColor color = get_color(obj.at("color"));
 
     auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
     stl->setMaterial(material);

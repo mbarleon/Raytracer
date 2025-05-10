@@ -18,6 +18,7 @@ class Vector3D
         double _z;
 
         explicit Vector3D();
+        explicit Vector3D(double all);
         explicit Vector3D(double x, double y, double z);
 
         [[nodiscard]] double length() const;
@@ -74,4 +75,5 @@ inline Vector3D operator*(const double scalar, const Vector3D &vector)
 * we better have to use a `using` macro to create another type.
 */
 using Point3D = Vector3D;
-}// namespace math
+using RGBColor = Vector3D;
+};// namespace math

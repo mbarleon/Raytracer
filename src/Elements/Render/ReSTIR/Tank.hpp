@@ -6,11 +6,11 @@
 */
 
 #include <random>
-#include "../../Scene/Material/Color.hpp"
+#include "../../../Maths/Vector3D.hpp"
 
 namespace raytracer {
 typedef struct light_sample {
-    RGBColor radiance;
+    math::RGBColor radiance;
     double pdf;
 } LightSample;
 
@@ -22,7 +22,7 @@ typedef struct restir_tank {
     restir_tank();
     void add(const LightSample &candidate, double w, std::mt19937 &gen);
     void merge(const struct restir_tank &other, std::mt19937 &gen);
-    RGBColor estimate() const;
+    math::RGBColor estimate() const;
     void clear();
-} ReSTIR_Tank;
+} Tank;
 };

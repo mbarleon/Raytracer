@@ -8,22 +8,23 @@
 #include "Camera.hpp"
 #include "Logger.hpp"
 #include <atomic>
-#include <cmath>
 #include <fstream>
 #include <mutex>
 #include <random>
 #include <sys/stat.h>
 #include <thread>
 #include <algorithm>
+#include "../../Maths/Intersect.hpp"
+#include "../Render/ReSTIR/Tank.hpp"
 
 // clang-format off
 
 raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D &position,
-    const math::Vector3D &rotation, const uint field_of_view) : _resolution(resolution),
-    _position(position), _rotation(rotation), _fov(field_of_view)
+    const math::Vector3D &rotation, const unsigned int fov) : _resolution(resolution),
+    _position(position), _rotation(rotation), _fov(fov)
 {
     logger::debug("Camera was built: resolution ", resolution, " position ", position,
-        " rotation ", rotation, " fov: ", field_of_view, ".");
+        " rotation ", rotation, " fov: ", fov, ".");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,179 +33,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
-    unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights,
-    std::mt19937 &rng)
-{
-    int unoccluded = 0;
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-
-    math::Vector3D tangent, bitangent;
-    buildOrthonormalBasis(intersect.normal, tangent, bitangent);
-
-    for (unsigned int i = 0; i < aoSamples; ++i) {
-        const double u1 = dist(rng);
-        const double u2 = dist(rng);
-        const math::Vector3D localDir = cosineSampleHemisphere(u1, u2);
-        const math::Vector3D worldDir =
-            localDir._x * tangent +
-            localDir._y * bitangent +
-            localDir._z * intersect.normal;
-        const math::Point3D jitteredPoint = intersect.point + 0.001 * tangent * dist(rng) + 0.001 * bitangent * dist(rng);
-        const math::Ray aoRay = offsetRay(jitteredPoint, intersect.normal, worldDir);
-
-        math::Intersect tmp;
-        if (!findClosestIntersection(aoRay, shapes, lights, tmp, false)) {
-            ++unoccluded;
-        }
-    }
-    const double visibility = double(unoccluded) / aoSamples;
-    return RGBColor(visibility);
-}
-
-raytracer::LightSample raytracer::sampleDirectLight(const math::Ray &incoming,
-    const math::Intersect &intersect, const IShapesList &shapes,
-    const IShapesList &lights, const raytracer::Render &render, std::mt19937 &rng)
-{
-    LightSample outSample;
-    outSample.radiance = RGBColor(0);
-    outSample.pdf = EPSILON;
-
-    const size_t lightCount = lights.size();
-
-    if (lightCount == 0)
-        return outSample;
-
-    // pick random light source
-    std::uniform_int_distribution<size_t> lightDist(0, lightCount - 1);
-    const size_t lightIdx = lightDist(rng);
-    const auto &lightObj = lights[lightIdx];
-    const auto &Lm = *lightObj->getMaterial();
-
-    // pick random point on surface
-    const math::Point3D lightSurfacePoint = lightObj->getRandomPointOnSurface(rng);
-
-    // distance calculation
-    const math::Vector3D toLight = lightSurfacePoint - intersect.point;
-    const double dist2 = toLight.dot(toLight);
-    const math::Vector3D toLightDir = toLight.normalize();
-
-    // shadow ray
-    const math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, toLightDir);
-    math::Intersect occIsect;
-    if (findClosestIntersection(shadowRay, shapes, lights, occIsect, true)) {
-        if (occIsect.object->getMaterial()->emissiveIntensity <= 0.0 &&
-        occIsect.distance * occIsect.distance < dist2) {
-            outSample.pdf = 1.0 / static_cast<double>(lightCount);
-            return outSample;
-        }
-    }
-
-    // Phong + Lambert
-    const double attenuation = Lm.emissiveIntensity / (4.0 * M_PI * dist2);
-    const double NdotL = std::max(0.0, intersect.normal.dot(toLightDir));
-
-    // diffuse Lambert
-    const RGBColor diffuse = intersect.object->getColor()
-        * (render.lighting.diffuse * attenuation * NdotL);
-
-    // specular Phong
-    const math::Vector3D viewDir = (-incoming._dir).normalize();
-    const math::Vector3D halfDir = (toLightDir + viewDir).normalize();
-    const double NdotH = std::max(0.0, intersect.normal.dot(halfDir));
-    const double specFactor = std::pow(NdotH, intersect.object->getMaterial()->shininess);
-    const RGBColor specular = RGBColor(1)
-        * (render.lighting.specular * attenuation * specFactor);
-
-    // ambient occlusion
-    const RGBColor aoFactor = computeAmbientOcclusion(intersect, render.occlusion.samples, shapes, lights, rng);
-
-    // output LightSample
-    const RGBColor aoBlended = diffuse * (aoFactor * render.lighting.ambient + RGBColor(1.0 - render.lighting.ambient));
-    outSample.radiance = aoBlended + specular;
-    outSample.pdf = 1.0 / static_cast<double>(lightCount);
-    return outSample;
-}
-
-bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-    const IShapesList &lights, math::Intersect &intersect, const bool cullBackFaces)
-{
-    double distMin = std::numeric_limits<double>::infinity();
-    math::Point3D intersectPoint;
-    bool hit = false;
-
-    for (const auto &shape : shapes) {
-        if (shape->intersect(ray, intersectPoint, cullBackFaces)) {
-            const double dist = (intersectPoint - ray._origin).length();
-            if (dist < distMin) {
-                distMin = dist;
-                hit = true;
-                intersect.object = shape;
-                intersect.point = intersectPoint;
-                intersect.normal = shape->getNormalAt(intersectPoint);
-                intersect.distance = dist;
-            }
-        }
-    }
-    for (const auto &light : lights) {
-        if (light->intersect(ray, intersectPoint, cullBackFaces)) {
-            const double dist = (intersectPoint - ray._origin).length();
-            if (dist < distMin) {
-                distMin = dist;
-                hit = true;
-                intersect.object = light;
-                intersect.point = intersectPoint;
-                intersect.normal = light->getNormalAt(intersectPoint);
-                intersect.distance = dist;
-            }
-        }
-    }
-    return hit;
-}
-
-void raytracer::applyGaussianBlurToReSTIRGrid(std::vector<std::vector<raytracer::ReSTIR_Tank>> &restirGrid,
-    int radius = 2, double sigma = 1.0)
-{
-    const int height = static_cast<int>(restirGrid.size());
-    const int width = static_cast<int>(restirGrid[0].size());
-
-    std::vector<double> kernel(2 * radius + 1);
-    double sumK = 0.0;
-    for (int i = -radius; i <= radius; ++i) {
-        double val = std::exp(-(i * i) / (2.0 * sigma * sigma));
-        kernel[i + radius] = val;
-        sumK += val;
-    }
-    for (double& k : kernel) {
-        k /= sumK;
-    }
-    std::vector<std::vector<RGBColor>> tmpRadiance(height, std::vector<RGBColor>(width));
-    std::mt19937 rngVoid(0);
-
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            RGBColor acc(0);
-            for (int dx = -radius; dx <= radius; ++dx) {
-                int xx = std::clamp(x + dx, 0, width - 1);
-                acc = acc + restirGrid[y][xx].estimate() * kernel[dx + radius];
-            }
-            tmpRadiance[y][x] = acc;
-        }
-    }
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            RGBColor acc(0);
-            for (int dy = -radius; dy <= radius; ++dy) {
-                int yy = std::clamp(y + dy, 0, height - 1);
-                acc = acc + tmpRadiance[yy][x] * kernel[dy + radius];
-            }
-            restirGrid[y][x].clear();
-            restirGrid[y][x].add({acc, 1.0}, 1.0, rngVoid);
-        }
-    }
-}
-
-void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lights,
+void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
     const Render &render) const
 {
     const unsigned int nproc = std::thread::hardware_concurrency();
@@ -219,7 +48,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
     threads.reserve(nproc);
 
     std::atomic<unsigned> linesDone(0);
-    std::vector<std::vector<ReSTIR_Tank>> restirGrid(_resolution.y, std::vector<ReSTIR_Tank>(_resolution.x));
+    std::vector<std::vector<Tank>> restirGrid(_resolution.y, std::vector<Tank>(_resolution.x));
 
     const auto sparseWorker = [&](unsigned threadId) {
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
@@ -238,20 +67,6 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                     generateRay(u, v, cameraRay);
 
                     // collect light sample from path tracing
-                    math::Intersect intersect;
-                    if (findClosestIntersection(cameraRay, shapes, lights, intersect, false)) {
-                        const auto &mat = *intersect.object->getMaterial();
-                        if (mat.emissiveIntensity > 0.0) {
-                            const RGBColor selfEmission = intersect.object->getColor() * mat.emissiveIntensity;
-                            restirGrid[y][x].add({selfEmission, 1.0}, 1.0, rng);
-                            continue;
-                        }
-
-                        const LightSample sample = sampleDirectLight(cameraRay, intersect, shapes, lights, render, rng);
-                        const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                        const double clampedWeight = std::min(weight, 10.0);
-                        restirGrid[y][x].add(sample, clampedWeight, rng);
-                    }
                 }
             }
 
@@ -270,15 +85,15 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
         t.join();
     }
 
-    // applyGaussianBlurToReSTIRGrid(restirGrid, static_cast<int>(render.occlusion.radius));
+    // apply image blur
 
     // image generation
     std::ofstream ppm(render.output.file);
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
-            RGBColor pixel = restirGrid[y][x].estimate();
-            pixel.realign(1.0, 255);
+            math::RGBColor pixel = restirGrid[y][x].estimate();
+            // pixel.realign(1.0, 255);
             ppm << pixel << '\n';
         }        
     }

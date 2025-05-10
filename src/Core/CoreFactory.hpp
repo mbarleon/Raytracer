@@ -9,7 +9,7 @@
 
 #include "../Elements/Camera/Camera.hpp"
 #include "../Elements/Render/Render.hpp"
-#include "../Elements/Scene/Material/Material.hpp"
+#include "../Elements/Scene/Material.hpp"
 #include "../Elements/Scene/Shapes/IShape.hpp"
 #include "../Parser/ParserTypes.hpp"
 #include <memory>
@@ -35,8 +35,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json);
     #include "Macro.hpp"
 unit_static double clamp_color(double component);
 unit_static std::string get_string(const ParsedJson &proto);
-unit_static raytracer::RGBColor get_color(const ParsedJson &proto);
-unit_static double get_double(const ParsedJson &proto);
+unit_static math::RGBColor get_color(const ParsedJson &proto);
 unit_static math::Vector3D get_vec3D(const ParsedJson &proto);
 unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials);
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials);

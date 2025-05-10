@@ -62,9 +62,3 @@ math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D __at
 {
     return math::Vector3D();
 }
-
-// TODO
-math::Point3D raytracer::shape::Rectangle::getRandomPointOnSurface(std::mt19937 __attribute__((unused)) &rng) const
-{
-    return math::Point3D();
-}

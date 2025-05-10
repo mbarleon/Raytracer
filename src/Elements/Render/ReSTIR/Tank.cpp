@@ -5,7 +5,7 @@
 ** RestTank
 */
 
-#include "ReSTIR_Tank.hpp"
+#include "Tank.hpp"
 
 raytracer::restir_tank::restir_tank(): weightSum(0.0), count(0)
 {
@@ -30,14 +30,14 @@ void raytracer::restir_tank::merge(const struct restir_tank &other, std::mt19937
     add(other.sample, w, gen);
 }
 
-raytracer::RGBColor raytracer::restir_tank::estimate() const
+math::RGBColor raytracer::restir_tank::estimate() const
 {
     return sample.radiance;
 }
 
 void raytracer::restir_tank::clear()
 {
-    sample.radiance = RGBColor(0.0);
+    sample.radiance = math::RGBColor(0);
     sample.pdf = 0.0;
     weightSum = 0.0;
     count = 0;

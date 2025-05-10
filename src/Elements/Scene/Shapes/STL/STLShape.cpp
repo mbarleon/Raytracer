@@ -448,9 +448,3 @@ bool raytracer::shape::STLShape::_pointInTriangle(const math::Point3D &point, co
 
     return u >= 0.0f && v >= 0.0f && u + v <= 1.0f;
 }
-
-// TODO
-math::Point3D raytracer::shape::STLShape::getRandomPointOnSurface(std::mt19937 __attribute__((unused)) &rng) const
-{
-    return math::Point3D();
-}

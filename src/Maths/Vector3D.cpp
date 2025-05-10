@@ -17,6 +17,10 @@ math::Vector3D::Vector3D() : _x(0), _y(0), _z(0)
     /* empty __ctor__ */
 }
 
+math::Vector3D::Vector3D(double all) : _x(all), _y(all), _z(all)
+{
+}
+
 math::Vector3D::Vector3D(const double x, const double y, const double z) : _x(x), _y(y), _z(z)
 {
     /* empty __ctor__ */

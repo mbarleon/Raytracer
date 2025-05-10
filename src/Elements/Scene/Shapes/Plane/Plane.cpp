@@ -41,11 +41,6 @@ math::Vector3D Plane::getNormalAt(const math::Point3D __attribute__((unused)) & 
     }
 }
 
-math::Point3D Plane::getRandomPointOnSurface(std::mt19937 __attribute__((unused)) &rng) const
-{
-    return math::Point3D();
-}
-
 bool Plane::intersect(const math::Ray &ray, math::Point3D &intPoint, __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     double t;

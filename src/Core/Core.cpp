@@ -27,20 +27,8 @@ void raytracer::Core::run(const char *RESTRICT filename)
     const auto &render = root.at("render");
     const auto &camera = root.at("camera");
     const auto &scene = std::get<JsonMap>(root.at("scene").value);
-    const auto &primitives = scene.at("primitives");
-    std::vector<std::shared_ptr<raytracer::shape::IShape>> lights;
-    std::vector<std::shared_ptr<raytracer::shape::IShape>> shapes;
-
-    _materials = material_factory(root.at("scene"));
-    _shapes = primitive_factory(primitives, _materials);
-
-    for (const auto &obj : _shapes) {
-        if (obj->getMaterial()->emissiveIntensity > 0.0) {
-            lights.push_back(obj);
-        } else {
-            shapes.push_back(obj);
-        }
-    }
+    const auto &shapes = scene.at("shapes");
+    const auto &lights = scene.at("lights");
 
     _render = create_render(render);
     _camera = create_camera(camera);

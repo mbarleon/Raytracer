@@ -49,7 +49,8 @@ const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Interse
             localDir._x * tangent +
             localDir._y * bitangent +
             localDir._z * intersect.normal;
-        const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, worldDir);
+        const math::Point3D jitteredPoint = intersect.point + 0.001 * tangent * dist(rng) + 0.001 * bitangent * dist(rng);
+        const math::Ray aoRay = offsetRay(jitteredPoint, intersect.normal, worldDir);
 
         math::Intersect tmp;
         if (!findClosestIntersection(aoRay, shapes, lights, tmp, false)) {
@@ -179,11 +180,11 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
     std::vector<std::vector<ReSTIR_Tank>> restirGrid(_resolution.y, std::vector<ReSTIR_Tank>(_resolution.x));
 
     const auto sparseWorker = [&](unsigned threadId) {
-        std::mt19937 rng(threadId);
-
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             for (unsigned x = 0; x < _resolution.x; ++x) {
                 for (unsigned N = 0; N < render.occlusion.samples; ++N) {
+                    std::mt19937 rng(x + y * _resolution.x + N * 2654435761);
+
                     if ((x % render.occlusion.radius != 0) ||
                     (y % render.occlusion.radius != 0))
                         continue;
@@ -250,8 +251,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lig
                         const RGBColor myEstimate = restirGrid[y][x].estimate();
                         const RGBColor neighborEstimate = restirGrid[ny][nx].estimate();
                         const double colorDist = (myEstimate - neighborEstimate).length();
-
-                        if (colorDist < 0.5) {
+                        const double spatialDist = std::sqrt((nx - x)*(nx - x) + (ny - y)*(ny - y)) / render.occlusion.radius;
+                        const double score = colorDist + 0.3 * spatialDist;
+                        if (score < 0.6) {
                             restirGrid[y][x].merge(restirGrid[ny][nx], rng);
                         }
                     }

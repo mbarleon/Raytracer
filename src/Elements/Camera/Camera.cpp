@@ -31,299 +31,111 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const raytracer::RGBColor raytracer::computeReflection(const ImagePixel &pixel,
-    const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
-    const IShapesList &lights, unsigned int depth, const raytracer::Render &render,
-    std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
-{
-    const math::Vector3D I = incoming._dir.normalize();
-    const math::Vector3D N = intersect.normal;
-
-    // R = I − 2*(I·N)*N
-    const math::Vector3D R = I - N * (2.0 * I.dot(N));
-    const math::Ray reflectedRay = offsetRay(intersect.point, N, R);
-
-    return traceRay(pixel, reflectedRay, shapes, lights, depth + 1, render, false, tank_grid);
-}
-
-const raytracer::RGBColor raytracer::computeRefraction(const ImagePixel &pixel,
-    const math::Ray &incoming, const math::Intersect &intersect, const IShapesList &shapes,
-    const IShapesList &lights, unsigned int depth, const raytracer::Render &render,
-    std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
-{
-    const math::Vector3D I = incoming._dir.normalize();
-    math::Vector3D N = intersect.normal;
-    const auto &M = *intersect.object->getMaterial();
-
-    double n1 = 1.0;
-    double n2 = M.refractiveIndex;
-    double cosI = I.dot(N);
-    if (cosI > 0) {
-        std::swap(n1, n2);
-        N = N * -1.0;
-    }
-    cosI = std::abs(cosI);
-
-    const double eta = n1 / n2;
-    const double k = 1 - eta * eta * (1 - cosI * cosI);
-
-    if (k < 0) {
-        return RGBColor(0,0,0);
-    }
-
-    // refracted ray T = ηI + (ηcosI − √k)N
-    const math::Vector3D T = (I * eta + N * (eta * cosI - std::sqrt(k))).normalize();
-    const math::Ray refractedRay = offsetRay(intersect.point, N * -1.0, T);
-
-    return traceRay(pixel, refractedRay, shapes, lights, depth + 1, render, false, tank_grid);
-}
-
-const raytracer::RGBColor raytracer::computeAmbientOcclusion(const math::Intersect &intersect,
-    unsigned int aoSamples, const IShapesList &shapes, const IShapesList &lights)
-{
-    int unoccluded = 0;
-    const uint32_t seed = static_cast<uint32_t>(intersect.point._x * 73856093u) ^
-        static_cast<uint32_t>(intersect.point._y * 19349663u) ^
-        static_cast<uint32_t>(intersect.point._z * 83492791u);
-    std::mt19937 gen(seed);
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-
-    for (unsigned int i = 0; i < aoSamples; ++i) {
-        // pick random direction
-        const double u1 = dist(gen);
-        const double u2 = dist(gen);
-        const double r = std::sqrt(1 - u1*u1), phi = 2 * M_PI * u2;
-        const math::Vector3D dir (r * std::cos(phi), r * std::sin(phi), u1);
-        // (transformer dir via base locale, omis ici pour la concision)
-        const math::Ray aoRay = offsetRay(intersect.point, intersect.normal, dir);
-
-        math::Intersect tmp;
-        if (!findClosestIntersection(aoRay, shapes, lights, tmp, false)) {
-            ++unoccluded;
-        }
-    }
-    const double visibility = double(unoccluded) / aoSamples;
-    return RGBColor(visibility, visibility, visibility);
-}
-
-const raytracer::RGBColor raytracer::computeDirectLighting(const ImagePixel &pixel,
-    const math::Ray &ray, const math::Intersect &intersect, const IShapesList &shapes,
-    const IShapesList &lights, const raytracer::Render &render,
-    std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
-{
-    const uint32_t seed = static_cast<uint32_t>(pixel.coordinates.x * 73856093u) ^
-        static_cast<uint32_t>(pixel.coordinates.y * 19349663u);
-    std::mt19937 gen(seed);
-    ReSTIR_Tank tank;
-
-    const long unsigned int lightCount = lights.size();
-
-    if (lightCount == 0)
-        return RGBColor(0,0,0);
-
-    const unsigned int N = render.occlusion.restir.spatial.samples;
-    std::uniform_int_distribution<unsigned long int> lightDist(0, lightCount - 1);
-
-    for (unsigned int i = 0; i < N; ++i) {
-        // pick random light
-        const auto lightObj = lights[lightDist(gen)];
-        const auto &Lm = *lightObj->getMaterial();
-
-        // direction & distance
-        const math::Vector3D toLight = lightObj->getPosition() - intersect.point;
-        const double dist2 = toLight.dot(toLight);
-        const math::Vector3D Ld = toLight.normalize();
-
-        // shadow ray
-        math::Ray shadowRay = offsetRay(intersect.point, intersect.normal, Ld);
-        math::Intersect tmp;
-        if (findClosestIntersection(shadowRay, shapes, lights, tmp, true)
-         && tmp.object->getMaterial()->emissiveIntensity == 0.0
-         && tmp.distance*tmp.distance < dist2)
-            continue;
-
-        // atténuation & Phong BRDF
-        const double attenuation = Lm.emissiveIntensity / (4 * M_PI * dist2);
-        const double NdotL = std::max(0.0, intersect.normal.dot(Ld));
-
-        // Lambert diffuse
-        RGBColor diffuse = intersect.object->getColor()
-            * (render.lighting.diffuse * attenuation * NdotL);
-
-        // Phong specular
-        const math::Vector3D V = -ray._dir.normalize();
-        const math::Vector3D R = reflect(-Ld, intersect.normal).normalize();
-        const double specFactor = std::pow(std::max(0.0, R.dot(V)),
-            intersect.object->getMaterial()->shininess);
-        const RGBColor specular = RGBColor(1,1,1)
-            * (render.lighting.specular * attenuation * specFactor);
-
-        LightSample candidate;
-        candidate.radiance = diffuse + specular;
-        candidate.pdf = 1.0 / double(lightCount);
-
-        // w = Li * cosθ / pdf
-        const double weight = (candidate.radiance.r + candidate.radiance.g +
-            candidate.radiance.b) / 3.0 / candidate.pdf;
-
-        tank.add(candidate, weight, gen);
-    }
-
-    // spatial fusion with neighbour in a radius of 1px
-    for (int dy = -1; dy <= 1; ++dy) {
-        for (int dx = -1; dx <= 1; ++dx) {
-            if (std::abs(dx) + std::abs(dy) == 0) {
-                continue;
-            }
-
-            const int nx = static_cast<int>(pixel.coordinates.x) + dx;
-            const int ny = static_cast<int>(pixel.coordinates.y) + dy;
-
-            if (!(nx < 0 || ny < 0 || nx >= static_cast<int>(pixel.image.x) ||
-            ny >= static_cast<int>(pixel.image.y))) {
-                tank.merge(tank_grid[static_cast<std::size_t>(ny)][static_cast<std::size_t>(nx)], gen);
-            }
-        }
-    }
-    tank_grid[pixel.coordinates.y][pixel.coordinates.x] = tank;
-    return tank.estimate();
-}
-
-bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-    const IShapesList &lights, math::Intersect &intersect, const bool cullBackFaces)
-{
-    double distMin = std::numeric_limits<double>::infinity();
-    math::Point3D intersectPoint;
-    bool hit = false;
-
-    for (const auto &shape : shapes) {
-        if (shape->intersect(ray, intersectPoint, cullBackFaces)) {
-            const double dist = (intersectPoint - ray._origin).length();
-            if (dist < distMin) {
-                distMin = dist;
-                hit = true;
-                intersect.object = shape;
-                intersect.point = intersectPoint;
-                intersect.normal = shape->getNormalAt(intersectPoint);
-                intersect.distance = dist;
-            }
-        }
-    }
-    for (const auto &light : lights) {
-        if (light->intersect(ray, intersectPoint, cullBackFaces)) {
-            const double dist = (intersectPoint - ray._origin).length();
-            if (dist < distMin) {
-                distMin = dist;
-                hit = true;
-                intersect.object = light;
-                intersect.point = intersectPoint;
-                intersect.normal = light->getNormalAt(intersectPoint);
-                intersect.distance = dist;
-            }
-        }
-    }
-    return hit;
-}
-
-const raytracer::RGBColor raytracer::traceRay(const ImagePixel &pixel, const math::Ray &ray,
-    const IShapesList &shapes, const IShapesList &lights, unsigned int depth,
-    const raytracer::Render &render, const bool cullBackFaces,
-    std::vector<std::vector<ReSTIR_Tank>> &tank_grid)
-{
-    if (depth > render.maxDepth) {
-        return RGBColor(0,0,0);
-    }
-
-    math::Intersect intersect;
-
-    if (!findClosestIntersection(ray, shapes, lights, intersect, cullBackFaces)) {
-        return RGBColor(0,0,0);
-    }
-
-    const auto &mat = *intersect.object->getMaterial();
-    const RGBColor surfaceColor = intersect.object->getColor();
-
-    if (mat.emissiveIntensity > 0.0) {
-        return surfaceColor * mat.emissiveIntensity;
-    }
-
-    const RGBColor ambient = surfaceColor * computeAmbientOcclusion(intersect,
-        static_cast<unsigned int>(render.occlusion.samples * 100.0), shapes, lights) * (render.lighting.ambient + 0.5);
-
-    const RGBColor direct = computeDirectLighting(pixel, ray, intersect, shapes, lights,
-        render, tank_grid);
-
-    RGBColor reflected(0,0,0);
-    if (mat.reflectivity > 0.0)
-        reflected = computeReflection(pixel, ray, intersect, shapes, lights, depth,
-            render, tank_grid) * mat.reflectivity;
-
-    RGBColor refracted(0,0,0);
-    if (mat.transparency > 0.0)
-        refracted = computeRefraction(pixel, ray, intersect, shapes, lights, depth,
-            render, tank_grid) * mat.transparency;
-
-    const double K = std::max(0.0, 1.0 - mat.reflectivity - mat.transparency);
-    return ambient + (direct * K) + reflected + refracted;
-}
-
-//TODO: maybe add computations on shaders if possible?
 void raytracer::Camera::render(const IShapesList &shapes, const IShapesList &lights,
     const Render &render) const
 {
-    std::vector<std::thread> threads;
-    std::vector<std::string> rows(_resolution.y);
     const std::size_t nproc = std::thread::hardware_concurrency();
 
     if (nproc == 0) {
         throw exception::Error("raytracer::Camera::render()", "No threads available");
     }
 
+    std::vector<std::thread> threads;
+    std::vector<std::string> rows(_resolution.y);
+    std::mutex progressBarMutex;
+
     threads.reserve(nproc);
 
-    std::atomic<unsigned> lines_done(0);
-    std::mutex progress_bar_mutex;
+    std::atomic<unsigned> linesDone(0);
+    std::vector<std::vector<ReSTIR_Tank>> restirGrid(_resolution.y, std::vector<ReSTIR_Tank>(_resolution.x));
 
-    const auto worker = [&](const unsigned startY, const unsigned step) {
-        std::vector<std::vector<ReSTIR_Tank>> tank_grid;
-        math::Ray cameraRay;
-        ImagePixel camPixel;
+    const auto sparseWorker = [&](unsigned threadId) {
+        std::mt19937 rng(threadId); // Each thread gets its own RNG
 
-        tank_grid.resize(_resolution.y);
-        for (size_t row = 0; row < _resolution.y; ++row) {
-            tank_grid[row].resize(_resolution.x);
-        }
-        camPixel.image = _resolution;
-
-        for (unsigned y = startY; y < _resolution.y; y += step) {
-            std::ostringstream rowBuffer;
+        for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             for (unsigned x = 0; x < _resolution.x; ++x) {
+                if ((x % render.occlusion.restir.spatial.radius != 0) ||
+                (y % render.occlusion.restir.spatial.radius != 0))
+                    continue;
+
                 const double u = (x + 0.5) / static_cast<double>(_resolution.x);
                 const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-                generateRay(u, v, cameraRay);
-                camPixel.coordinates = {x, y};
 
-                RGBColor pixel = traceRay(camPixel, cameraRay, shapes, lights, 0, render, false, tank_grid);
+                math::Ray primaryRay;
+                generateRay(u, v, primaryRay);
 
-                pixel.realign(1, 255);
+                ImagePixel pixelInfo;
+                pixelInfo.image = _resolution;
+                pixelInfo.coordinates = {x, y};
+
+                // collect light sample from path tracing
+                const LightSample sample = ;//sampleLightContribution(primaryRay, pixelInfo, shapes, lights, render, rng);
+
+                const double weight = 1.0 / std::max(sample.pdf, 1e-8);
+                restirGrid[y][x].add(sample, weight, rng);
+            }
+
+            const unsigned done = linesDone.fetch_add(1) + 1;
+            if (done % 10 == 0 || done == _resolution.y) {
+                const std::lock_guard<std::mutex> lock(progressBarMutex);
+                logger::progress_bar(0.3f, static_cast<float>(done) / static_cast<float>(_resolution.y));
+            }
+        }
+    };
+
+    for (size_t i = 0; i < nproc; ++i) {
+        threads.emplace_back(sparseWorker, i);
+    }
+    for (auto &t : threads) {
+        t.join();
+    }
+
+    // ReSTIR spatial propagation
+    const auto spatialRadius = render.occlusion.restir.spatial.radius;
+    const auto numSpatialSamples = render.occlusion.restir.spatial.samples;
+
+    for (unsigned y = 0; y < _resolution.y; ++y) {
+        for (unsigned x = 0; x < _resolution.x; ++x) {
+            std::mt19937 rng(x + y * _resolution.x);
+
+            for (unsigned i = 0; i < numSpatialSamples; ++i) {
+                const int dx = static_cast<int>(x) + (rng() % (2 * spatialRadius + 1)) - spatialRadius;
+                const int dy = static_cast<int>(y) + (rng() % (2 * spatialRadius + 1)) - spatialRadius;
+
+                if (!(dx < 0 || dy < 0 || dx >= static_cast<int>(_resolution.x) ||
+                dy >= static_cast<int>(_resolution.y))) {
+                    restirGrid[y][x].merge(restirGrid[dy][dx], rng);
+                }
+            }
+        }
+    }
+
+    // image generation
+    linesDone.store(0);
+    const auto imageWorker = [&](unsigned threadId) {
+        for (unsigned y = threadId; y < _resolution.y; y += nproc) {
+            std::ostringstream rowBuffer;
+
+            for (unsigned x = 0; x < _resolution.x; ++x) {
+                RGBColor pixel = restirGrid[y][x].estimate();
+                pixel.realign(1.0, 255);
                 rowBuffer << pixel << '\n';
             }
+
             rows[y] = rowBuffer.str();
 
-            const unsigned done = lines_done.fetch_add(1) + 1;
-
+            const unsigned done = linesDone.fetch_add(1) + 1;
             if (done % 10 == 0 || done == _resolution.y) {
-                const std::lock_guard<std::mutex> lock(progress_bar_mutex);
-
+                const std::lock_guard<std::mutex> lock(progressBarMutex);
                 logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution.y));
             }
         }
     };
 
-    for (std::size_t i = 0; i < nproc; ++i) {
-        threads.emplace_back(worker, i, nproc);
+    threads.clear();
+    for (size_t i = 0; i < nproc; ++i) {
+        threads.emplace_back(imageWorker, i);
     }
-
     for (auto &t : threads) {
         t.join();
     }

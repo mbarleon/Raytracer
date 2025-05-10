@@ -5,22 +5,17 @@
             "samples": 4 // for supersampling
         },
         "ambient-occlusion": {
-            "samples": 40, // 40 for realism, 1 for fast testing
+            "samples": 1, // 40 for realism, 1 for fast testing
             "restir": {
-                "spatial": {
-                    "radius": 1,
-                    "samples": 8
-                },
-                "temporal": {
-                    "samples": 1
-                }
+                "spatial": { "radius": 1, "samples": 8 },
+                "temporal": { "samples": 1 }
             }
         },
         "max-depth": 10, // reflection and refraction limit
         "lighting": {
-            "ambient": 0.6,
-            "diffuse": 0.6,
-            "specular": 0.5
+            "ambient": 1.0,
+            "diffuse": 1.0,
+            "specular": 0.0
         },
         "output": {
             "file": "output.ppm",
@@ -28,20 +23,9 @@
         }
     },
     "camera": {
-        "resolution": {
-            "width": 1920,
-            "height": 1080
-        },
-        "position": {
-            "x": 0,
-            "y": 20,
-            "z": -200
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
+        "resolution": { "width": 1920, "height": 1080 },
+        "position": { "x": 0, "y": 20, "z": -100 },
+        "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
     "scene": {
@@ -74,46 +58,28 @@
         "primitives": {
             "spheres": [
                 {
-                    "position": {
-                        "x": 60,
-                        "y": 150,
-                        "z": 5
-                    },
+                    "position": { "x": 50, "y": 50, "z": 5 },
                     "radius": 25,
                     "material": "light",
-                    "color": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 0
-                    }
+                    "color": { "r": 255, "g": 255, "b": 0 }
                 },
                 {
-                    "position": {
-                        "x": 60,
-                        "y": 40,
-                        "z": 5
-                    },
+                    "position": { "x": -40, "y": 50, "z": -20 },
+                    "radius": 25,
+                    "material": "light",
+                    "color": { "r": 255, "g": 255, "b": 0 }
+                },
+                {
+                    "position": { "x": 60, "y": 40, "z": 5 },
                     "radius": 25,
                     "material": "ground",
-                    "color": {
-                        "r": 255,
-                        "g": 64,
-                        "b": 64
-                    }
+                    "color": { "r": 255, "g": 64, "b": 64 }
                 },
                 {
-                    "position": {
-                        "x": -40,
-                        "y": -10,
-                        "z": 20
-                    },
+                    "position": { "x": -40, "y": -10, "z": 20 },
                     "radius": 35,
                     "material": "ground",
-                    "color": {
-                        "r": 64,
-                        "g": 255,
-                        "b": 64
-                    }
+                    "color": { "r": 64, "g": 255, "b": 64 }
                 }
             ],
             "planes": [
@@ -121,11 +87,7 @@
                     "axis": "Y",
                     "position": -20,
                     "material": "ground",
-                    "color": {
-                        "r": 64,
-                        "g": 64,
-                        "b": 255
-                    }
+                    "color": { "r": 64, "g": 64, "b": 255 }
                 }
             ]
         }

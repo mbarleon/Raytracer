@@ -10,7 +10,7 @@
 // clang-format off
 namespace raytracer {
 struct spatial_restir {
-    double radius;
+    unsigned int radius;
     unsigned int samples;
 };
 

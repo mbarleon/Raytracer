@@ -7,18 +7,10 @@
 
 #pragma once
 
-#include "../../Maths/Ray.hpp"
+#include "Logic/Pathtracer.hpp"
 #include "../../Maths/Vector2u.hpp"
-#include "../../Maths/Vector3D.hpp"
-#include "../Render/Render.hpp"
-#include "../Scene/Shapes/IShape.hpp"
-#include "../Scene/Lights/ILight.hpp"
-#include "Macro.hpp"
-#include <vector>
 
 // clang-format off
-using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
-using ILightsList = std::vector<std::shared_ptr<raytracer::shape::ILight>>;
 
 namespace raytracer {
     class Camera final
@@ -29,8 +21,7 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            void render(const IShapesList &shapes, const ILightsList &lights,
-                const Render &render) const;
+            void render(const IShapesList &shapes, const Render &render) const;
 
         private:
             math::Vector2u _resolution;

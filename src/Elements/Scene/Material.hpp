@@ -13,7 +13,6 @@ typedef struct material {
     double reflectivity;
     double transparency;
     double refractiveIndex;
-    double emissiveIntensity;
     double shininess;
 } Material;
 };// namespace raytracer

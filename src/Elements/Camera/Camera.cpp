@@ -16,6 +16,7 @@
 #include <algorithm>
 #include "../../Maths/Intersect.hpp"
 #include "../Render/ReSTIR/Tank.hpp"
+#include "Logic/Pathtracer.hpp"
 
 // clang-format off
 
@@ -33,8 +34,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
-    const Render &render) const
+void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const
 {
     const unsigned int nproc = std::thread::hardware_concurrency();
 
@@ -67,6 +67,18 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
                     generateRay(u, v, cameraRay);
 
                     // collect light sample from path tracing
+                    LightSample sample;
+                    sample.pdf = EPSILON;
+
+                    math::Intersect intersect;
+                    if (findClosestIntersection(cameraRay, shapes, intersect, true)) {
+                        sample.radiance = intersect.object->getColor();
+                    } else {
+                        sample.radiance = getBackgroundColor(cameraRay._dir);
+                    }
+                    const double weight = 1.0 / std::max(sample.pdf, EPSILON);
+                    const double clampedWeight = std::min(weight, 10.0);
+                    restirGrid[y][x].add(sample, clampedWeight, rng);
                 }
             }
 
@@ -93,8 +105,8 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             math::RGBColor pixel = restirGrid[y][x].estimate();
-            // pixel.realign(1.0, 255);
-            ppm << pixel << '\n';
+            pixel.realign(1.0, 255);
+            ppm << pixel._x << ' ' << pixel._y << ' ' << pixel._z << '\n';
         }        
     }
 }

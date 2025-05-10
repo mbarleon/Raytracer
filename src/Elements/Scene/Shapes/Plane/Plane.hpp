@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include "../../../Maths/Vector3D.hpp"
-#include "AShape.hpp"
+#include "../AShape.hpp"
 
 namespace raytracer::shape {
 class Plane final : public AShape

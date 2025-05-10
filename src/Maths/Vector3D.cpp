@@ -145,3 +145,13 @@ std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
 {
     return (os << "{" << self._x << ", " << self._y << ", " << self._z << "}");
 }
+
+void math::Vector3D::realign(double oldMaximum, int maximum)
+{
+    _x = std::min(oldMaximum, std::max(0.0, _x));
+    _y = std::min(oldMaximum, std::max(0.0, _y));
+    _z = std::min(oldMaximum, std::max(0.0, _z));
+    _x = std::min(maximum, std::max(0, int(_x * maximum)));
+    _y = std::min(maximum, std::max(0, int(_y * maximum)));
+    _z = std::min(maximum, std::max(0, int(_z * maximum)));
+}

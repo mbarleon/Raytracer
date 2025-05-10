@@ -45,6 +45,7 @@ class Vector3D
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
+        void realign(double oldMaximum, int maximum);
 
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;

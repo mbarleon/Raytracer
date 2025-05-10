@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "AShape.hpp"
+#include "../AShape.hpp"
 
 namespace raytracer::shape {
 class Rectangle final : public AShape

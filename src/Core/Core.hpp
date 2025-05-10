@@ -8,13 +8,11 @@
 #pragma once
 
 #include "../Elements/Camera/Camera.hpp"
-#include "../Elements/Scene/Shapes/IShape.hpp"
-#include "../Elements/Scene/Material/Material.hpp"
+#include "../Elements/Scene/Material.hpp"
 #include "../Elements/Render/Render.hpp"
 #include "Macro.hpp"
 #include <unordered_map>
 #include <memory>
-#include <vector>
 
 namespace raytracer {
 class Core final

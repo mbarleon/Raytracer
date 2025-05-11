@@ -20,12 +20,12 @@ math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &s
 {
     math::Intersect intersect;
 
+    if (depth > render.maxDepth) {
+        return math::RGBColor(0);
+    }
     if (findClosestIntersection(ray, shapes, intersect, true)) {
-        if (depth >= render.maxDepth) {
-            return math::RGBColor(0);
-        }
-        return intersect.object->getColor() * getRayColor(intersect.reflected, shapes,
-            render, depth + 1);
+        return intersect.object->getColor() *
+            getRayColor(intersect.reflected, shapes, render, depth + 1);
     }
     return getBackgroundColor(ray._dir);
 }

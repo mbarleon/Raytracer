@@ -23,9 +23,9 @@ using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 // using ILightsList = std::vector<std::shared_ptr<raytracer::shape::ILight>>;
 
 // Reflect
-math::Vector3D getRandomReflectUnitSphere();
-math::Vector3D getRandomReflect(const math::Vector3D &normal);
 math::Vector3D getReflectedVector(const math::Vector3D &I, const math::Vector3D &N);
+math::Vector3D getRandomReflectUnitSphere();
+math::Vector3D reflectHemisphere(const math::Vector3D &normal);
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);

@@ -2,13 +2,13 @@
     "render": {
         "antialiasing": {
             "type": "supersampling", // "none", "supersampling", "adaptive"
-            "samples": 4 // for supersampling
+            "samples": 1 // for supersampling
         },
         "ambient-occlusion": {
             "samples": 1, // 40 for absolute realism, 1 for fast rendering
             "radius": 1
         },
-        "max-depth": 1, // reflection and refraction limit
+        "max-depth": 10, // reflection and refraction limit
         "lighting": {
             "ambient": 0.6,
             "diffuse": 0.6,
@@ -65,7 +65,7 @@
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
-                    "material": "glass",
+                    "material": "ground",
                     "color": { "r": 150, "g": 150, "b": 150 }
                 }
             ]

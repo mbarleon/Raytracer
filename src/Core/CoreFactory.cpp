@@ -193,8 +193,9 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const P
     const auto &obj = get_value<JsonMap>(proto);
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const math::RGBColor color = get_color(obj.at("color"));
+    const double intensity = get_value<double>(obj.at("intensity"));
 
-    return std::make_shared<raytracer::light::Point>(color, position);
+    return std::make_shared<raytracer::light::Point>(color, position, intensity);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -36,7 +36,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     }
 
     // russian roulette
-    math::RGBColor newThroughput = throughput * (bsdfS.value / bsdfS.pdf);
+    math::RGBColor newThroughput = throughput * (bsdfS.radiance / bsdfS.pdf);
     const double pContinue = std::min(1.0, newThroughput.maxComponent());
 
     if (material::getRandomDouble() >= pContinue) {

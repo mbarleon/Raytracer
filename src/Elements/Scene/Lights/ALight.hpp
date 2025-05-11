@@ -12,14 +12,14 @@
 namespace raytracer::light {
 class ALight : public ILight {
     public:
-        ALight(const math::RGBColor &color, const math::Point3D &point);
+        ALight(const math::RGBColor &color, double intensity);
         ~ALight() override = default;
 
         [[nodiscard]] math::RGBColor getColor() const override;
-        [[nodiscard]] math::Point3D getPosition() const override;
+        [[nodiscard]] double getIntensity() const override;
 
     protected:
         math::RGBColor _color;
-        math::Point3D _position;
+        double _intensity;
 };
 };

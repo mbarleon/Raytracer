@@ -7,8 +7,18 @@
 
 #include "Point.hpp"
 
-raytracer::light::Point::Point(const math::RGBColor &color, const math::Point3D &point) :
-    ALight(color, point)
+raytracer::light::Point::Point(const math::RGBColor &color, const math::Point3D &position,
+    double intensity) : ALight(color, intensity), _position(position)
 {
-    logger::debug("Light point was built: ", point, ".");
+    logger::debug("Light point was built: ", position, ".");
+}
+
+raytracer::material::BSDFSample raytracer::light::Point::sample(const math::Point3D &targetPoint) const
+{
+    math::Vector3D dir = _position - targetPoint;
+    const double dist = dir.length();
+    dir = dir / dist;
+
+    const math::RGBColor radiance = (_color * _intensity) / (dist * dist);
+    return { dir, dist, radiance };
 }

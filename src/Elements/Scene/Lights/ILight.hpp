@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../../../Maths/Ray.hpp"
+#include "../Materials/BSDF/Sample.hpp"
 
 namespace raytracer::light {
 class ILight {
@@ -15,6 +16,8 @@ class ILight {
         virtual ~ILight() = default;
 
         [[nodiscard]] virtual math::RGBColor getColor() const = 0;
-        [[nodiscard]] virtual math::Point3D getPosition() const = 0;
+        [[nodiscard]] virtual double getIntensity() const = 0;
+
+        virtual material::BSDFSample sample(const math::Point3D &targetPoint) const = 0;
 };
 };

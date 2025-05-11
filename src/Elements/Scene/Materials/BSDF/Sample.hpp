@@ -13,6 +13,6 @@ namespace raytracer::material {
 struct BSDFSample {
     math::Vector3D direction;
     double pdf;
-    math::RGBColor value;
+    math::RGBColor radiance;
 };
 };

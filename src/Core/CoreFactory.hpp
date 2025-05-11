@@ -11,12 +11,14 @@
 #include "../Elements/Render/Render.hpp"
 #include "../Elements/Scene/Material.hpp"
 #include "../Elements/Scene/Shapes/IShape.hpp"
+#include "../Elements/Scene/Lights/ILight.hpp"
 #include "../Parser/ParserTypes.hpp"
 #include <memory>
 
 using ParsedJson = raytracer::parser::JsonProto;
 using JsonMap = std::unordered_map<std::string, ParsedJson>;
 using Shapes = std::vector<ParsedJson>;
+using ILightsList = std::vector<std::shared_ptr<raytracer::light::ILight>>;
 using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 using MaterialsList = std::unordered_map<std::string, std::shared_ptr<raytracer::Material>>;
 
@@ -24,6 +26,7 @@ using MaterialsList = std::unordered_map<std::string, std::shared_ptr<raytracer:
 * TODO: templates?
 */
 
+ILightsList light_factory(const ParsedJson &json_lights);
 IShapesList primitive_factory(const ParsedJson &json_primitives, const MaterialsList &materials);
 MaterialsList material_factory(const ParsedJson &json_scene);
 std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json);

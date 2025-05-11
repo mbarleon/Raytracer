@@ -12,7 +12,7 @@
 namespace raytracer::light {
 class ILight {
     public:
-        virtual ~ILight() = 0;
+        virtual ~ILight() = default;
 
         [[nodiscard]] virtual math::RGBColor getColor() const = 0;
         [[nodiscard]] virtual math::Point3D getPosition() const = 0;

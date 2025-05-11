@@ -11,6 +11,7 @@
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Lights/Point/Point.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -61,6 +62,24 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 
         for (const auto &e : shape_array) {
             shapes.emplace_back(creator(e, materials));
+        }
+    }
+}
+
+template<typename LightCreator>
+unit_static void emplace_lights(const JsonMap &lights, const std::string &key,
+    ILightsList &lightSrc, LightCreator creator)
+{
+    const auto it = lights.find(key);
+
+    if (it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
+
+        const auto &light_array = std::get<Shapes>(it->second.value);
+
+        lightSrc.reserve(lightSrc.size() + light_array.size());
+
+        for (const auto &e : light_array) {
+            lightSrc.emplace_back(creator(e));
         }
     }
 }
@@ -175,6 +194,15 @@ unit_static void create_material(const ParsedJson &proto, MaterialsList &materia
     raytracer::logger::debug("Material was built: { name: ", name, ", reflectivity: ", reflectivity,
         ", transparency: ", transparency, ", refractive-index: ", refr_index,
         ", shininess: ", shininess, " }.");
+}
+
+unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D position = get_vec3D(obj.at("position"));
+    const math::RGBColor color = get_color(obj.at("color"));
+
+    return std::make_shared<raytracer::light::Point>(color, position);
 }
 
 /**
@@ -344,6 +372,16 @@ MaterialsList material_factory(const ParsedJson &json_scene)
     }
 
     return materials;
+}
+
+ILightsList light_factory(const ParsedJson &json_lights)
+{
+    const auto &lights = get_value<JsonMap>(json_lights);
+    ILightsList lightSrc;
+
+    emplace_lights(lights, "points", lightSrc, create_light_point);
+
+    return lightSrc;
 }
 
 /**

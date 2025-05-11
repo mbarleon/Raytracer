@@ -47,6 +47,7 @@ class Vector3D
         [[nodiscard]] Vector3D normalize() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
         void realign();
+        bool nearZero() const;
 
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;

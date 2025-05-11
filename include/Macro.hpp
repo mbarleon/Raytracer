@@ -40,4 +40,4 @@
 #define MAX_COLOR 255.0
 #define MIN_COLOR 0.0
 
-static constexpr double EPSILON = 1e-6;
+static constexpr double EPSILON = 1e-8;

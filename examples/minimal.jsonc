@@ -29,8 +29,8 @@
         "materials": [
             {
                 "name": "glass",
-                "reflectivity": 0.05, // coefficient de réflexion [0,1]
-                "transparency": 0.95, // coefficient de transparence [0,1]
+                "reflectivity": 0.1, // coefficient de réflexion [0,1]
+                "transparency": 0.9, // coefficient de transparence [0,1]
                 "refractive-index": 1.5, // indice de réfraction (1.0 = air)
                 "shininess": 100.0
             },
@@ -44,24 +44,24 @@
         ],
         "shapes": {
             "spheres": [
-                {
-                    "position": { "x": -1, "y": 0, "z": -1 },
-                    "radius": 0.5,
-                    "material": "glass",
-                    "color": { "r": 0, "g": 255, "b": 0 }
-                },
+                // {
+                //     "position": { "x": -1, "y": 0, "z": -1 },
+                //     "radius": 0.5,
+                //     "material": "ground",
+                //     "color": { "r": 0, "g": 255, "b": 0 }
+                // },
                 {
                     "position": { "x": 0, "y": 0, "z": -1 },
                     "radius": 0.5,
-                    "material": "ground",
+                    "material": "glass",
                     "color": { "r": 255, "g": 0, "b": 0 }
                 },
-                {
-                    "position": { "x": 1, "y": 0, "z": -1 },
-                    "radius": 0.5,
-                    "material": "glass",
-                    "color": { "r": 0, "g": 0, "b": 255 }
-                },
+                // {
+                //     "position": { "x": 1, "y": 0, "z": -1 },
+                //     "radius": 0.5,
+                //     "material": "ground",
+                //     "color": { "r": 0, "g": 0, "b": 255 }
+                // },
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,

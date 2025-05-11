@@ -6,6 +6,7 @@
 */
 
 #include "Vector3D.hpp"
+#include "../../include/Macro.hpp"
 #include <cmath>
 
 /*
@@ -149,6 +150,12 @@ bool math::Vector3D::operator!=(const Vector3D &other) const
 std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
 {
     return (os << "{" << self._x << ", " << self._y << ", " << self._z << "}");
+}
+
+bool math::Vector3D::nearZero() const
+{
+    return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) &&
+        (std::fabs(_z) < EPSILON);
 }
 
 void math::Vector3D::realign()

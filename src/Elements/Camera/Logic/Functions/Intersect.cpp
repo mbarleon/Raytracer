@@ -18,7 +18,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     for (const auto &shape : shapes) {
         if (shape->intersect(ray, intersectPoint, cullBackFaces)) {
             const double dist = (intersectPoint - ray._origin).length();
-            if (dist < EPSILON) {
+            if (dist < 0.001) {
                 continue;
             }
             if (dist < distMin) {
@@ -35,11 +35,14 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
 
         intersect.normal = intersect.object->getNormalAt(intersectPoint);
         if (intersect.object->getMaterial()->reflectivity > 0.0) {
-            direction = getReflectedVector(ray._dir, intersect.normal);
+            direction = getReflectedVector(ray._dir, intersect.normal).normalize();
+
+            if (direction.nearZero())
+                direction = intersect.normal;
         } else {
             direction = intersect.normal + getRandomReflectUnitSphere().normalize();
         }
-        intersect.reflected = {intersect.point + intersect.normal * EPSILON, direction};
+        intersect.reflected = {intersect.point, direction};
     }
     return hit;
 }

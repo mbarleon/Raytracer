@@ -306,12 +306,8 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
-    const raytracer::Antialiasing anti = {get_string(anti_obj.at("type")),
-        static_cast<unsigned int>(get_value<double>(anti_obj.at("samples")))};
-
-    const auto &ambi_obj = get_value<JsonMap>(obj.at("ambient-occlusion"));
-    const raytracer::AmbientOcclusion ambi = {static_cast<unsigned int>(get_value<int>(ambi_obj.at("samples"))),
-        static_cast<unsigned int>(get_value<int>(ambi_obj.at("radius")))};
+    const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<double>(anti_obj.at("samples"))),
+        static_cast<unsigned int>(get_value<double>(anti_obj.at("radius")))};
 
     const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 
@@ -322,7 +318,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::Render>(anti, ambi, mdepth, light, output);
+    return std::make_unique<raytracer::Render>(anti, mdepth, light, output);
 }
 
 /**

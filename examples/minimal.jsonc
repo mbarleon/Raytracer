@@ -1,10 +1,6 @@
 {
     "render": {
         "antialiasing": {
-            "type": "supersampling", // "none", "supersampling", "adaptive"
-            "samples": 1 // for supersampling
-        },
-        "ambient-occlusion": {
             "samples": 1, // 40 for absolute realism, 1 for fast rendering
             "radius": 1
         },
@@ -79,7 +75,12 @@
             // ]
         },
         "lights": {
-            "points": [],
+            "points": [
+                {
+                    "position": { "x": 0, "y": -1, "z": -1 },
+                    "color": { "r": 0, "g": 255, "b": 255 }
+                }
+            ],
             "directionals": []
         }
     }

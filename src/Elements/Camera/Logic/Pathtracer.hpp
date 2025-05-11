@@ -20,7 +20,7 @@
 namespace raytracer {
 
 using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
-// using ILightsList = std::vector<std::shared_ptr<raytracer::shape::ILight>>;
+using ILightsList = std::vector<std::shared_ptr<raytracer::light::ILight>>;
 
 // Reflect
 math::Vector3D getReflectedVector(const math::Vector3D &I, const math::Vector3D &N);

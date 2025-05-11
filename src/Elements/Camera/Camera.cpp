@@ -53,31 +53,29 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
     const auto sparseWorker = [&](unsigned threadId) {
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                for (unsigned N = 0; N < render.occlusion.samples; ++N) {
-                    if ((x % render.occlusion.radius != 0) ||
-                    (y % render.occlusion.radius != 0)) {
-                        continue;
-                    }
-
-                    std::mt19937 rng(x + y * _resolution.x + N * 2654435761);
-                    LightSample sample;
-                    sample.pdf = EPSILON;
-
-                    for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                        const double u = (x + 0.5) / static_cast<double>(_resolution.x);
-                        const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-
-                        math::Ray cameraRay;
-                        generateRay(u, v, cameraRay);
-                        sample.radiance += getRayColor(cameraRay, shapes, render, 0);
-                    }
-                    sample.radiance /= render.antialiasing.samples;
-
-                    // collect light sample from path tracing
-                    const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                    const double clampedWeight = std::min(weight, 10.0);
-                    restirGrid[y][x].add(sample, clampedWeight, rng);
+                if ((x % render.antialiasing.radius != 0) ||
+                (y % render.antialiasing.radius != 0)) {
+                    continue;
                 }
+
+                std::mt19937 rng(x + y * _resolution.x);
+                LightSample sample;
+                sample.pdf = EPSILON;
+
+                for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
+                    const double u = (x + 0.5) / static_cast<double>(_resolution.x);
+                    const double v = (y + 0.5) / static_cast<double>(_resolution.y);
+
+                    math::Ray cameraRay;
+                    generateRay(u, v, cameraRay);
+                    sample.radiance += getRayColor(cameraRay, shapes, render, 0);
+                }
+                sample.radiance /= render.antialiasing.samples;
+
+                // collect light sample from path tracing
+                const double weight = 1.0 / std::max(sample.pdf, EPSILON);
+                const double clampedWeight = std::min(weight, 10.0);
+                restirGrid[y][x].add(sample, clampedWeight, rng);
             }
 
             const unsigned done = linesDone.fetch_add(1) + 1;

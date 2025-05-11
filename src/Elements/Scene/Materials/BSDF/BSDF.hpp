@@ -23,5 +23,8 @@ class BSDF {
         // isect : infos d’intersection, incluant objet et normale
         virtual BSDFSample sample(const math::Vector3D &wo,
             const math::Intersect &isect) const = 0;
+        
+        virtual math::RGBColor evaluate(const math::Vector3D &wo,
+            const math::Vector3D &wi, const math::Intersect &isect) const = 0;
 };
 };

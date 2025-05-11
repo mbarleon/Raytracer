@@ -1,7 +1,7 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 1, // 200 for absolute realism, 1 for fast rendering
+            "samples": 200, // 200 for absolute realism, 1 for fast rendering
             "radius": 1
         },
         "max-depth": 10, // reflection and refraction limit
@@ -17,7 +17,7 @@
     },
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 0, "z": -2.7 },
+        "position": { "x": 0, "y": 0, "z": -3 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
@@ -65,12 +65,18 @@
         "lights": {
             "points": [
                 {
-                    "position": { "x": 0, "y": -1, "z": -1 },
+                    "position": { "x": 0, "y": 0, "z": 1 },
                     "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 1.0
+                    "intensity": 20.0
                 }
             ],
-            "directionals": []
+            "directionals": [
+                // {
+                //     "direction": { "x": 0, "y": -1, "z": -1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 1.0
+                // }
+            ]
         }
     }
 }

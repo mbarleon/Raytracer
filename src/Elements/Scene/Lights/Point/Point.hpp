@@ -8,7 +8,6 @@
 #pragma once
 
 #include "../ALight.hpp"
-#include "Logger.hpp"
 
 namespace raytracer::light {
 class Point final : public ALight {

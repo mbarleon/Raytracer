@@ -7,16 +7,31 @@
 
 #include "../Pathtracer.hpp"
 
-math::RGBColor raytracer::computeDirectLight(const math::Intersect &intersect,
-    const math::Vector3D &V, const material::Material &mat, const IShapesList &shapes,
-    const ILightsList &lights, const Render &render)
+math::RGBColor raytracer::sampleLightContribution(const math::Intersect &isect,
+    const ILightsList &lights, const IShapesList &shapes)
 {
-    (void)intersect;
-    (void)lights;
-    (void)V;
-    (void)mat;
-    (void)shapes;
-    (void)lights;
-    (void)render;
-    return math::RGBColor(1.0);
+    math::RGBColor totalRadiance(0);
+
+    for (const auto &light : lights) {
+        const material::BSDFSample lightSample = light->sample(isect.point);
+        const math::Vector3D toLight = lightSample.direction.normalize();
+
+        // test visibility
+        const math::Ray shadowRay = { isect.point + toLight * EPSILON, toLight };
+
+        math::Intersect shadowIsect;
+        if (findClosestIntersection(shadowRay, shapes, shadowIsect, true) &&
+        shadowIsect.distance + EPSILON < lightSample.pdf) {
+            continue;
+        }
+
+        // evalute bsdf
+        const raytracer::material::Material &material = isect.object->getMaterial();
+        const math::RGBColor f = material.bsdf->evaluate(-shadowRay._dir, toLight, isect);
+
+        if (!f.nearZero()) {
+            totalRadiance += (f * lightSample.radiance);
+        }
+    }
+    return totalRadiance;
 }

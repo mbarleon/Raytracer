@@ -12,6 +12,7 @@
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
 #include "../Elements/Scene/Lights/Point/Point.hpp"
+#include "../Elements/Scene/Lights/Directional/Directional.hpp"
 #include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
 #include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
 #include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
@@ -191,11 +192,21 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
 unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
-    const math::Vector3D position = get_vec3D(obj.at("position"));
+    const math::Point3D position = get_vec3D(obj.at("position"));
     const math::RGBColor color = get_color(obj.at("color"));
     const double intensity = get_value<double>(obj.at("intensity"));
 
     return std::make_shared<raytracer::light::Point>(color, position, intensity);
+}
+
+unit_static std::shared_ptr<raytracer::light::ILight> create_light_directional(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D direction = get_vec3D(obj.at("direction"));
+    const math::RGBColor color = get_color(obj.at("color"));
+    const double intensity = get_value<double>(obj.at("intensity"));
+
+    return std::make_shared<raytracer::light::Directional>(color, direction, intensity);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -360,6 +371,7 @@ ILightsList light_factory(const ParsedJson &json_lights)
     ILightsList lightSrc;
 
     emplace_lights(lights, "points", lightSrc, create_light_point);
+    emplace_lights(lights, "directionals", lightSrc, create_light_directional);
 
     return lightSrc;
 }

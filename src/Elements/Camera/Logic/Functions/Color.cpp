@@ -29,7 +29,10 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
         return { getBackgroundColor(ray._dir) * throughput, 1.0 };
     }
 
-    // bsdf
+    // direct light
+    const math::RGBColor radiance = sampleLightContribution(isect, lights, shapes) * throughput;
+
+    // bsdf sampling
     const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect);
     if (bsdfS.pdf < EPSILON) {
         return { math::RGBColor(0), 1.0 };
@@ -48,5 +51,5 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
     const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, newThroughput);
 
-    return { next.radiance * throughput, bsdfS.pdf };
+    return { radiance + next.radiance, bsdfS.pdf };
 }

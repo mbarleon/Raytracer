@@ -16,3 +16,9 @@ raytracer::material::BSDFSample raytracer::material::SpecularBSDF::sample(const 
 
     return {reflected, 1.0, color};
 }
+
+math::RGBColor raytracer::material::SpecularBSDF::evaluate(const math::Vector3D __attribute__((unused)) &wo,
+    const math::Vector3D __attribute__((unused)) &wi, const math::Intersect __attribute__((unused)) &isect) const
+{
+    return math::RGBColor(0.0);
+}

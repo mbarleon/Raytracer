@@ -46,3 +46,9 @@ raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(cons
     );
     return {refracted, 1.0 - fresnel, absorption};
 }
+
+math::RGBColor raytracer::material::DielectricBSDF::evaluate(const math::Vector3D __attribute__((unused)) &wo,
+    const math::Vector3D __attribute__((unused)) &wi, const math::Intersect __attribute__((unused)) &isect) const
+{
+    return math::RGBColor(0.0);
+}

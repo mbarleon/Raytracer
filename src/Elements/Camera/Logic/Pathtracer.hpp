@@ -31,7 +31,8 @@ math::RGBColor computeDirectLight(const math::Intersect &intersect,
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);
 LightSample getRayColor(const math::Ray &ray, const IShapesList &shapes,
-    const ILightsList &lights, const Render &render, unsigned depth);
+    const ILightsList &lights, const Render &render, unsigned depth,
+    const math::RGBColor &throughput = math::RGBColor(1.0));
 
 // Intersect
 bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,

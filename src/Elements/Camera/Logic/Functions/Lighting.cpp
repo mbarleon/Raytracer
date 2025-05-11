@@ -18,5 +18,5 @@ math::RGBColor raytracer::computeDirectLight(const math::Intersect &intersect,
     (void)shapes;
     (void)lights;
     (void)render;
-    return math::RGBColor(0.5);
+    return math::RGBColor(1.0);
 }

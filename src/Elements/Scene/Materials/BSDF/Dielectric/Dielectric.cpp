@@ -8,6 +8,7 @@
 #include "Dielectric.hpp"
 #include "../../../../../Maths/Intersect.hpp"
 #include <random>
+#include <algorithm>
 
 raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt) :
     etaExt(etaExt), etaInt(etaInt)
@@ -17,29 +18,31 @@ raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt
 raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(const math::Vector3D &wo,
     const math::Intersect &isect) const
 {
-    math::Vector3D normal = isect.normal;
-    double cosTheta = (-wo).dot(normal);
-    double etaI = etaExt, etaT = etaInt;
+    const math::Vector3D N = isect.normal;
+    const bool entering = wo.dot(N) > 0.0;
+    const math::Vector3D normal = entering ? N : -N;
 
-    if (cosTheta < 0.0) {
-        normal = -normal;
-        std::swap(etaI, etaT);
-        cosTheta = (-wo).dot(normal);
+    const double eta = entering ? etaExt / etaInt : etaInt / etaExt;
+
+    const double cosThetaI = std::clamp(wo.normalize().dot(normal), -1.0, 1.0);
+    const double fresnel = reflectance(std::abs(cosThetaI), etaExt, etaInt);
+
+    if (getRandomDouble(0.0, 1.0) < fresnel) {
+        // réflexion spéculaire
+        const math::Vector3D reflected = reflect(-wo, normal).normalize();
+        return {reflected, fresnel, math::RGBColor(1.0)};
     }
 
-    double reflectProb;
-    math::Vector3D wi;
-    double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
-    bool cannotRefract = etaI / etaT * sinTheta > 1.0;
+    // réfraction
+    const math::Vector3D refracted = refract(-wo, normal, eta).normalize();
 
-    if (cannotRefract) {
-        wi = reflect(-wo, normal);
-        reflectProb = 1.0;
-    } else {
-        wi = refract(-wo, normal, etaI / etaT);
-        reflectProb = 0.0;
-    }
-    (void)reflectProb;
-    // || getRandomDouble() < reflectProb
-    return {wi, 1.0, isect.object->getColor()};
+    // absorption via Beer-Lambert
+    double distance = 1.0; // ou un chemin moyen estimé
+    const math::RGBColor mat = isect.object->getColor();
+    math::RGBColor absorption = math::RGBColor(
+        std::exp(-mat._x * distance),
+        std::exp(-mat._y * distance),
+        std::exp(-mat._z * distance)
+    );
+    return {refracted, 1.0 - fresnel, absorption};
 }

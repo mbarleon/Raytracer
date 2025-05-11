@@ -1,7 +1,7 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 4, // 40 for absolute realism, 1 for fast rendering
+            "samples": 1, // 200 for absolute realism, 1 for fast rendering
             "radius": 1
         },
         "max-depth": 10, // reflection and refraction limit
@@ -49,7 +49,7 @@
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
-                    "material": "specular",
+                    "material": "diffuse",
                     "color": { "r": 150, "g": 150, "b": 150 }
                 }
             ]

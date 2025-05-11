@@ -47,6 +47,7 @@ class Vector3D
         [[nodiscard]] Vector3D normalize() const;
         [[nodiscard]] Vector3D orthonormal() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
+        [[nodiscard]] double maxComponent() const;
         void realign();
         bool nearZero() const;
 

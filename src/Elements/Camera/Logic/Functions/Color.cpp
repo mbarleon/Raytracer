@@ -6,6 +6,7 @@
 */
 
 #include "../Pathtracer.hpp"
+#include "../../../Scene/Materials/Utils/Utils.hpp"
 
 math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
 {
@@ -15,32 +16,37 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
     return (1.0 - t) * math::RGBColor(1) + t * math::RGBColor(0.3, 0.5, 1.0);
 }
 
-raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes,
-    const ILightsList &lights, const Render &render, unsigned depth)
+raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
+    const IShapesList &shapes, const ILightsList &lights, const Render &render,
+    unsigned depth, const math::RGBColor &throughput)
 {
-    raytracer::LightSample sample = { math::RGBColor(0), EPSILON };
-
-    if (depth > render.maxDepth)
-        return sample;
-
-    math::Intersect intersect;
-    if (!findClosestIntersection(ray, shapes, intersect, true)) {
-        sample.radiance = getBackgroundColor(ray._dir);
-        sample.pdf = 1.0;
-        return sample;
+    if (depth > render.maxDepth) {
+        return { math::RGBColor(0), 1.0 };
     }
 
-    const math::Vector3D V = -ray._dir;
-    const auto &mat = intersect.object->getMaterial();
-    const auto bsdfSample = mat.bsdf->sample(V, intersect);
+    math::Intersect isect;
+    if (!findClosestIntersection(ray, shapes, isect, true)) {
+        return { getBackgroundColor(ray._dir) * throughput, 1.0 };
+    }
 
-    if (bsdfSample.pdf < EPSILON)
-        return sample;
+    // bsdf
+    const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect);
+    if (bsdfS.pdf < EPSILON) {
+        return { math::RGBColor(0), 1.0 };
+    }
 
-    const math::Ray nextRay = {intersect.point + bsdfSample.direction * EPSILON, bsdfSample.direction};
-    const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1);
+    // russian roulette
+    math::RGBColor newThroughput = throughput * (bsdfS.value / bsdfS.pdf);
+    const double pContinue = std::min(1.0, newThroughput.maxComponent());
 
-    sample.radiance = bsdfSample.value * next.radiance;
-    sample.pdf = bsdfSample.pdf;
-    return sample;
+    if (material::getRandomDouble() >= pContinue) {
+        return { math::RGBColor(0), 1.0 };
+    }
+    newThroughput /= pContinue;
+
+    // recursive bounce
+    const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
+    const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, newThroughput);
+
+    return { next.radiance * throughput, bsdfS.pdf };
 }

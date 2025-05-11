@@ -26,3 +26,8 @@ math::Vector3D raytracer::getRandomReflect(const math::Vector3D &normal)
     }
     return -inUnitSphere;
 }
+
+math::Vector3D raytracer::getReflectedVector(const math::Vector3D &I, const math::Vector3D &N)
+{
+    return I - N * (2.0 * I.dot(N));
+}

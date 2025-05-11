@@ -21,7 +21,7 @@
     },
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 20, "z": -100 },
+        "position": { "x": 0, "y": 0, "z": -2.3 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
@@ -45,26 +45,38 @@
         "shapes": {
             "spheres": [
                 {
-                    "position": { "x": 60, "y": 40, "z": 5 },
-                    "radius": 25,
-                    "material": "ground",
-                    "color": { "r": 255, "g": 64, "b": 64 }
+                    "position": { "x": -1, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "material": "glass",
+                    "color": { "r": 0, "g": 255, "b": 0 }
                 },
                 {
-                    "position": { "x": -40, "y": -10, "z": 20 },
-                    "radius": 35,
+                    "position": { "x": 0, "y": 0, "z": -1 },
+                    "radius": 0.5,
                     "material": "ground",
-                    "color": { "r": 64, "g": 255, "b": 64 }
-                }
-            ],
-            "planes": [
+                    "color": { "r": 255, "g": 0, "b": 0 }
+                },
                 {
-                    "axis": "Y",
-                    "position": -20,
-                    "material": "ground",
-                    "color": { "r": 64, "g": 64, "b": 255 }
+                    "position": { "x": 1, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "material": "glass",
+                    "color": { "r": 0, "g": 0, "b": 255 }
+                },
+                {
+                    "position": { "x": 0, "y": -100.5, "z": -1 },
+                    "radius": 100,
+                    "material": "glass",
+                    "color": { "r": 150, "g": 150, "b": 150 }
                 }
             ]
+            // "planes": [
+            //     {
+            //         "axis": "Y",
+            //         "position": -20,
+            //         "material": "ground",
+            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //     }
+            // ]
         },
         "lights": {
             "points": [],

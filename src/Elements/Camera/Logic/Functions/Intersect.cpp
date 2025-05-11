@@ -28,9 +28,14 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
         }
     }
     if (hit) {
-        const math::Vector3D direction = intersect.normal + getRandomReflectUnitSphere().normalize();
+        math::Vector3D direction;
 
         intersect.normal = intersect.object->getNormalAt(intersectPoint);
+        if (intersect.object->getMaterial()->reflectivity > 0.0) {
+            direction = getReflectedVector(ray._dir, intersect.normal);
+        } else {
+            direction = intersect.normal + getRandomReflectUnitSphere().normalize();
+        }
         intersect.reflected = {intersect.point, direction};
     }
     return hit;

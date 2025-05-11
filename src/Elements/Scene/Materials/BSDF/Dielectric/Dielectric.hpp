@@ -14,11 +14,10 @@ class DielectricBSDF : public BSDF {
     public:
         double etaExt;
         double etaInt;
-        math::RGBColor absorptionCoeff;
-    
-        DielectricBSDF(double etaExt, double etaInt, const math::RGBColor &absorptionCoeff);
 
-        math::RGBColor sample(const math::Vector3D &wo, const math::Vector3D &normal,
-            math::Vector3D &wi, double &pdf) const override;
+        DielectricBSDF(double etaExt, double etaInt);
+
+        BSDFSample sample(const math::Vector3D &wo,
+            const math::Intersect &isect) const override;
 };
 };

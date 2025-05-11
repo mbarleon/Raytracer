@@ -12,13 +12,11 @@
 namespace raytracer::material {
 
 // Reflect
-math::Vector3D reflect(const math::Vector3D &incident, const math::Vector3D &normal);
-bool refract(const math::Vector3D &incident, const math::Vector3D &normal,
-    double iorIncident, double iorTransmitted, math::Vector3D &refracted);
-double reflectance(double cosTheta, double iorIncident, double iorTransmitted);
+math::Vector3D reflect(const math::Vector3D &I, const math::Vector3D &N);
+math::Vector3D refract(const math::Vector3D &I, const math::Vector3D &N, double eta);
+double reflectance(double cosTheta, double iorI, double iorTransmitted);
 
-void buildOrthonormalBasis(const math::Vector3D &normal, math::Vector3D &tangent,
-    math::Vector3D &bitangent);
+math::Vector3D raytracer::material::cosineHemisphere(const math::Vector3D &N);
 
 // Random
 double getRandomDouble();

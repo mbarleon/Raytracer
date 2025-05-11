@@ -8,54 +8,35 @@
 #include "Dielectric.hpp"
 #include <random>
 
-raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt,
-    const math::RGBColor &absorptionCoeff) : etaExt(etaExt), etaInt(etaInt),
-    absorptionCoeff(absorptionCoeff)
+raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt) :
+    etaExt(etaExt), etaInt(etaInt)
 {
 }
 
-math::RGBColor raytracer::material::DielectricBSDF::sample(const math::Vector3D &wo,
-    const math::Vector3D &normal, math::Vector3D &wi, double &pdf) const
+raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(const math::Vector3D &wo,
+    const math::Intersect &isect) const
 {
-    const bool entering = wo.dot(normal) < 0.0;
-    const math::Vector3D n = entering ? normal : -normal;
-    const double etaI = entering ? etaExt : etaInt;
-    const double etaT = entering ? etaInt : etaExt;
-    const double eta = etaI / etaT;
+    math::Vector3D normal = isect.normal;
+    double cosTheta = (-wo).dot(normal);
+    double etaI = etaExt, etaT = etaInt;
 
-    const double cosThetaI = -wo.dot(n);
-    const double sin2ThetaT = eta * eta * (1.0 - cosThetaI * cosThetaI);
-
-    std::mt19937 gen(std::random_device{}());
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
-
-    if (sin2ThetaT > 1.0) {
-        wi = reflect(wo, n);
-        pdf = 1.0;
-        return math::RGBColor(1.0);
+    if (cosTheta < 0.0) {
+        normal = -normal;
+        std::swap(etaI, etaT);
+        cosTheta = (-wo).dot(normal);
     }
 
-    const double cosThetaT = std::sqrt(1.0 - sin2ThetaT);
-    math::Vector3D refracted = eta * (-wo) + (eta * cosThetaI - cosThetaT) * n;
-    refracted = refracted.normalize();
+    double reflectProb;
+    math::Vector3D wi;
+    double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+    bool cannotRefract = etaI / etaT * sinTheta > 1.0;
 
-    const double R0 = std::pow((etaI - etaT) / (etaI + etaT), 2.0);
-    const double fresnel = R0 + (1.0 - R0) * std::pow(1.0 - std::fabs(cosThetaI), 5.0);
-
-    if (dist(gen) < fresnel) {
-        wi = reflect(wo, n);
-        pdf = fresnel;
-        return math::RGBColor(1.0);
+    if (cannotRefract || getRandomDouble() < reflectProb) {
+        wi = reflect(-wo, normal);
+        reflectProb = 1.0;
     } else {
-        wi = refracted;
-        pdf = 1.0 - fresnel;
-
-        const double distance = 1.0;
-        math::RGBColor attenuation = math::RGBColor(
-            std::exp(-absorptionCoeff._x * distance),
-            std::exp(-absorptionCoeff._y * distance),
-            std::exp(-absorptionCoeff._z * distance)
-        );
-        return attenuation;
+        wi = refract(-wo, normal, etaI / etaT);
+        reflectProb = 0.0;
     }
+    return {wi, 1.0, isect.object->getColor()};
 }

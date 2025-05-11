@@ -132,6 +132,14 @@ math::Vector3D math::Vector3D::normalize() const
     return len != 0.0 ? *this / len : Vector3D(0.0, 0.0, 0.0);
 }
 
+math::Vector3D math::Vector3D::orthonormal() const
+{
+    if (std::fabs(_x) > std::fabs(_z)) {
+        return math::Vector3D(-_y, _x, 0.0).normalize();
+    }
+    return math::Vector3D(0.0, -_z, _y).normalize();
+}
+
 math::Vector3D math::Vector3D::cross(const Vector3D &other) const
 {
     return Vector3D(_y * other._z - _z * other._y, _z * other._x - _x * other._z, _x * other._y - _y * other._x);

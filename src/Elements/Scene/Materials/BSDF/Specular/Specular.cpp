@@ -7,11 +7,11 @@
 
 #include "Specular.hpp"
 
-math::RGBColor raytracer::material::SpecularBSDF::sample(const math::Vector3D &wo,
-    const math::Vector3D &normal, math::Vector3D &wi, double &pdf) const
+raytracer::material::BSDFSample raytracer::material::SpecularBSDF::sample(const math::Vector3D &wo,
+    const math::Intersect &isect) const
 {
-    wi = reflect(-wo, normal);
-    pdf = 1.0f;
+    math::Vector3D wi = reflect(-wo, isect.normal);
+    math::RGBColor color = isect.object->getColor();
 
-    return albedo / std::abs(normal.dot(wi));
+    return {wi, 1.0, color};
 }

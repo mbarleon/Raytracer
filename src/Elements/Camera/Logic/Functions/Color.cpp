@@ -30,7 +30,13 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     }
 
     // direct light
-    const math::RGBColor radiance = sampleLightContribution(isect, lights, shapes) * throughput;
+    const math::Vector3D viewDir = -ray._dir.normalize();
+
+    const double ao = ambientOcclusion(isect, shapes, /*samples=*/1);
+    math::RGBColor radiance = phongDirect(isect, viewDir, lights, shapes, render);
+
+    const math::RGBColor baseAmb = isect.object->getColor() * render.lighting.ambient;
+    radiance = radiance - baseAmb + (baseAmb * ao);
 
     // bsdf sampling
     const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect);
@@ -51,5 +57,5 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
     const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, newThroughput);
 
-    return { radiance + next.radiance, bsdfS.pdf };
+    return { radiance * throughput + next.radiance, bsdfS.pdf };
 }

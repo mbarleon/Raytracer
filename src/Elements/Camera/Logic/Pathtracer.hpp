@@ -24,8 +24,10 @@ using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 using ILightsList = std::vector<std::shared_ptr<raytracer::light::ILight>>;
 
 // Lighting
-math::RGBColor sampleLightContribution(const math::Intersect &isect,
-    const ILightsList &lights, const IShapesList &shapes);
+math::RGBColor phongDirect(const math::Intersect &isect, const math::Vector3D &viewDir,
+    const ILightsList &lights, const IShapesList &shapes, const Render &render);
+double ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes,
+    int aoSamples);
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);

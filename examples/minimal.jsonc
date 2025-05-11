@@ -1,7 +1,7 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 200, // 200 for absolute realism, 1 for fast rendering
+            "samples": 1, // 200 for absolute realism, 1 for fast rendering
             "radius": 1
         },
         "max-depth": 10, // reflection and refraction limit
@@ -50,7 +50,7 @@
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
                     "material": "diffuse",
-                    "color": { "r": 150, "g": 150, "b": 150 }
+                    "color": { "r": 0, "g": 0, "b": 255 }
                 }
             ]
             // "planes": [
@@ -64,11 +64,11 @@
         },
         "lights": {
             "points": [
-                {
-                    "position": { "x": 0, "y": 0, "z": 1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 20.0
-                }
+                // {
+                //     "position": { "x": 0, "y": 2, "z": 1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 5.0
+                // }
             ],
             "directionals": [
                 // {

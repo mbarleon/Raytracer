@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../Material.hpp"
+#include "../Materials/Material.hpp"
 #include "../../../Maths/Ray.hpp"
 #include <memory>
 #include <random>

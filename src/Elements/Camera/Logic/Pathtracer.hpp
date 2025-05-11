@@ -11,7 +11,7 @@
 #include "../../../Maths/Intersect.hpp"
 #include "../../../Maths/Ray.hpp"
 #include "../../Render/Render.hpp"
-#include "../../Scene/Material.hpp"
+#include "../../Scene/Materials/Material.hpp"
 #include "../../Scene/Shapes/IShape.hpp"
 #include "../../Scene/Lights/ILight.hpp"
 #include "Macro.hpp"
@@ -22,10 +22,10 @@ namespace raytracer {
 using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 using ILightsList = std::vector<std::shared_ptr<raytracer::light::ILight>>;
 
-// Reflect
-math::Vector3D getReflectedVector(const math::Vector3D &I, const math::Vector3D &N);
-math::Vector3D getRandomReflectUnitSphere();
-math::Vector3D reflectHemisphere(const math::Vector3D &normal);
+// Lighting
+math::RGBColor computeDirectLight(const math::Intersect &intersect,
+    const math::Vector3D &V, const Material &mat, const IShapesList &shapes,
+    const ILightsList &lights, const Render &render);
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);
@@ -35,11 +35,5 @@ math::RGBColor getRayColor(const math::Ray &ray, const IShapesList &shapes,
 // Intersect
 bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
     math::Intersect &intersect, const bool cullBackFaces);
-
-// Random
-double getRandomDouble();
-double getRandomDouble(double min, double max);
-math::Vector3D getRandomVector();
-math::Vector3D getRandomVector(double min, double max);
 
 };

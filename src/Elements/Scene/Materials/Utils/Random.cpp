@@ -5,24 +5,24 @@
 ** Random
 */
 
-#include "../Pathtracer.hpp"
+#include "Utils.hpp"
 
-double raytracer::getRandomDouble()
+double raytracer::material::getRandomDouble()
 {
     return rand() / (RAND_MAX + 1.0);
 }
 
-double raytracer::getRandomDouble(double min, double max)
+double raytracer::material::getRandomDouble(double min, double max)
 {
     return min + (max - min) * getRandomDouble();
 }
 
-math::Vector3D raytracer::getRandomVector()
+math::Vector3D raytracer::material::getRandomVector()
 {
     return math::Vector3D(getRandomDouble(), getRandomDouble(), getRandomDouble());
 }
 
-math::Vector3D raytracer::getRandomVector(double min, double max)
+math::Vector3D raytracer::material::getRandomVector(double min, double max)
 {
     return math::Vector3D(getRandomDouble(min, max), getRandomDouble(min, max),
         getRandomDouble(min, max));

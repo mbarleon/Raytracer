@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../../Maths/Vector3D.hpp"
+#include "../../../../Maths/Vector3D.hpp"
 
 namespace raytracer::material {
 struct BSDFSample {

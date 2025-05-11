@@ -15,14 +15,14 @@ class AShape : public IShape
     public:
         ~AShape() override = default;
 
-        void setMaterial(const std::shared_ptr<Material> &material) override;
+        void setMaterial(const material::Material &material) override;
         void setColor(math::RGBColor color) override;
 
-        std::shared_ptr<Material> getMaterial() const override;
+        material::Material getMaterial() const override;
         math::RGBColor getColor() const override;
 
     protected:
-        std::shared_ptr<Material> _material;
+        material::Material _material;
         math::RGBColor _color;
 };
 };// namespace raytracer::shape

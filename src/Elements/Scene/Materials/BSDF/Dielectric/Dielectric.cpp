@@ -6,6 +6,7 @@
 */
 
 #include "Dielectric.hpp"
+#include "../../../../../Maths/Intersect.hpp"
 #include <random>
 
 raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt) :
@@ -31,12 +32,14 @@ raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(cons
     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
     bool cannotRefract = etaI / etaT * sinTheta > 1.0;
 
-    if (cannotRefract || getRandomDouble() < reflectProb) {
+    if (cannotRefract) {
         wi = reflect(-wo, normal);
         reflectProb = 1.0;
     } else {
         wi = refract(-wo, normal, etaI / etaT);
         reflectProb = 0.0;
     }
+    (void)reflectProb;
+    // || getRandomDouble() < reflectProb
     return {wi, 1.0, isect.object->getColor()};
 }

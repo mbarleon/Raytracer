@@ -6,10 +6,10 @@
 */
 
 #include "Diffuse.hpp"
+#include "../../../../../Maths/Intersect.hpp"
 #include <cmath>
 
-
-raytracer::material::BSDFSample raytracer::material::DiffuseBSDF::sample(const math::Vector3D &wo,
+raytracer::material::BSDFSample raytracer::material::DiffuseBSDF::sample(const math::Vector3D __attribute__((unused)) &wo,
     const math::Intersect &isect) const
 {
     const math::Vector3D wi = cosineHemisphere(isect.normal);

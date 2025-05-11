@@ -27,7 +27,7 @@ math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &s
         return getBackgroundColor(ray._dir);
     }
 
-    const auto &mat = *intersect.object->getMaterial();
+    const auto &mat = intersect.object->getMaterial();
     const math::Vector3D V = -ray._dir;
     math::RGBColor Lo(0);
 
@@ -39,13 +39,6 @@ math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &s
 
     // other
     if (depth < render.maxDepth) {
-        if (mat.reflectivity > 0) {
-            math::Vector3D R = getReflectedVector(ray._dir, intersect.normal).normalize();
-            // pondération Phong : (R·V)^shininess
-            double spec = std::pow(std::max(0.0, R.dot(V)), mat.shininess);
-            Lo += math::RGBColor(spec) * mat.reflectivity
-                  * getRayColor(intersect.reflected, shapes, lights, render, depth+1);
-        }
     }
 
     // indirect, restir...

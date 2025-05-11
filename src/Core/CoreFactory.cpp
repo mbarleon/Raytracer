@@ -12,6 +12,9 @@
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
 #include "../Elements/Scene/Lights/Point/Point.hpp"
+#include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
+#include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
+#include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -46,11 +49,9 @@ T get_value(const ParsedJson &proto)
  * @param key the key in the JSON map (e.g., "spheres", "rectangles")
  * @param shapes the IShapesList to populate
  * @param creator the function to create the specific shape
- * @param materials the MaterialsList to use for material creation
  */
 template<typename ShapeCreator>
-unit_static void emplace_shapes(const JsonMap &primitives, const std::string &key, IShapesList &shapes, ShapeCreator creator,
-    const MaterialsList &materials)
+unit_static void emplace_shapes(const JsonMap &primitives, const std::string &key, IShapesList &shapes, ShapeCreator creator)
 {
     const auto it = primitives.find(key);
 
@@ -61,7 +62,7 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
         shapes.reserve(shapes.size() + shape_array.size());
 
         for (const auto &e : shape_array) {
-            shapes.emplace_back(creator(e, materials));
+            shapes.emplace_back(creator(e));
         }
     }
 }
@@ -161,40 +162,31 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
  * @param materials MaterialsList to search
  * @return shared pointer to Material
  */
-unit_static std::shared_ptr<raytracer::Material> get_material(const ParsedJson &proto, const MaterialsList &materials)
+unit_static raytracer::material::Material get_material(const JsonMap &obj)
 {
-    const std::string mat_str = get_string(proto);
-    const auto it = materials.find(mat_str);
+    const std::string materialId = get_string(obj.at("material"));
+    std::shared_ptr<raytracer::material::BSDF> bsdf;
 
-    if (it == materials.end()) {
-        throw raytracer::exception::Error("Core", "Undefined material");
+    if (materialId == std::string("diffuse")) {
+        bsdf = std::make_shared<raytracer::material::DiffuseBSDF>();
+    } else if (materialId == std::string("specular")) {
+        bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
+    } else if (materialId == std::string("dielectric")) {
+        const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
+        const double ior_in = get_value<double>(refract_obj.at("inside"));
+        const double ior_out = get_value<double>(refract_obj.at("outside"));
+        bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
+    } else {
+        throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
     }
-    return it->second;
+    return raytracer::material::Material(bsdf);
 }
 
-/**
- * @brief create a material from ParsedJson
- * @details uses get_value for all extractions
- * @param proto ParsedJson object
- * @param materials MaterialsList to add the material to
- * @return none <|> adds material to MaterialsList
- */
-unit_static void create_material(const ParsedJson &proto, MaterialsList &materials)
-{
-    const auto &obj = get_value<JsonMap>(proto);
-    const std::string name = get_string(obj.at("name"));
-    const double reflectivity = get_value<double>(obj.at("reflectivity"));
-    const double transparency = get_value<double>(obj.at("transparency"));
-    const double refr_index = get_value<double>(obj.at("refractive-index"));
-    const double shininess = get_value<double>(obj.at("shininess"));
-    const std::shared_ptr<raytracer::Material> material =
-        std::make_shared<raytracer::Material>(reflectivity, transparency, refr_index, shininess);
-
-    materials[name] = material;
-    raytracer::logger::debug("Material was built: { name: ", name, ", reflectivity: ", reflectivity,
-        ", transparency: ", transparency, ", refractive-index: ", refr_index,
-        ", shininess: ", shininess, " }.");
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const ParsedJson &proto)
 {
@@ -205,6 +197,12 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const P
     return std::make_shared<raytracer::light::Point>(color, position);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief create a sphere from ParsedJson
  * @details uses get_value for JsonMap and other extractions
@@ -212,12 +210,12 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_point(const P
  * @param materials MaterialsList to use for material creation
  * @return shared pointer to Sphere
  */
-unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto, const MaterialsList &materials)
+unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const double radius = get_value<double>(obj.at("radius"));
-    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
 
@@ -233,13 +231,13 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
  * @param materials MaterialsList to use for material creation
  * @return shared pointer to Rectangle
  */
-unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto, const MaterialsList &materials)
+unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
     const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
-    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const std::shared_ptr<raytracer::shape::Rectangle> rectangle =
         std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
@@ -256,11 +254,11 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
  * @param materials MaterialsList to use for material creation
  * @return shared pointer to Plane
  */
-unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto, const MaterialsList &materials)
+unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
     const double position = get_value<double>(obj.at("position"));
-    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const std::string str = get_string(obj.at("axis"));
 
@@ -280,14 +278,14 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 * @details private static
 * @return
 */
-unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJson &proto, const MaterialsList &materials)
+unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJson &proto)
 {
     const auto &obj = std::get<JsonMap>(proto.value);
     const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const math::Vector3D rotation = get_vec3D(obj.at("rotation"));
     const std::string filename = get_string(obj.at("filename"));
     const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
-    const std::shared_ptr<raytracer::Material> material = get_material(obj.at("material"), materials);
+    const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
 
     auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
@@ -349,30 +347,11 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     return std::make_unique<raytracer::Render>(anti, mdepth, light, output);
 }
 
-/**
- * @brief material factory entry point
- * @details unchanged, relies on create_material
- * @param json_scene ParsedJson object
- * @return MaterialsList
- */
-MaterialsList material_factory(const ParsedJson &json_scene)
-{
-    const auto &scene = get_value<JsonMap>(json_scene);
-    MaterialsList materials;
-    const auto material_it = scene.find("materials");
-
-    if (material_it != scene.end() && std::holds_alternative<Shapes>(material_it->second.value)) {
-
-        const auto &mats = std::get<Shapes>(material_it->second.value);
-
-        materials.reserve(mats.size());
-        for (const auto &e : mats) {
-            create_material(e, materials);
-        }
-    }
-
-    return materials;
-}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ILightsList light_factory(const ParsedJson &json_lights)
 {
@@ -391,15 +370,15 @@ ILightsList light_factory(const ParsedJson &json_lights)
  * @param materials MaterialsList to use for material creation
  * @return IShapesList
  */
-IShapesList primitive_factory(const ParsedJson &json_primitives, const MaterialsList &materials)
+IShapesList primitive_factory(const ParsedJson &json_primitives)
 {
     const auto &primitives = get_value<JsonMap>(json_primitives);
     IShapesList shapes;
 
-    emplace_shapes(primitives, "spheres", shapes, create_sphere, materials);
-    emplace_shapes(primitives, "rectangles", shapes, create_rectangle, materials);
-    emplace_shapes(primitives, "planes", shapes, create_plane, materials);
-    emplace_shapes(primitives, "stl", shapes, create_stl, materials);
+    emplace_shapes(primitives, "spheres", shapes, create_sphere);
+    emplace_shapes(primitives, "rectangles", shapes, create_rectangle);
+    emplace_shapes(primitives, "planes", shapes, create_plane);
+    emplace_shapes(primitives, "stl", shapes, create_stl);
 
     return shapes;
 }

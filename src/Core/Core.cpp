@@ -30,8 +30,7 @@ void raytracer::Core::run(const char *RESTRICT filename)
     const auto &shapes = scene.at("shapes");
     const auto &lights = scene.at("lights");
 
-    _materials = material_factory(root.at("scene"));
-    _shapes = primitive_factory(shapes, _materials);
+    _shapes = primitive_factory(shapes);
     _lights = light_factory(lights);
 
     _render = create_render(render);

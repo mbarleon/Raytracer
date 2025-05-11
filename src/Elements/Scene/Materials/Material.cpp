@@ -7,12 +7,16 @@
 
 #include "Material.hpp"
 
-raytracer::material::material::material(BSDF *bsdf) : bsdf(bsdf)
+raytracer::material::material::material() : bsdf(nullptr)
 {
 }
 
-math::RGBColor raytracer::material::material::sample(const math::Vector3D &wo,
-    const math::Vector3D &normal, math::Vector3D &wi, double &pdf) const
+raytracer::material::material::material(std::shared_ptr<BSDF> bsdf) : bsdf(bsdf)
 {
-    return bsdf->sample(wo, normal, wi, pdf);
+}
+
+raytracer::material::BSDFSample raytracer::material::material::sample(const math::Vector3D &wo,
+    const math::Intersect &isect) const
+{
+    return bsdf->sample(wo, isect);
 }

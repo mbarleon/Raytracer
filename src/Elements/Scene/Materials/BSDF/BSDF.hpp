@@ -8,8 +8,11 @@
 #pragma once
 
 #include "Sample.hpp"
-#include "../../../../Maths/Intersect.hpp"
-#include "Utils/Utils.hpp"
+#include "../Utils/Utils.hpp"
+
+namespace math {
+    struct Intersect;
+}
 
 namespace raytracer::material {
 class BSDF {

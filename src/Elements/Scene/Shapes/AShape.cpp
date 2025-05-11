@@ -7,7 +7,7 @@
 
 #include "AShape.hpp"
 
-void raytracer::shape::AShape::setMaterial(const std::shared_ptr<Material> &material)
+void raytracer::shape::AShape::setMaterial(const material::Material &material)
 {
     _material = material;
 }
@@ -17,7 +17,7 @@ void raytracer::shape::AShape::setColor(math::RGBColor color)
     _color = color;
 }
 
-std::shared_ptr<raytracer::Material> raytracer::shape::AShape::getMaterial() const
+raytracer::material::Material raytracer::shape::AShape::getMaterial() const
 {
     return _material;
 }

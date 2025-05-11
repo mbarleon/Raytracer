@@ -8,16 +8,17 @@
 #pragma once
 
 #include "BSDF/BSDF.hpp"
+#include <memory>
 
 // clang-format off
 namespace raytracer::material {
 typedef struct material {
-    BSDF *bsdf;
+    std::shared_ptr<BSDF> bsdf;
 
-    material(BSDF *bsdf);
+    material();
+    material(std::shared_ptr<BSDF> bsdf);
 
-    math::RGBColor sample(const math::Vector3D &wo, const math::Vector3D &normal,
-        math::Vector3D &wi, double &pdf) const;
+    BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect) const;
 } Material;
 };// namespace raytracer
 // clang-format on

@@ -16,6 +16,7 @@ class DielectricBSDF : public BSDF {
         double etaInt;
 
         DielectricBSDF(double etaExt, double etaInt);
+        ~DielectricBSDF() override = default;
 
         BSDFSample sample(const math::Vector3D &wo,
             const math::Intersect &isect) const override;

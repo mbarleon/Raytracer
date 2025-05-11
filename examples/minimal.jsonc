@@ -22,22 +22,6 @@
         "fov": 72
     },
     "scene": {
-        "materials": [
-            {
-                "name": "glass",
-                "reflectivity": 1.0, // coefficient de réflexion [0,1]
-                "transparency": 0.0, // coefficient de transparence [0,1]
-                "refractive-index": 1.5, // indice de réfraction (1.0 = air)
-                "shininess": 100.0
-            },
-            {
-                "name": "ground",
-                "reflectivity": 0.0,
-                "transparency": 0.0,
-                "refractive-index": 1.0,
-                "shininess": 20.0
-            }
-        ],
         "shapes": {
             "spheres": [
                 // {
@@ -49,7 +33,11 @@
                 {
                     "position": { "x": 0, "y": 0, "z": -1 },
                     "radius": 0.5,
-                    "material": "glass",
+                    "material": "dielectric",
+                    "refraction": {
+                        "inside": 1.5,
+                        "outside": 1.0
+                    },
                     "color": { "r": 255, "g": 0, "b": 0 }
                 },
                 // {
@@ -61,7 +49,7 @@
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
-                    "material": "ground",
+                    "material": "specular",
                     "color": { "r": 150, "g": 150, "b": 150 }
                 }
             ]

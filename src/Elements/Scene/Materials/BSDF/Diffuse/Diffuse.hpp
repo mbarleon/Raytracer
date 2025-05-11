@@ -12,6 +12,9 @@
 namespace raytracer::material {
 class DiffuseBSDF : public BSDF {
     public:
+        DiffuseBSDF() = default;
+        ~DiffuseBSDF() override = default;
+
         BSDFSample sample(const math::Vector3D &wo,
             const math::Intersect &isect) const override;
 };

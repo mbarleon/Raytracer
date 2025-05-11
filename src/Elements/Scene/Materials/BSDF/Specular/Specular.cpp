@@ -6,6 +6,7 @@
 */
 
 #include "Specular.hpp"
+#include "../../../../../Maths/Intersect.hpp"
 
 raytracer::material::BSDFSample raytracer::material::SpecularBSDF::sample(const math::Vector3D &wo,
     const math::Intersect &isect) const

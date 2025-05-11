@@ -30,7 +30,7 @@ math::Vector3D reflectHemisphere(const math::Vector3D &normal);
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);
 math::RGBColor getRayColor(const math::Ray &ray, const IShapesList &shapes,
-    const Render &render, unsigned depth);
+    const ILightsList &lights, const Render &render, unsigned depth);
 
 // Intersect
 bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,

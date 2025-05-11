@@ -34,7 +34,8 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void raytracer::Camera::render(const IShapesList &shapes, const Render &render) const
+void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
+    const Render &render) const
 {
     const unsigned int nproc = std::thread::hardware_concurrency();
 
@@ -58,17 +59,17 @@ void raytracer::Camera::render(const IShapesList &shapes, const Render &render) 
                     continue;
                 }
 
+                const double u = (x + 0.5) / static_cast<double>(_resolution.x);
+                const double v = (y + 0.5) / static_cast<double>(_resolution.y);
+
+                math::Ray cameraRay;
                 std::mt19937 rng(x + y * _resolution.x);
                 LightSample sample;
                 sample.pdf = EPSILON;
+                generateRay(u, v, cameraRay);
 
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    const double u = (x + 0.5) / static_cast<double>(_resolution.x);
-                    const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-
-                    math::Ray cameraRay;
-                    generateRay(u, v, cameraRay);
-                    sample.radiance += getRayColor(cameraRay, shapes, render, 0);
+                    sample.radiance += getRayColor(cameraRay, shapes, lights, render, 0);
                 }
                 sample.radiance /= render.antialiasing.samples;
 

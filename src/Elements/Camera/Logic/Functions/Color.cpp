@@ -16,7 +16,7 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
 }
 
 math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes,
-    const Render &render, unsigned depth)
+    const ILightsList &lights, const Render &render, unsigned depth)
 {
     math::Intersect intersect;
 
@@ -25,7 +25,7 @@ math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &s
     }
     if (findClosestIntersection(ray, shapes, intersect, true)) {
         return intersect.object->getColor() *
-            getRayColor(intersect.reflected, shapes, render, depth + 1);
+            getRayColor(intersect.reflected, shapes, lights, render, depth + 1);
     }
     return getBackgroundColor(ray._dir);
 }

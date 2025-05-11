@@ -25,6 +25,7 @@ class Core final
 
     private:
         std::vector<std::shared_ptr<shape::IShape>> _shapes;
+        std::vector<std::shared_ptr<light::ILight>> _lights;
         std::unordered_map<std::string, std::shared_ptr<Material>> _materials;
         std::unique_ptr<Render> _render;
         std::unique_ptr<Camera> _camera;

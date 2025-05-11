@@ -28,12 +28,13 @@ void raytracer::Core::run(const char *RESTRICT filename)
     const auto &camera = root.at("camera");
     const auto &scene = std::get<JsonMap>(root.at("scene").value);
     const auto &shapes = scene.at("shapes");
-    // const auto &lights = scene.at("lights");
+    const auto &lights = scene.at("lights");
 
     _materials = material_factory(root.at("scene"));
     _shapes = primitive_factory(shapes, _materials);
+    _lights = light_factory(lights);
 
     _render = create_render(render);
     _camera = create_camera(camera);
-    _camera.get()->render(_shapes, *_render.get());
+    _camera.get()->render(_shapes, _lights, *_render.get());
 }

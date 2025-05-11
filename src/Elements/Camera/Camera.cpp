@@ -64,14 +64,19 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
 
                 math::Ray cameraRay;
                 std::mt19937 rng(x + y * _resolution.x);
-                LightSample sample;
-                sample.pdf = EPSILON;
                 generateRay(u, v, cameraRay);
 
+                LightSample sample;
+                sample.radiance = math::RGBColor(0);
+                sample.pdf = 0.0;
+
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    sample.radiance += getRayColor(cameraRay, shapes, lights, render, 0);
+                    LightSample newSample = getRayColor(cameraRay, shapes, lights, render, 0);
+                    sample.radiance += newSample.radiance;
+                    sample.pdf += newSample.pdf;
                 }
-                sample.radiance /= render.antialiasing.samples;
+                sample.radiance /= static_cast<double>(render.antialiasing.samples);
+                sample.pdf /= static_cast<double>(render.antialiasing.samples);
 
                 // collect light sample from path tracing
                 const double weight = 1.0 / std::max(sample.pdf, EPSILON);

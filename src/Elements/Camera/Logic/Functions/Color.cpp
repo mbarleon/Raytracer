@@ -15,32 +15,32 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
     return (1.0 - t) * math::RGBColor(1) + t * math::RGBColor(0.3, 0.5, 1.0);
 }
 
-math::RGBColor raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes,
+raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes,
     const ILightsList &lights, const Render &render, unsigned depth)
 {
+    raytracer::LightSample sample = { math::RGBColor(0), EPSILON };
+
+    if (depth > render.maxDepth)
+        return sample;
+
     math::Intersect intersect;
-
-    if (depth > render.maxDepth) {
-        return math::RGBColor(0);
-    }
     if (!findClosestIntersection(ray, shapes, intersect, true)) {
-        return getBackgroundColor(ray._dir);
+        sample.radiance = getBackgroundColor(ray._dir);
+        sample.pdf = 1.0;
+        return sample;
     }
 
-    const auto &mat = intersect.object->getMaterial();
     const math::Vector3D V = -ray._dir;
-    math::RGBColor Lo(0);
+    const auto &mat = intersect.object->getMaterial();
+    const auto bsdfSample = mat.bsdf->sample(V, intersect);
 
-    // ambient
-    Lo += render.lighting.ambient * intersect.object->getColor();
+    if (bsdfSample.pdf < EPSILON)
+        return sample;
 
-    // direct
-    Lo += computeDirectLight(intersect, V, mat, shapes, lights, render);
+    const math::Ray nextRay = {intersect.point + bsdfSample.direction * EPSILON, bsdfSample.direction};
+    const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1);
 
-    // other
-    if (depth < render.maxDepth) {
-    }
-
-    // indirect, restir...
-    return Lo;
+    sample.radiance = bsdfSample.value * next.radiance;
+    sample.pdf = bsdfSample.pdf;
+    return sample;
 }

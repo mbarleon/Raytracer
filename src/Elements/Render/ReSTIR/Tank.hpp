@@ -5,6 +5,8 @@
 ** RestTank
 */
 
+#pragma once
+
 #include <random>
 #include "../../../Maths/Vector3D.hpp"
 

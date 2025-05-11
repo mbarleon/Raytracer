@@ -1,7 +1,7 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 1, // 40 for absolute realism, 1 for fast rendering
+            "samples": 4, // 40 for absolute realism, 1 for fast rendering
             "radius": 1
         },
         "max-depth": 10, // reflection and refraction limit
@@ -17,35 +17,35 @@
     },
     "camera": {
         "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 0, "z": -2.3 },
+        "position": { "x": 0, "y": 0, "z": -2.7 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
     "scene": {
         "shapes": {
             "spheres": [
-                // {
-                //     "position": { "x": -1, "y": 0, "z": -1 },
-                //     "radius": 0.5,
-                //     "material": "ground",
-                //     "color": { "r": 0, "g": 255, "b": 0 }
-                // },
+                {
+                    "position": { "x": -1, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "material": "specular",
+                    "color": { "r": 0, "g": 255, "b": 0 }
+                },
                 {
                     "position": { "x": 0, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "material": "diffuse",
+                    "color": { "r": 255, "g": 0, "b": 0 }
+                },
+                {
+                    "position": { "x": 1, "y": 0, "z": -1 },
                     "radius": 0.5,
                     "material": "dielectric",
                     "refraction": {
                         "inside": 1.5,
                         "outside": 1.0
                     },
-                    "color": { "r": 255, "g": 0, "b": 0 }
+                    "color": { "r": 0, "g": 0, "b": 255 }
                 },
-                // {
-                //     "position": { "x": 1, "y": 0, "z": -1 },
-                //     "radius": 0.5,
-                //     "material": "ground",
-                //     "color": { "r": 0, "g": 0, "b": 255 }
-                // },
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,

@@ -14,6 +14,7 @@
 #include "../../Scene/Materials/Material.hpp"
 #include "../../Scene/Shapes/IShape.hpp"
 #include "../../Scene/Lights/ILight.hpp"
+#include "../../Render/ReSTIR/Tank.hpp"
 #include "Macro.hpp"
 #include <vector>
 
@@ -29,7 +30,7 @@ math::RGBColor computeDirectLight(const math::Intersect &intersect,
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v);
-math::RGBColor getRayColor(const math::Ray &ray, const IShapesList &shapes,
+LightSample getRayColor(const math::Ray &ray, const IShapesList &shapes,
     const ILightsList &lights, const Render &render, unsigned depth);
 
 // Intersect

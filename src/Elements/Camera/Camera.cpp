@@ -62,10 +62,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
         std::uniform_real_distribution<double> jitterY(-0.5, 0.5);
 
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
-            const double v0 = (y + 0.5) / double(_resolution.y);
+            const double v0 = (y + 0.5) / static_cast<double>(_resolution.y);
 
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                const double u0 = (x + 0.5) / double(_resolution.x);
+                const double u0 = (x + 0.5) / static_cast<double>(_resolution.x);
 
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
                     double du = u0 + jitterX(rng) * (1.0 / _resolution.x);

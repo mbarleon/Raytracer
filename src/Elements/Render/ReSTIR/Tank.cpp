@@ -13,24 +13,27 @@ raytracer::restir_tank::restir_tank(): weightSum(0.0), count(0)
 
 void raytracer::restir_tank::add(const LightSample &candidate, double w, std::mt19937 &gen)
 {
-    ++count;
-    weightSum += w;
+    const double newSum = weightSum + w;
     std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) * weightSum < w) {
+
+    if (dist(gen) < w / newSum) {
         sample = candidate;
     }
+    ++count;
+    weightSum = newSum;
 }
 
 void raytracer::restir_tank::merge(const struct restir_tank &other, std::mt19937 &gen)
 {
-    if (other.weightSum <= 0.0)
+    if (other.weightSum <= 0.0) {
         return;
+    }
 
     weightSum += other.weightSum;
     count += other.count;
 
     std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) * weightSum < other.weightSum) {
+    if (dist(gen) < other.weightSum / weightSum) {
         sample = other.sample;
     }
 }

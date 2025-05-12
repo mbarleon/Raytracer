@@ -50,19 +50,26 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
 
     std::atomic<unsigned> linesDone(0);
     std::vector<std::vector<Tank>> restirGrid(_resolution.y, std::vector<Tank>(_resolution.x));
+    const unsigned seedGlobal = std::random_device{}();
 
     const auto sparseWorker = [&](unsigned threadId) {
+        std::mt19937 rng(seedGlobal + threadId * 0x9E3779B1u);
+        math::Ray cameraRay;
+
+        // jitter
+        std::uniform_real_distribution<double> uni(0.0, 1.0);
+        std::uniform_real_distribution<double> jitterX(-0.5, 0.5);
+        std::uniform_real_distribution<double> jitterY(-0.5, 0.5);
+
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
+            const double v0 = (y + 0.5) / double(_resolution.y);
+
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                std::mt19937 rng(x + y * _resolution.x);
                 const double u0 = (x + 0.5) / double(_resolution.x);
-                const double v0 = (y + 0.5) / double(_resolution.y);
-                math::Ray cameraRay;
 
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    double du = u0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.x);
-                    double dv = v0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.y);
-
+                    double du = u0 + jitterX(rng) * (1.0 / _resolution.x);
+                    double dv = v0 + jitterY(rng) * (1.0 / _resolution.y);
                     du = std::clamp(du, 0.0, 1.0);
                     dv = std::clamp(dv, 0.0, 1.0);
                     generateRay(du, dv, cameraRay);

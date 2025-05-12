@@ -14,7 +14,7 @@ raytracer::material::BSDFSample raytracer::material::SpecularBSDF::sample(const 
     const math::Vector3D reflected = reflect(-wo, isect.normal).normalize();
     const math::RGBColor color = isect.object->getColor();
 
-    return {reflected, 1.0, color};
+    return {reflected, 1.0, color, true };
 }
 
 math::RGBColor raytracer::material::SpecularBSDF::evaluate(const math::Vector3D __attribute__((unused)) &wo,

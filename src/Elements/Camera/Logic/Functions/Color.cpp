@@ -58,5 +58,5 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
     const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, rng, newThroughput);
 
-    return { radiance * throughput + next.radiance, bsdfS.pdf };
+    return { radiance * throughput + next.radiance, bsdfS.pdf, bsdfS.isDelta };
 }

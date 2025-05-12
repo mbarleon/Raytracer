@@ -7,7 +7,6 @@
 
 #include "Directional.hpp"
 #include "Logger.hpp"
-#include <limits>
 
 raytracer::light::Directional::Directional(const math::RGBColor &color,
     const math::Vector3D &direction, double intensity)
@@ -18,5 +17,5 @@ raytracer::light::Directional::Directional(const math::RGBColor &color,
 
 raytracer::material::BSDFSample raytracer::light::Directional::sample(const math::Point3D __attribute__((unused)) &targetPoint) const
 {
-    return {-_direction, std::numeric_limits<double>::infinity(), _color * _intensity};
+    return { -_direction, 1.0, _color * _intensity, true };
 }

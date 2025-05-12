@@ -74,9 +74,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
                     dv = std::clamp(dv, 0.0, 1.0);
                     generateRay(du, dv, cameraRay);
 
-                    // luminance / pdf or maxComponent / pdf
                     const LightSample sample = getRayColor(cameraRay, shapes, lights, render, 0, rng);
-                    const double w = sample.radiance.maxComponent() / std::max(sample.pdf, EPSILON);
+                    const double L = 0.2126 * sample.radiance._x +
+                        0.7152 * sample.radiance._y + 0.0722 * sample.radiance._z;
+                    const double w = sample.isDelta ? L : L / std::max(sample.pdf, EPSILON);
                     restirGrid[y][x].add(sample, w, rng);
                 }
             }

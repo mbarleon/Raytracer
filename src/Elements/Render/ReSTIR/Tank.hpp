@@ -14,6 +14,7 @@ namespace raytracer {
 typedef struct light_sample {
     math::RGBColor radiance;
     double pdf;
+    bool isDelta = false;
 } LightSample;
 
 typedef struct restir_tank {

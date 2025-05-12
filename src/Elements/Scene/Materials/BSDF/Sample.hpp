@@ -14,5 +14,6 @@ struct BSDFSample {
     math::Vector3D direction;
     double pdf;
     math::RGBColor radiance;
+    bool isDelta = false;
 };
 };

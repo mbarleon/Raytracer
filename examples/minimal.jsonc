@@ -41,17 +41,17 @@
                     "radius": 0.5,
                     "material": "dielectric",
                     "refraction": {
-                        "inside": 1.5,
-                        "outside": 1.0
+                        "inside": 1.0,
+                        "outside": 1.52 // glass
                     },
                     "color": { "r": 0, "g": 0, "b": 255 }
                 },
-                {
-                    "position": { "x": 0, "y": -100.5, "z": -1 },
-                    "radius": 100,
-                    "material": "specular",
-                    "color": { "r": 255, "g": 255, "b": 255 }
-                }
+                // {
+                //     "position": { "x": 0, "y": -100.5, "z": -1 },
+                //     "radius": 100,
+                //     "material": "specular",
+                //     "color": { "r": 255, "g": 255, "b": 255 }
+                // }
             ]
             // "planes": [
             //     {

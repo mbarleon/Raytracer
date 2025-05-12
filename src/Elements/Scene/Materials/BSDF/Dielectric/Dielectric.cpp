@@ -19,65 +19,75 @@ raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt
 raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(const math::Vector3D &wo,
     const math::Intersect &isect, std::mt19937 &rng) const
 {
-    const bool entering = (wo.dot(isect.normal) > 0);
-    const math::Vector3D normal = entering ? isect.normal : -isect.normal;
-    const double eta = entering ? etaExt / etaInt : etaInt / etaExt;
+    const bool entering = (wo.dot(isect.normal) < 0);
+    const math::Vector3D N = entering ? isect.normal : -isect.normal;  // on veut cosi = dot(-wo, N) >= 0
+    const double eta_i = entering ? etaInt : etaExt;
+    const double eta_t = entering ? etaExt : etaInt;
+    const double eta   = eta_i / eta_t;
 
-    const double cosi = std::clamp(wo.normalize().dot(normal), -1.0, 1.0);
-    const double F = reflectance(fabs(cosi), etaExt, etaInt);
+    const math::Vector3D V = wo.normalize();
+    const double cosi = std::clamp((-V).dot(N), 0.0, 1.0);
+    const double k = 1.0 - eta*eta * (1.0 - cosi*cosi);
 
-    math::Vector3D wi;
-    double pdf;
-    math::RGBColor beta;
-
-    // choice reflrect or refract
-    if (getRandomDouble(rng) < F) {
-        wi = reflect(-wo, normal).normalize();
-        pdf = F;
-        beta = math::RGBColor(1.0);
-    } else {
-        wi = refract(-wo, normal, eta).normalize();
-        const double cosThetaI = fabs(wo.normalize().dot(normal));
-        const double cosThetaT = fabs(wi.normalize().dot(normal));
-        const double jac = (eta * eta * cosThetaT) / std::max(cosThetaI, EPSILON);
-        pdf = (1.0 - F) * jac;
-
-        // Bee­r–Lambert
-        const double distance = 1.0;
-        const math::RGBColor mat = isect.object->getColor();
-        beta = math::RGBColor(
-            exp(-mat._x * distance),
-            exp(-mat._y * distance),
-            exp(-mat._z * distance)
-        );
+    math::Vector3D refracted;
+    bool hasRefract = false;
+    if (k >= 0.0) {
+        refracted = (eta * (V + cosi * N) - std::sqrt(k) * N).normalize();
+        hasRefract = true;
     }
-    return { wi, pdf, beta };
+
+    // schlick
+    const double R0 = ((eta_t - eta_i)/(eta_t + eta_i));
+    const double reflect_prob = R0*R0 + (1.0 - R0*R0) * std::pow(1.0 - cosi, 5.0);  // :contentReference[oaicite:9]{index=9}
+
+    // pick random choice reflect / refract
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    const bool doReflect = (!hasRefract) || (dist(rng) < reflect_prob);
+
+    const math::Vector3D wi = doReflect ? reflect(V, N).normalize() : refracted;
+    const math::RGBColor beta = math::RGBColor(1.0);
+
+    return { wi, 1.0, beta, true };
 }
 
 math::RGBColor raytracer::material::DielectricBSDF::evaluate(const math::Vector3D __attribute__((unused)) &wo,
     const math::Vector3D __attribute__((unused)) &wi, const math::Intersect __attribute__((unused)) &isect,
     std::mt19937 __attribute__((unused)) &rng) const
 {
-    const bool entering = (wo.dot(isect.normal) > 0);
-    const math::Vector3D normal = entering ? isect.normal : -isect.normal;
-    const double eta = entering ? etaExt / etaInt : etaInt / etaExt;
+    const bool entering = (wo.dot(isect.normal) < 0.0);
+    const math::Vector3D N = entering ?  isect.normal : -isect.normal;
+    const double eta_i = entering ? etaInt : etaExt;
+    const double eta_t = entering ? etaExt : etaInt;
+    const double eta = eta_i / eta_t;
 
-    const double cosi = std::clamp(wo.normalize().dot(normal), -1.0, 1.0);
-    const double F = reflectance(fabs(cosi), etaExt, etaInt);
+    const math::Vector3D V = wo.normalize();
+    const double cosi = std::clamp((-V).dot(N), 0.0, 1.0);
+    const double k = 1.0 - eta*eta * (1.0 - cosi*cosi);
 
-    const math::Vector3D R = reflect(-wo, normal).normalize();
-    const math::Vector3D T = refract(-wo, normal, eta).normalize();
-    const double cosThetaI = fabs(wo.normalize().dot(normal));
+    // schlick
+    const double R0 = (eta_t - eta_i) / (eta_t + eta_i);
+    const double F  = R0*R0 + (1.0 - R0*R0) * std::pow(1.0 - cosi, 5.0);
+
+    const math::Vector3D R = reflect(V, N).normalize();
+    const math::Vector3D T = (eta * (V + cosi * N) - std::sqrt(k) * N).normalize();
+
+    if (k < 0.0) {
+        if ((wi - R).length() < EPSILON) {
+            const double invCos = 1.0 / std::max(cosi, EPSILON);
+            return math::RGBColor(invCos);
+        }
+        return math::RGBColor(0.0);
+    }
 
     if ((wi - R).length() < EPSILON) {
-        // reflect f = F · δ(wi-R) / |cosθi|
-        return math::RGBColor(F / std::max(cosThetaI, EPSILON));
+        // f = F / |cosθᵢ| · δ(ωᵢ - R)
+        const double invCos = 1.0 / std::max(cosi, EPSILON);
+        return math::RGBColor(F * invCos);
     }
     if ((wi - T).length() < EPSILON) {
-        // refract f = (1-F)·η²/|cosθi| · δ(wi-T)
-        const double factor = (1.0 - F) * (eta*eta) / std::max(cosThetaI, EPSILON);
-        return math::RGBColor(factor);
+        // f = (1-F)·η² / |cosθᵢ| · δ(ωᵢ - T)
+        const double invCos = 1.0 / std::max(cosi, EPSILON);
+        return math::RGBColor((1.0 - F) * (eta*eta) * invCos);
     }
-    // sinon : pas de contribution
     return math::RGBColor(0.0);
 }

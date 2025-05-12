@@ -174,19 +174,3 @@ bool math::Vector3D::nearZero() const
     return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) &&
         (std::fabs(_z) < EPSILON);
 }
-
-void math::Vector3D::realign()
-{
-    _x = sqrt(_x);
-    _y = sqrt(_y);
-    _z = sqrt(_z);
-    if (_x > 0.999)
-        _x = 0.999;
-    if (_y > 0.999)
-        _y = 0.999;
-    if (_z > 0.999)
-        _z = 0.999;
-    _x *= 256;
-    _y *= 256;
-    _z *= 256;
-}

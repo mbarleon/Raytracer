@@ -24,5 +24,6 @@ double getRandomDouble(std::mt19937 &rng);
 double getRandomDouble(std::mt19937 &rng, double min, double max);
 math::Vector3D getRandomVector(std::mt19937 &rng);
 math::Vector3D getRandomVector(std::mt19937 &rng, double min, double max);
+std::mt19937 getRng(unsigned threadId, unsigned res_x, unsigned res_y);
 
 };

@@ -34,6 +34,14 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+int getPixelColor(double c)
+{
+    double g = std::pow(c, 1.0/2.2); // 2.2 = gamma
+
+    g = std::min(1.0, std::max(0.0, g));
+    return static_cast<int>(g * 255.0 + 0.5);
+};
+
 void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
     const Render &render) const
 {
@@ -50,10 +58,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
 
     std::atomic<unsigned> linesDone(0);
     std::vector<std::vector<Tank>> restirGrid(_resolution.y, std::vector<Tank>(_resolution.x));
-    const unsigned seedGlobal = std::random_device{}();
 
     const auto sparseWorker = [&](unsigned threadId) {
-        std::mt19937 rng(seedGlobal + threadId * 0x9E3779B1u);
+        std::mt19937 rng = material::getRng(threadId, _resolution.x, _resolution.y);
         math::Ray cameraRay;
 
         // jitter
@@ -105,10 +112,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             math::RGBColor pixel = restirGrid[y][x].estimate();
-            pixel.realign();
-            ppm << static_cast<int>(pixel._x) << ' '
-                << static_cast<int>(pixel._y) << ' '
-                << static_cast<int>(pixel._z) << '\n';
+            ppm << getPixelColor(pixel._x) << ' '
+                << getPixelColor(pixel._y) << ' '
+                << getPixelColor(pixel._z) << '\n';
         }        
     }
 }
@@ -151,7 +157,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;
     cameraRay._dir._y = (1.0 - 2.0 * v) * fov_adjustment;
-    cameraRay._dir._z = +1.0;
+    cameraRay._dir._z = 1.0;
     cameraRay._dir = cameraRay._dir.normalize();
     cameraRay._dir = applyRotation(cameraRay._dir, _rotation).normalize();
 }

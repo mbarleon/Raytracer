@@ -29,3 +29,10 @@ math::Vector3D raytracer::material::getRandomVector(std::mt19937 &rng, double mi
     return math::Vector3D(getRandomDouble(rng, min, max), getRandomDouble(rng, min, max),
         getRandomDouble(rng, min, max));
 }
+
+std::mt19937 raytracer::material::getRng(unsigned threadId, unsigned res_x, unsigned res_y)
+{
+    std::seed_seq seq { std::random_device{}(), threadId, res_x, res_y };
+
+    return std::mt19937(seq);
+};

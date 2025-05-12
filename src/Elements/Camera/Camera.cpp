@@ -36,9 +36,10 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 
 int getPixelColor(double c)
 {
-    c = std::clamp(c, 0.0, 1.0);
+    double mapped = c / (1.0 + c);
+    mapped = std::clamp(mapped, 0.0, 1.0);
 
-    const double g = std::pow(c, 1.0/2.2); // 2.2 = gamma
+    const double g = std::pow(mapped, 1.0 / 3.0); // gamma = 3.0
     return static_cast<int>(g * 255.0 + 0.5);
 };
 
@@ -103,7 +104,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
         t.join();
     }
 
-    // apply image blur
+    // TODO: restir spatial merge
 
     // image generation
     std::ofstream ppm(render.output.file);

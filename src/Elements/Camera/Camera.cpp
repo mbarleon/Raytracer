@@ -54,34 +54,24 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     const auto sparseWorker = [&](unsigned threadId) {
         for (unsigned y = threadId; y < _resolution.y; y += nproc) {
             for (unsigned x = 0; x < _resolution.x; ++x) {
-                if ((x % render.antialiasing.radius != 0) ||
-                (y % render.antialiasing.radius != 0)) {
-                    continue;
-                }
-
-                const double u = (x + 0.5) / static_cast<double>(_resolution.x);
-                const double v = (y + 0.5) / static_cast<double>(_resolution.y);
-
-                math::Ray cameraRay;
                 std::mt19937 rng(x + y * _resolution.x);
-                generateRay(u, v, cameraRay);
-
-                LightSample sample;
-                sample.radiance = math::RGBColor(0);
-                sample.pdf = 0.0;
+                const double u0 = (x + 0.5) / double(_resolution.x);
+                const double v0 = (y + 0.5) / double(_resolution.y);
+                math::Ray cameraRay;
 
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    LightSample newSample = getRayColor(cameraRay, shapes, lights, render, 0);
-                    sample.radiance += newSample.radiance;
-                    sample.pdf += newSample.pdf;
-                }
-                sample.radiance /= static_cast<double>(render.antialiasing.samples);
-                sample.pdf /= static_cast<double>(render.antialiasing.samples);
+                    double du = u0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.x);
+                    double dv = v0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.y);
 
-                // collect light sample from path tracing
-                const double weight = 1.0 / std::max(sample.pdf, EPSILON);
-                const double clampedWeight = std::min(weight, 10.0);
-                restirGrid[y][x].add(sample, clampedWeight, rng);
+                    du = std::clamp(du, 0.0, 1.0);
+                    dv = std::clamp(dv, 0.0, 1.0);
+                    generateRay(du, dv, cameraRay);
+
+                    // luminance / pdf or maxComponent / pdf
+                    const LightSample sample = getRayColor(cameraRay, shapes, lights, render, 0);
+                    const double w = sample.radiance.maxComponent() / std::max(sample.pdf, EPSILON);
+                    restirGrid[y][x].add(sample, w, rng);
+                }
             }
 
             const unsigned done = linesDone.fetch_add(1) + 1;

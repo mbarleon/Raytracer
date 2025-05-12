@@ -7,13 +7,14 @@
 
 #include "../Pathtracer.hpp"
 #include "../../../Scene/Materials/Utils/Utils.hpp"
+#include <algorithm>
 
 math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
 {
     const math::Vector3D dir = v.normalize();
     const auto t = 0.5 * (dir._y + 1.0);
 
-    return (1.0 - t) * math::RGBColor(1) + t * math::RGBColor(0.3, 0.5, 1.0);
+    return (1.0 - t) * math::RGBColor(0) + t * math::RGBColor(0.1, 0.0, 0.3);
 }
 
 raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
@@ -30,18 +31,18 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     }
 
     // direct light
-    const math::Vector3D viewDir = -ray._dir.normalize();
-
-    const double ao = ambientOcclusion(isect, shapes, /*samples=*/1);
-    math::RGBColor radiance = phongDirect(isect, viewDir, lights, shapes, render);
-
-    const math::RGBColor baseAmb = isect.object->getColor() * render.lighting.ambient;
-    radiance = radiance - baseAmb + (baseAmb * ao);
+    math::RGBColor radiance(0);
+    if (depth == 0) {
+        const double ao = ambientOcclusion(isect, shapes, 10);
+        const math::RGBColor baseAmb = isect.object->getColor() * render.lighting.ambient;
+        radiance = phongDirect(isect, -ray._dir, lights, shapes, render);
+        radiance = radiance - baseAmb + (baseAmb * ao);
+    }
 
     // bsdf sampling
     const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect);
     if (bsdfS.pdf < EPSILON) {
-        return { math::RGBColor(0), 1.0 };
+        return { radiance * throughput, 1.0 };
     }
 
     // russian roulette
@@ -49,7 +50,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const double pContinue = std::min(1.0, newThroughput.maxComponent());
 
     if (material::getRandomDouble() >= pContinue) {
-        return { math::RGBColor(0), 1.0 };
+        return { radiance * throughput, 1.0 };
     }
     newThroughput /= pContinue;
 

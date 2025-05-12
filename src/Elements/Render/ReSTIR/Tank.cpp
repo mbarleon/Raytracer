@@ -23,11 +23,16 @@ void raytracer::restir_tank::add(const LightSample &candidate, double w, std::mt
 
 void raytracer::restir_tank::merge(const struct restir_tank &other, std::mt19937 &gen)
 {
-    if (other.count == 0) {
+    if (other.weightSum <= 0.0)
         return;
+
+    weightSum += other.weightSum;
+    count += other.count;
+
+    std::uniform_real_distribution<> dist(0.0, 1.0);
+    if (dist(gen) * weightSum < other.weightSum) {
+        sample = other.sample;
     }
-    const double w = other.weightSum;
-    add(other.sample, w, gen);
 }
 
 math::RGBColor raytracer::restir_tank::estimate() const

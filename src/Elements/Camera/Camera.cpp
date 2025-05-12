@@ -36,9 +36,9 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 
 int getPixelColor(double c)
 {
-    double g = std::pow(c, 1.0/2.2); // 2.2 = gamma
+    c = std::clamp(c, 0.0, 1.0);
 
-    g = std::min(1.0, std::max(0.0, g));
+    const double g = std::pow(c, 1.0/2.2); // 2.2 = gamma
     return static_cast<int>(g * 255.0 + 0.5);
 };
 
@@ -64,7 +64,6 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
         math::Ray cameraRay;
 
         // jitter
-        std::uniform_real_distribution<double> uni(0.0, 1.0);
         std::uniform_real_distribution<double> jitterX(-0.5, 0.5);
         std::uniform_real_distribution<double> jitterY(-0.5, 0.5);
 
@@ -108,6 +107,10 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
 
     // image generation
     std::ofstream ppm(render.output.file);
+
+    if (!ppm) {
+        throw exception::Error("Camera", "Unable to open output file.");
+    }
     ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {

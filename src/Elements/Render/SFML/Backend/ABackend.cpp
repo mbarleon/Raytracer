@@ -74,3 +74,13 @@ const sf::Event raytracer::backend::ABackend::getEvents() noexcept
     }
     return {};
 }
+
+/**
+* @brief isOpen
+* @details check if the window is open
+* @return true <|> false
+*/
+bool raytracer::backend::ABackend::isOpen() const noexcept
+{
+    return _window.isOpen();
+}

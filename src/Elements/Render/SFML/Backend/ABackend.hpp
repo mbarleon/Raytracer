@@ -21,6 +21,7 @@ class ABackend : public IBackend
         void display() noexcept override;
         const sf::Event getEvents() noexcept override;
 
+        [[nodiscard]] bool isOpen() const noexcept override;
         [[nodiscard]] sf::RenderWindow &getWindow() noexcept override;
         [[nodiscard]] bool getAction(const float every, float &last) noexcept override;
 

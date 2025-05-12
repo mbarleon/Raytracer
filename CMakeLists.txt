@@ -60,6 +60,7 @@ if(ENABLE_DEBUG)
 endif()
 
 target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(raytracer PRIVATE sfml-graphics sfml-system sfml-window)
 
 ########################################
 
@@ -85,7 +86,7 @@ endif()
 
 target_compile_definitions(unit_tests PRIVATE UNIT_TESTS=1)
 
-target_link_libraries(unit_tests PRIVATE criterion)
+target_link_libraries(unit_tests PRIVATE criterion sfml-graphics sfml-system sfml-window)
 
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 

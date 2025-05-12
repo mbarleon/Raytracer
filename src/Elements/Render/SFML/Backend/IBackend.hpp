@@ -20,6 +20,7 @@ class IBackend
         virtual void display() noexcept = 0;
         virtual const sf::Event getEvents() noexcept = 0;
 
+        [[nodiscard]] virtual bool isOpen() const noexcept = 0;
         [[nodiscard]] virtual sf::RenderWindow &getWindow() noexcept = 0;
         [[nodiscard]] virtual bool getAction(const float every, float &last) noexcept = 0;
 };

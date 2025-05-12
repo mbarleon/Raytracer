@@ -16,39 +16,47 @@ raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt
 }
 
 raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(const math::Vector3D &wo,
-    const math::Intersect &isect) const
+    const math::Intersect &isect, std::mt19937 &rng) const
 {
     const math::Vector3D N = isect.normal;
-    const bool entering = wo.dot(N) > 0.0;
+    const bool entering = (wo.dot(N) > 0);
     const math::Vector3D normal = entering ? N : -N;
-
     const double eta = entering ? etaExt / etaInt : etaInt / etaExt;
 
-    const double cosThetaI = std::clamp(wo.normalize().dot(normal), -1.0, 1.0);
-    const double fresnel = reflectance(std::abs(cosThetaI), etaExt, etaInt);
+    const double cosi = std::clamp(wo.normalize().dot(normal), -1.0, 1.0);
+    const double F = reflectance(fabs(cosi), etaExt, etaInt);
 
-    if (getRandomDouble(0.0, 1.0) < fresnel) {
-        // réflexion spéculaire
-        const math::Vector3D reflected = reflect(-wo, normal).normalize();
-        return {reflected, fresnel, math::RGBColor(1.0)};
+    math::Vector3D wi;
+    double pdf;
+    math::RGBColor beta;
+
+    // choice reflrect or refract
+    if (getRandomDouble(rng) < F) {
+        wi = reflect(-wo, normal).normalize();
+        pdf = F;
+        beta = math::RGBColor(1.0);
+    } else {
+        wi = refract(-wo, normal, eta).normalize();
+        const double cosThetaI = fabs(wo.dot(normal));
+        const double cosThetaT = fabs(wi.dot(normal));
+        const double jac = (eta*eta * cosThetaT) / cosThetaI;
+        pdf = (1 - F) * jac;
+
+        // Bee­r–Lambert
+        const double distance = 1.0;
+        const math::RGBColor mat = isect.object->getColor();
+        beta = math::RGBColor(
+            exp(-mat._x*distance),
+            exp(-mat._y*distance),
+            exp(-mat._z*distance)
+        );
     }
-
-    // réfraction
-    const math::Vector3D refracted = refract(-wo, normal, eta).normalize();
-
-    // absorption via Beer-Lambert
-    double distance = 1.0; // ou un chemin moyen estimé
-    const math::RGBColor mat = isect.object->getColor();
-    math::RGBColor absorption = math::RGBColor(
-        std::exp(-mat._x * distance),
-        std::exp(-mat._y * distance),
-        std::exp(-mat._z * distance)
-    );
-    return {refracted, 1.0 - fresnel, absorption};
+    return { wi, pdf, beta };
 }
 
 math::RGBColor raytracer::material::DielectricBSDF::evaluate(const math::Vector3D __attribute__((unused)) &wo,
-    const math::Vector3D __attribute__((unused)) &wi, const math::Intersect __attribute__((unused)) &isect) const
+    const math::Vector3D __attribute__((unused)) &wi, const math::Intersect __attribute__((unused)) &isect,
+    std::mt19937 __attribute__((unused)) &rng) const
 {
     return math::RGBColor(0.0);
 }

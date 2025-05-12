@@ -135,9 +135,9 @@ math::Vector3D math::Vector3D::normalize() const
 math::Vector3D math::Vector3D::orthonormal() const
 {
     if (std::fabs(_x) > std::fabs(_z)) {
-        return math::Vector3D(-_y, _x, 0.0).normalize();
+        return math::Vector3D(-_y, _x, 0.0);
     }
-    return math::Vector3D(0.0, -_z, _y).normalize();
+    return math::Vector3D(0.0, -_z, _y);
 }
 
 math::Vector3D math::Vector3D::cross(const Vector3D &other) const

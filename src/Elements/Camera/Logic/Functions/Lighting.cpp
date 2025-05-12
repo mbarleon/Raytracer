@@ -9,7 +9,7 @@
 
 math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
     const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const Render &render)
+    const IShapesList &shapes, const Render &render, std::mt19937 &rng)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColor();
@@ -32,7 +32,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
         }
 
         // diffuse
-        const math::RGBColor f_diff = bsdf->evaluate(viewDir, L, isect);
+        const math::RGBColor f_diff = bsdf->evaluate(viewDir, L, isect, rng);
         Lo += f_diff * ls.radiance * cosNL * render.lighting.diffuse;
 
         // specular
@@ -48,17 +48,15 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
 }
 
 double raytracer::ambientOcclusion(const math::Intersect &isect,
-    const IShapesList &shapes, int N)
+    const IShapesList &shapes, int N, std::mt19937 &rng)
 {
     const int total = N * N;
     const double maxDistance = 1.0; // shape -> getAOMaxDistance
     double occlusion = 0.0;
 
-    const math::Vector3D T = isect.normal.orthonormal();
+    const math::Vector3D T = isect.normal.orthonormal().cross(isect.normal).normalize();
     const math::Vector3D B = isect.normal.cross(T);
 
-    std::mt19937_64 rng(std::hash<const void*>{}(isect.object.get()) ^ 
-        std::hash<double>{}(isect.point._x));
     std::uniform_real_distribution<double> u01(0.0, 1.0);
 
     for (int a = 0; a < total; ++a) {

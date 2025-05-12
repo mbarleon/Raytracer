@@ -34,17 +34,18 @@ double raytracer::material::reflectance(double cosTheta, double iorI,
     return r0 + (1.0f - r0) * std::pow(1.0f - cosTheta, 5.0f);
 }
 
-math::Vector3D raytracer::material::cosineHemisphere(const math::Vector3D &N)
+math::Vector3D raytracer::material::cosineHemisphere(const math::Vector3D &N,
+    std::mt19937 &rng)
 {
-    double r1 = getRandomDouble();
-    double r2 = getRandomDouble();
+    double r1 = getRandomDouble(rng);
+    double r2 = getRandomDouble(rng);
 
     double phi = 2 * M_PI * r1;
     double x = std::cos(phi) * std::sqrt(r2);
     double y = std::sin(phi) * std::sqrt(r2);
     double z = std::sqrt(1.0 - r2);
 
-    math::Vector3D u = N.orthonormal();
+    math::Vector3D u = N.orthonormal().cross(N).normalize();
     math::Vector3D v = N.cross(u);
 
     return (u * x + v * y + N * z).normalize();

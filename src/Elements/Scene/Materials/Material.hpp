@@ -18,7 +18,8 @@ typedef struct material {
     material();
     material(std::shared_ptr<BSDF> bsdf);
 
-    BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect) const;
+    BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect,
+        std::mt19937 &rng) const;
 } Material;
 };// namespace raytracer
 // clang-format on

@@ -68,7 +68,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
                     generateRay(du, dv, cameraRay);
 
                     // luminance / pdf or maxComponent / pdf
-                    const LightSample sample = getRayColor(cameraRay, shapes, lights, render, 0);
+                    const LightSample sample = getRayColor(cameraRay, shapes, lights, render, 0, rng);
                     const double w = sample.radiance.maxComponent() / std::max(sample.pdf, EPSILON);
                     restirGrid[y][x].add(sample, w, rng);
                 }

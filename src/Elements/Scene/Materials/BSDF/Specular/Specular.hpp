@@ -16,9 +16,9 @@ class SpecularBSDF : public BSDF {
         ~SpecularBSDF() override = default;
 
         BSDFSample sample(const math::Vector3D &wo,
-            const math::Intersect &isect) const override;
+            const math::Intersect &isect, std::mt19937 &rng) const override;
         
         math::RGBColor evaluate(const math::Vector3D &wo, const math::Vector3D &wi,
-            const math::Intersect &isect) const override;
+            const math::Intersect &isect, std::mt19937 &rng) const override;
 };
 };

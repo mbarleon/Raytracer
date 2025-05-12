@@ -9,6 +9,7 @@
 
 #include "Sample.hpp"
 #include "../Utils/Utils.hpp"
+#include <random>
 
 namespace math {
     struct Intersect;
@@ -22,9 +23,10 @@ class BSDF {
         // wo : direction sortante (vers la caméra)
         // isect : infos d’intersection, incluant objet et normale
         virtual BSDFSample sample(const math::Vector3D &wo,
-            const math::Intersect &isect) const = 0;
+            const math::Intersect &isect, std::mt19937 &rng) const = 0;
         
         virtual math::RGBColor evaluate(const math::Vector3D &wo,
-            const math::Vector3D &wi, const math::Intersect &isect) const = 0;
+            const math::Vector3D &wi, const math::Intersect &isect,
+            std::mt19937 &rng) const = 0;
 };
 };

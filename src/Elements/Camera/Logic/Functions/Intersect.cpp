@@ -24,7 +24,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
             if (dist < distMin) {
                 distMin = dist;
                 hit = true;
-                intersect.object = shape;
+                intersect.object = shape.get();
                 intersect.point = intersectPoint;
                 intersect.distance = dist;
             }

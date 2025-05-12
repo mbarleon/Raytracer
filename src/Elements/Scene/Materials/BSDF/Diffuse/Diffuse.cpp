@@ -23,7 +23,5 @@ math::RGBColor raytracer::material::DiffuseBSDF::evaluate(const math::Vector3D _
     std::mt19937 __attribute__((unused)) &rng) const
 {
     // f = albedo / π
-    const math::RGBColor albedo = isect.object->getColor();
-
-    return albedo / M_PI;
+    return isect.object->getColor() / M_PI;
 }

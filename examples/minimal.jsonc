@@ -46,12 +46,16 @@
                     },
                     "color": { "r": 0, "g": 0, "b": 255 }
                 },
-                // {
-                //     "position": { "x": 0, "y": -100.5, "z": -1 },
-                //     "radius": 100,
-                //     "material": "specular",
-                //     "color": { "r": 255, "g": 255, "b": 255 }
-                // }
+                {
+                    "position": { "x": 0, "y": -100.5, "z": -1 },
+                    "radius": 100,
+                    "material": "dielectric",
+                    "refraction": {
+                        "inside": 0.0,
+                        "outside": 0.0
+                    },
+                    "color": { "r": 255, "g": 255, "b": 255 }
+                }
             ]
             // "planes": [
             //     {
@@ -64,18 +68,18 @@
         },
         "lights": {
             "points": [
-                // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
-                //     "color": { "r": 0, "g": 255, "b": 255 },
-                //     "intensity": 100.0
-                // }
+                {
+                    "position": { "x": 0, "y": 2, "z": 1 },
+                    "color": { "r": 0, "g": 255, "b": 255 },
+                    "intensity": 5.0
+                }
             ],
             "directionals": [
-                {
-                    "direction": { "x": 0, "y": -1, "z": -1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 20.0
-                }
+                // {
+                //     "direction": { "x": 0, "y": -1, "z": -1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 1.0
+                // }
             ]
         }
     }

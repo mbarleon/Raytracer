@@ -13,7 +13,7 @@
 // clang-format off
 namespace math {
 typedef struct Intersect {
-    std::shared_ptr<raytracer::shape::IShape> object;
+    raytracer::shape::IShape *object;
     Point3D point;
     Vector3D normal;
     double distance;

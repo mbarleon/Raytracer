@@ -40,12 +40,16 @@ file (GLOB PARSER_SOURCE
 file(GLOB_RECURSE SCENE_SOURCE
     "src/Elements/*.cpp")
 
+file(GLOB_RECURSE UI_SOURCE
+    "src/UI/*.cpp")
+
 
 add_executable(raytracer
     ${UTILS_SOURCE}
     ${MATH_SOURCE}
     ${SCENE_SOURCE}
     ${PARSER_SOURCE}
+    ${UI_SOURCE}
     ${CORE_SOURCE}
     ${MAIN_SOURCE}
 )
@@ -72,6 +76,7 @@ add_executable(unit_tests
     ${MATH_SOURCE}
     ${SCENE_SOURCE}
     ${PARSER_SOURCE}
+    ${UI_SOURCE}
     ${CORE_SOURCE}
     ${TEST_SOURCE}
 )

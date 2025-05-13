@@ -5,7 +5,7 @@
 ** Main.cpp
 */
 
-#include "Core/Core.hpp"
+#include "Core/Application.hpp"
 #include "Error.hpp"
 #include "Logger.hpp"
 #include "Macro.hpp"
@@ -15,8 +15,9 @@ int main(const int argc, char **argv)
 {
     try {
         if (raytracer::parser::parse_arguments(argc, argv)) {
-            raytracer::core::Core core;
-            core.run(argv[1]);
+            raytracer::core::Application app;
+
+            app.run();
         }
     } catch (raytracer::exception::Error &e) {
         raytracer::logger::error(e);

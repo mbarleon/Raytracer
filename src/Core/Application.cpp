@@ -6,7 +6,9 @@
 */
 
 #include "Application.hpp"
+#include "../UI/UIButton.hpp"
 #include "../UI/UIManager.hpp"
+#include <iostream>
 
 /**
  * public
@@ -32,6 +34,24 @@ raytracer::core::Application::Application()
 
 void raytracer::core::Application::run()
 {
+    sf::Clock clock;
+
+    while (_window.isOpen()) {
+
+        sf::Event event{};
+
+        while (_window.pollEvent(event)) {
+
+            if (event.type == sf::Event::Closed)
+                _window.close();
+
+            ui::UIManager::getInstance().events(event);
+        }
+
+        float dt = clock.restart().asSeconds();
+        ui::UIManager::getInstance().update(dt);
+        ui::UIManager::getInstance().render();
+    }
 }
 
 /**
@@ -40,4 +60,12 @@ void raytracer::core::Application::run()
 
 void raytracer::core::Application::setupUI()
 {
+    // ui::UIManager &ui = ui::UIManager::getInstance();
+    // ui::Container &container = ui.getContainer();
+
+    // auto button =
+    //     std::make_shared<ui::Button>(sf::Vector2f(50.f, 50.f), sf::Vector2f(200.f, 50.f), std::string("Click me!"), ui.getFont());
+
+    // button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
+    // container.addWidget(button);
 }

@@ -8,11 +8,21 @@
 #include "UIManager.hpp"
 #include "Error.hpp"
 
-raytracer::ui::UIManager &raytracer::ui::UIManager::getInstance()
+raytracer::ui::UIManager &raytracer::ui::UIManager::getInstance() noexcept
 {
     static UIManager instance;
 
     return instance;
+}
+
+raytracer::ui::Container &raytracer::ui::UIManager::getContainer() noexcept
+{
+    return *_container;
+}
+
+sf::Font &raytracer::ui::UIManager::getFont() noexcept
+{
+    return _font;
 }
 
 void raytracer::ui::UIManager::initialize(sf::RenderWindow &window)
@@ -25,21 +35,21 @@ void raytracer::ui::UIManager::initialize(sf::RenderWindow &window)
     _container = std::make_shared<Container>();
 }
 
-void raytracer::ui::UIManager::events(const sf::Event &event)
+void raytracer::ui::UIManager::events(const sf::Event &event) noexcept
 {
     if (_window) {
         _container->events(event, *_window);
     }
 }
 
-void raytracer::ui::UIManager::update(float dt)
+void raytracer::ui::UIManager::update(const float dt) noexcept
 {
     if (_window) {
         _container->update(dt);
     }
 }
 
-void raytracer::ui::UIManager::render()
+void raytracer::ui::UIManager::render() noexcept
 {
     if (_window) {
         _window->clear();

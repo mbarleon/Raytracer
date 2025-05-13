@@ -14,6 +14,8 @@
 
 namespace raytracer::ui {
 
+using ContainerPtr = std::shared_ptr<Container>;
+
 /**
 * @class UIManager
 * @brief Singleton class to manage the UI components and events.
@@ -21,12 +23,14 @@ namespace raytracer::ui {
 class UIManager final
 {
     public:
-        static UIManager &getInstance();
+        [[nodiscard]] static UIManager &getInstance() noexcept;
+        [[nodiscard]] Container &getContainer() noexcept;
+        [[nodiscard]] sf::Font &getFont() noexcept;
 
         void initialize(sf::RenderWindow &window);
-        void events(const sf::Event &event);
-        void update(float dt);
-        void render();
+        void events(const sf::Event &event) noexcept;
+        void update(const float dt) noexcept;
+        void render() noexcept;
 
         /* TODO: set theme | get theme */
 
@@ -41,6 +45,6 @@ class UIManager final
 
         sf::Font _font;
         sf::RenderWindow *_window = nullptr;
-        std::shared_ptr<Container> _container;
+        ContainerPtr _container = nullptr;
 };
 }// namespace raytracer::ui

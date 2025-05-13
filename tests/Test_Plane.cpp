@@ -5,7 +5,7 @@
 ** Test_Plane.cpp
 */
 
-#include "../src/Elements/Scene/Shapes/Plane.hpp"
+#include "../src/Elements/Scene/Shapes/Plane/Plane.hpp"
 #include <criterion/criterion.h>
 #include <criterion/internal/test.h>
 
@@ -77,7 +77,7 @@ Test(Plane, PlaneGetPositionZ)
 Test(Plane, PlaneIntersectX)
 {
     const raytracer::shape::Plane plane('X', 5.0);
-    const math::Ray ray(math::Point3D(0.0, 0.0, 0.0), math::Vector3D(1.0, 0.0, 0.0));
+    const math::Ray ray = {math::Point3D(0.0, 0.0, 0.0), math::Vector3D(1.0, 0.0, 0.0)};
     math::Point3D intersection;
 
     cr_assert_eq(plane.intersect(ray, intersection, false), true);
@@ -89,7 +89,7 @@ Test(Plane, PlaneIntersectX)
 Test(Plane, PlaneIntersectY)
 {
     const raytracer::shape::Plane plane('Y', 5.0);
-    const math::Ray ray(math::Point3D(0.0, 0.0, 0.0), math::Vector3D(0.0, 1.0, 0.0));
+    const math::Ray ray = {math::Point3D(0.0, 0.0, 0.0), math::Vector3D(0.0, 1.0, 0.0)};
     math::Point3D intersection;
 
     cr_assert_eq(plane.intersect(ray, intersection, false), true);
@@ -101,7 +101,7 @@ Test(Plane, PlaneIntersectY)
 Test(Plane, PlaneIntersectZ)
 {
     const raytracer::shape::Plane plane('Z', 5.0);
-    const math::Ray ray(math::Point3D(0.0, 0.0, 0.0), math::Vector3D(0.0, 0.0, 1.0));
+    const math::Ray ray = {math::Point3D(0.0, 0.0, 0.0), math::Vector3D(0.0, 0.0, 1.0)};
     math::Point3D intersection;
 
     cr_assert_eq(plane.intersect(ray, intersection, false), true);

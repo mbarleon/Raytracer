@@ -17,7 +17,8 @@ namespace raytracer::ui {
 class Button : public IWidget
 {
     public:
-        explicit Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font);
+        explicit Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font,
+            const uint fontSize = 24);
 
         void setOnClick(std::function<void()> callback);
 

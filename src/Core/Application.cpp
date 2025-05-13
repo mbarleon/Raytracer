@@ -45,6 +45,12 @@ void raytracer::core::Application::run()
             if (event.type == sf::Event::Closed)
                 _window.close();
 
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    _window.close();
+                }
+            }
+
             ui::UIManager::getInstance().events(event);
         }
 
@@ -60,12 +66,12 @@ void raytracer::core::Application::run()
 
 void raytracer::core::Application::setupUI()
 {
-    // ui::UIManager &ui = ui::UIManager::getInstance();
-    // ui::Container &container = ui.getContainer();
+    ui::UIManager &ui = ui::UIManager::getInstance();
+    ui::Container &container = ui.getContainer();
 
-    // auto button =
-    //     std::make_shared<ui::Button>(sf::Vector2f(50.f, 50.f), sf::Vector2f(200.f, 50.f), std::string("Click me!"), ui.getFont());
+    auto button =
+        std::make_shared<ui::Button>(sf::Vector2f(50.f, 50.f), sf::Vector2f(100.f, 50.f), std::string("File"), ui.getFont());
 
-    // button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
-    // container.addWidget(button);
+    button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
+    container.addWidget(button);
 }

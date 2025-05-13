@@ -7,16 +7,17 @@
 
 #include "UIButton.hpp"
 
-raytracer::ui::Button::Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font)
+raytracer::ui::Button::Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font,
+    const uint fontSize)
 {
     _shape.setPosition(position);
     _shape.setSize(size);
-    _shape.setFillColor(sf::Color::Blue);
+    _shape.setFillColor(sf::Color::White);
 
     _text.setFont(font);
     _text.setString(label);
-    _text.setCharacterSize(20);
-    _text.setFillColor(sf::Color::White);
+    _text.setCharacterSize(fontSize);
+    _text.setFillColor(sf::Color::Black);
     _text.setPosition(position + sf::Vector2f(10, 10));
 }
 

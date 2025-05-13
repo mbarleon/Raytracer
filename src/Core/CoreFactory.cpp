@@ -344,19 +344,31 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
-    const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<double>(anti_obj.at("samples"))),
-        static_cast<unsigned int>(get_value<double>(anti_obj.at("radius")))};
 
-    const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
+    const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<int>(anti_obj.at("samples"))),
+        get_string(anti_obj.at("mode"))};
+
+    const math::RGBColor background = get_color(obj.at("background-color"));
 
     const auto &light_obj = get_value<JsonMap>(obj.at("lighting"));
-    const raytracer::Lighting light = {get_value<double>(light_obj.at("ambient")), get_value<double>(light_obj.at("diffuse")),
-        get_value<double>(light_obj.at("specular"))};
+    const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
+    const raytracer::AmbientOcclusion ambient = {
+        get_value<double>(light_ambient_obj.at("coef")),
+        static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))
+    };
+    const raytracer::Lighting light = {
+        get_value<double>(light_obj.at("gamma")),
+        ambient,
+        get_value<double>(light_obj.at("diffuse")),
+        get_value<double>(light_obj.at("specular"))
+    };
+
+    const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::Render>(anti, mdepth, light, output);
+    return std::make_unique<raytracer::Render>(anti, background, light, mdepth, output);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

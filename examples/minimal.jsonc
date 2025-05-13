@@ -1,15 +1,20 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 1, // 40 for absolute realism, 1 for fast rendering
-            "radius": 1
+            "samples": 5, // 40 for absolute realism, 1 for fast rendering
+            "mode": "classic" // none, classic, adaptive
         },
-        "max-depth": 4, // reflection and refraction limit
+        "background-color": { "r": 26, "g": 0, "b": 77 },
         "lighting": {
-            "ambient": 0.6,
+            "gamma": 3.0,
+            "ambient": {
+                "coef": 0.6,
+                "samples": 10 // 20 for absolute realism, 1 for fast rendering
+            },
             "diffuse": 1.0,
             "specular": 0.6
         },
+        "max-depth": 4, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"

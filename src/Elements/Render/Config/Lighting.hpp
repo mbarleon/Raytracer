@@ -7,12 +7,15 @@
 
 #pragma once
 
+#include "Lighting/AmbientOcclusion.hpp"
+
 // clang-format off
 namespace raytracer {
-typedef struct lighting {
-    double ambient;
+struct Lighting {
+    double gamma;
+    AmbientOcclusion ambient;
     double diffuse;
     double specular;
-} Lighting;
+};
 };// namespace raytracer
 // clang-format on

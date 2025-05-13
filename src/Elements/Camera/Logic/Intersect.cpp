@@ -5,7 +5,7 @@
 ** Intersect
 */
 
-#include "../Pathtracer.hpp"
+#include "Pathtracer.hpp"
 #include <limits>
 
 bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,

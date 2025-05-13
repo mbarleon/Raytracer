@@ -5,7 +5,7 @@
 ** Lighting
 */
 
-#include "../Pathtracer.hpp"
+#include "Pathtracer.hpp"
 
 math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
     const math::Vector3D &viewDir, const ILightsList &lights,
@@ -13,7 +13,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColor();
-    math::RGBColor Lo = baseColor * render.lighting.ambient;
+    math::RGBColor Lo = baseColor * render.lighting.ambient.coef;
 
     for (const auto &light : lights) {
         const auto ls = light->sample(isect.point);

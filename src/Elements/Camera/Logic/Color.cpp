@@ -5,16 +5,16 @@
 ** Background
 */
 
-#include "../Pathtracer.hpp"
-#include "../../../Scene/Materials/Utils/Utils.hpp"
+#include "Pathtracer.hpp"
+#include "../../Scene/Materials/Utils/Utils.hpp"
 #include <algorithm>
 
-math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
+math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v, const math::RGBColor &background)
 {
     const math::Vector3D dir = v.normalize();
     const auto t = 0.5 * (dir._y + 1.0);
 
-    return (1.0 - t) * math::RGBColor(0) + t * math::RGBColor(0.1, 0.0, 0.3);
+    return (1.0 - t) * math::RGBColor(0) + t * background;
 }
 
 raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
@@ -27,14 +27,14 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
 
     math::Intersect isect;
     if (!findClosestIntersection(ray, shapes, isect, true)) {
-        return { getBackgroundColor(ray._dir) * throughput, 1.0 };
+        return { getBackgroundColor(ray._dir, render.background) * throughput, 1.0 };
     }
 
     // direct light
     math::RGBColor radiance(0);
     if (depth == 0) {
-        const double ao = ambientOcclusion(isect, shapes, 10, rng);
-        const math::RGBColor baseAmb = isect.object->getColor() * render.lighting.ambient;
+        const double ao = ambientOcclusion(isect, shapes, render.lighting.ambient.samples, rng);
+        const math::RGBColor baseAmb = isect.object->getColor() * render.lighting.ambient.coef;
         radiance = phongDirect(isect, -ray._dir, lights, shapes, render, rng);
         radiance = radiance - baseAmb + (baseAmb * ao);
     }

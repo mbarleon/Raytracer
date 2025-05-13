@@ -11,21 +11,21 @@
 #include "../../../Maths/Vector3D.hpp"
 
 namespace raytracer {
-typedef struct light_sample {
+struct LightSample {
     math::RGBColor radiance;
     double pdf;
     bool isDelta = false;
-} LightSample;
+};
 
-typedef struct restir_tank {
+struct Tank {
     LightSample sample;
     double weightSum;
     int count;
 
-    restir_tank();
+    Tank();
     void add(const LightSample &candidate, double w, std::mt19937 &gen);
-    void merge(const struct restir_tank &other, std::mt19937 &gen);
+    void merge(const Tank &other, std::mt19937 &gen);
     math::RGBColor estimate() const;
     void clear();
-} Tank;
+};
 };

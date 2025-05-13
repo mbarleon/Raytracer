@@ -34,12 +34,12 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int getPixelColor(double c)
+int getPixelColor(double c, double gamma)
 {
     double mapped = c / (1.0 + c);
     mapped = std::clamp(mapped, 0.0, 1.0);
 
-    const double g = std::pow(mapped, 1.0 / 3.0); // gamma = 3.0
+    const double g = std::pow(mapped, 1.0 / gamma);
     return static_cast<int>(g * 255.0 + 0.5);
 };
 
@@ -116,9 +116,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     for (unsigned y = 0; y < _resolution.y; ++y) {
         for (unsigned x = 0; x < _resolution.x; ++x) {
             math::RGBColor pixel = restirGrid[y][x].estimate();
-            ppm << getPixelColor(pixel._x) << ' '
-                << getPixelColor(pixel._y) << ' '
-                << getPixelColor(pixel._z) << '\n';
+            ppm << getPixelColor(pixel._x, render.lighting.gamma) << ' '
+                << getPixelColor(pixel._y, render.lighting.gamma) << ' '
+                << getPixelColor(pixel._z, render.lighting.gamma) << '\n';
         }        
     }
 }

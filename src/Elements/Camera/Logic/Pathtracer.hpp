@@ -31,7 +31,7 @@ double ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes,
     int aoSamples, std::mt19937 &rng);
 
 // Color
-math::RGBColor getBackgroundColor(const math::Vector3D &v);
+math::RGBColor getBackgroundColor(const math::Vector3D &v, const math::RGBColor &background);
 LightSample getRayColor(const math::Ray &ray, const IShapesList &shapes,
     const ILightsList &lights, const Render &render, unsigned depth,
     std::mt19937 &rng, const math::RGBColor &throughput = math::RGBColor(1.0));

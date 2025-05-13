@@ -7,13 +7,11 @@
 
 #pragma once
 
-#include <string>
-
 // clang-format off
 namespace raytracer {
-struct Antialiasing {
+struct AmbientOcclusion {
+    double coef;
     unsigned int samples;
-    std::string mode;
 };
 };// namespace raytracer
 // clang-format on

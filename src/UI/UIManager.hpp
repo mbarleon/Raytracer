@@ -35,13 +35,13 @@ class UIManager final
         /* TODO: set theme | get theme */
 
     private:
-        UIManager() = default;
+        explicit UIManager() = default;
         ~UIManager() = default;
 
-        UIManager(const UIManager &) = delete;
-        UIManager &operator=(const UIManager &) = delete;
-        UIManager(UIManager &&) = delete;
-        UIManager &operator=(UIManager &&) = delete;
+        constexpr UIManager(const UIManager &) = delete;
+        constexpr UIManager &operator=(const UIManager &) = delete;
+        constexpr UIManager(UIManager &&) = delete;
+        constexpr UIManager &operator=(UIManager &&) = delete;
 
         sf::Font _font;
         sf::RenderWindow *_window = nullptr;

@@ -16,7 +16,7 @@ typedef struct material {
     std::shared_ptr<BSDF> bsdf;
 
     material();
-    material(std::shared_ptr<BSDF> bsdf);
+    material(const std::shared_ptr<BSDF> &bsdf);
 
     BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect,
         std::mt19937 &rng) const;

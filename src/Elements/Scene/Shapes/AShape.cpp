@@ -17,6 +17,11 @@ void raytracer::shape::AShape::setColor(math::RGBColor color)
     _color = color;
 }
 
+void raytracer::shape::AShape::setShininess(double shininess)
+{
+    _shininess = shininess;
+}
+
 raytracer::material::Material raytracer::shape::AShape::getMaterial() const
 {
     return _material;
@@ -25,4 +30,9 @@ raytracer::material::Material raytracer::shape::AShape::getMaterial() const
 math::RGBColor raytracer::shape::AShape::getColor() const
 {
     return _color;
+}
+
+double raytracer::shape::AShape::getShininess() const
+{
+    return _shininess;
 }

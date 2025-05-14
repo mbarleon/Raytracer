@@ -40,13 +40,14 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     }
 
     // bsdf sampling
-    const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect, rng);
-    if (bsdfS.pdf < EPSILON) {
+    const auto [bsdfWi, bsdfPdf, bsdfColor, bsdfSpecular] =
+        isect.object->getMaterial().sample(-ray._dir, isect, rng);
+    if (bsdfPdf < EPSILON) {
         return { radiance * throughput, 1.0 };
     }
 
     // russian roulette
-    math::RGBColor newThroughput = throughput * (bsdfS.radiance / bsdfS.pdf);
+    math::RGBColor newThroughput = throughput * (bsdfColor / bsdfPdf);
     const double pContinue = std::min(1.0, newThroughput.maxComponent());
 
     if (material::getRandomDouble(rng) >= pContinue) {
@@ -55,8 +56,8 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     newThroughput /= pContinue;
 
     // recursive bounce
-    const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
+    const math::Ray nextRay = { isect.point + bsdfWi * EPSILON, bsdfWi };
     const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, rng, newThroughput);
 
-    return { radiance * throughput + next.radiance, bsdfS.pdf, bsdfS.isDelta };
+    return { radiance * throughput + next.radiance, bsdfPdf, bsdfSpecular };
 }

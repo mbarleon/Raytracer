@@ -17,12 +17,15 @@ class AShape : public IShape
 
         void setMaterial(const material::Material &material) override;
         void setColor(math::RGBColor color) override;
+        void setShininess(double shininess) override;
 
         material::Material getMaterial() const override;
         math::RGBColor getColor() const override;
+        double getShininess() const override;
 
     protected:
         material::Material _material;
         math::RGBColor _color;
+        double _shininess;
 };
 };// namespace raytracer::shape

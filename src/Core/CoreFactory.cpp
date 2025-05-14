@@ -234,10 +234,12 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const double radius = get_value<double>(obj.at("radius"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
-    const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    const double shininess = get_value<double>(obj.at("shininess"));
 
-    sphere.get()->setMaterial(material);
-    sphere.get()->setColor(color);
+    auto sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    sphere->setMaterial(material);
+    sphere->setColor(color);
+    sphere->setShininess(shininess);
     return sphere;
 }
 
@@ -256,11 +258,12 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
-    const std::shared_ptr<raytracer::shape::Rectangle> rectangle =
-        std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    const double shininess = get_value<double>(obj.at("shininess"));
 
-    rectangle.get()->setMaterial(material);
-    rectangle.get()->setColor(color);
+    auto rectangle = std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    rectangle->setMaterial(material);
+    rectangle->setColor(color);
+    rectangle->setShininess(shininess);
     return rectangle;
 }
 
@@ -277,16 +280,17 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
     const double position = get_value<double>(obj.at("position"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
+    const double shininess = get_value<double>(obj.at("shininess"));
     const std::string str = get_string(obj.at("axis"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z') {
         throw raytracer::exception::Error("Core", "Invalid plane axis");
     }
 
-    const std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
-
-    plane.get()->setMaterial(material);
-    plane.get()->setColor(color);
+    auto plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    plane->setMaterial(material);
+    plane->setColor(color);
+    plane->setShininess(shininess);
     return plane;
 }
 
@@ -304,10 +308,12 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
+    const double shininess = get_value<double>(obj.at("shininess"));
 
     auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
     stl->setMaterial(material);
     stl->setColor(color);
+    stl->setShininess(shininess);
     return stl;
 }
 

@@ -34,13 +34,15 @@
                     "radius": 0.5,
                     "material": "metal",
                     "roughness": 0.1,
-                    "color": { "r": 0, "g": 255, "b": 0 }
+                    "color": { "r": 0, "g": 255, "b": 0 },
+                    "shininess": 100.0
                 },
                 {
                     "position": { "x": 0, "y": 0, "z": -1 },
                     "radius": 0.5,
                     "material": "diffuse",
-                    "color": { "r": 255, "g": 255, "b": 0 }
+                    "color": { "r": 255, "g": 255, "b": 0 },
+                    "shininess": 100.0
                 },
                 {
                     "position": { "x": 1, "y": 0, "z": -1 },
@@ -50,14 +52,16 @@
                         "inside": 1.0,
                         "outside": 1.52 // glass
                     },
-                    "color": { "r": 0, "g": 0, "b": 255 }
+                    "color": { "r": 0, "g": 0, "b": 255 },
+                    "shininess": 100.0
                 },
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
                     "material": "metal",
                     "roughness": 1.0,
-                    "color": { "r": 255, "g": 255, "b": 255 }
+                    "color": { "r": 255, "g": 255, "b": 255 },
+                    "shininess": 100.0
                 }
             ]
             // "planes": [
@@ -65,7 +69,8 @@
             //         "axis": "Y",
             //         "position": -20,
             //         "material": "ground",
-            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //         "color": { "r": 64, "g": 64, "b": 255 },
+            //         "shininess": 100.0
             //     }
             // ]
         },

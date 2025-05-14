@@ -38,7 +38,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
         // specular
         const math::Vector3D R = material::reflect(-L, isect.normal).normalize();
         const double RdotV = std::max(0.0, R.dot(viewDir));
-        const double shininess = 100.0; // mat.getShininess()
+        const double shininess = isect.object->getShininess();
         const math::RGBColor f_spec = baseColor * render.lighting.specular *
             std::pow(RdotV, shininess);
 

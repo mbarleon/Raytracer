@@ -11,7 +11,7 @@ raytracer::material::material::material() : bsdf(nullptr)
 {
 }
 
-raytracer::material::material::material(std::shared_ptr<BSDF> bsdf) : bsdf(bsdf)
+raytracer::material::material::material(const std::shared_ptr<BSDF> &bsdf) : bsdf(bsdf)
 {
 }
 

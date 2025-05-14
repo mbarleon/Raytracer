@@ -27,4 +27,4 @@ private:
     math::RGBColor _specular; // specular color
     double _roughnessSquare;
 };
-} // namespace raytracer::material
+}// namespace raytracer::material

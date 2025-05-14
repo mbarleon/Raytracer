@@ -22,4 +22,4 @@ class ALight : public ILight {
         math::RGBColor _color;
         double _intensity;
 };
-};
+}

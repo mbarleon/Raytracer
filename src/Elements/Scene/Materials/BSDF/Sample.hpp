@@ -16,4 +16,4 @@ struct BSDFSample {
     math::RGBColor radiance;
     bool isDelta = false;
 };
-};
+}

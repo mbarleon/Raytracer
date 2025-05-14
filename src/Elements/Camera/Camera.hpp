@@ -30,5 +30,5 @@ namespace raytracer {
             math::Vector3D _rotation;
             uint _fov = DEFAULT_FIELD_OF_VIEW;
     };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

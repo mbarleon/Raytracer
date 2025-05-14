@@ -28,4 +28,4 @@ struct Tank {
     math::RGBColor estimate() const;
     void clear();
 };
-};
+}

@@ -29,4 +29,4 @@ class BSDF {
             const math::Vector3D &wi, const math::Intersect &isect,
             std::mt19937 &rng) const = 0;
 };
-};
+}

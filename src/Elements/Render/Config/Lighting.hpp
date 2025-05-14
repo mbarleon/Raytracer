@@ -17,5 +17,5 @@ struct Lighting {
     double diffuse;
     double specular;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

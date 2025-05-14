@@ -15,5 +15,5 @@ struct RenderOutput {
     std::string file;
     std::string format;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

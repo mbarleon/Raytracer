@@ -21,5 +21,5 @@ struct Material {
     BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect,
         std::mt19937 &rng) const;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

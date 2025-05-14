@@ -40,4 +40,4 @@ LightSample getRayColor(const math::Ray &ray, const IShapesList &shapes,
 bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
     math::Intersect &intersect, const bool cullBackFaces);
 
-};
+}

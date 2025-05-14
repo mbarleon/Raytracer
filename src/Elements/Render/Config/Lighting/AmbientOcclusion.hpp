@@ -13,5 +13,5 @@ struct AmbientOcclusion {
     double coef;
     unsigned int samples;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

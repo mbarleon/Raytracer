@@ -21,5 +21,5 @@ struct RenderConfig {
 	unsigned int maxDepth;
 	RenderOutput output;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

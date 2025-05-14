@@ -30,4 +30,4 @@ class IShape
 
         [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept = 0;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

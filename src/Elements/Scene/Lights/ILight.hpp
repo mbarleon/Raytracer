@@ -20,4 +20,4 @@ class ILight {
 
         virtual material::BSDFSample sample(const math::Point3D &targetPoint) const = 0;
 };
-};
+}

@@ -24,4 +24,4 @@ class Plane final : public AShape
         char _axis;
         double _position;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

@@ -26,4 +26,4 @@ class Rectangle final : public AShape
         math::Vector3D _bottom_side;
         math::Vector3D _left_side;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

@@ -20,4 +20,4 @@ class Directional : public ALight {
     private:
         math::Vector3D _direction;
 };
-};
+}

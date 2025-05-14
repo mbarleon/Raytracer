@@ -18,5 +18,5 @@ typedef struct Intersect {
     Vector3D normal;
     double distance;
 } Intersect;
-};// namespace math
+}// namespace math
 // clang-format on

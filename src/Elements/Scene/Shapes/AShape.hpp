@@ -28,4 +28,4 @@ class AShape : public IShape
         math::RGBColor _color;
         double _shininess;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

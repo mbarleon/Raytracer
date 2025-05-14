@@ -20,4 +20,4 @@ class Point final : public ALight {
     private:
         math::Point3D _position;
 };
-};
+}

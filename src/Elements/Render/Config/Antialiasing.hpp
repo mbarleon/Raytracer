@@ -15,5 +15,5 @@ struct Antialiasing {
     unsigned int samples;
     std::string mode;
 };
-};// namespace raytracer
+}// namespace raytracer
 // clang-format on

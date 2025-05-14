@@ -80,4 +80,4 @@ inline Vector3D operator*(const double scalar, const Vector3D &vector)
 */
 using Point3D = Vector3D;
 using RGBColor = Vector3D;
-};// namespace math
+}// namespace math

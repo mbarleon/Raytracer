@@ -25,4 +25,4 @@ class Sphere final : public AShape
         math::Point3D _center;
         double _radius;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

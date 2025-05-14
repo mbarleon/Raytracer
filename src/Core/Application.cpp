@@ -12,7 +12,6 @@
 #include "../UI/UIScenePreview.hpp"
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
-#include <iostream>
 
 /**
  * public
@@ -50,11 +49,11 @@ void raytracer::core::Application::run()
         while (_window.pollEvent(event)) {
 
             if (event.type == sf::Event::Closed)
-                _window.close();
+                stop();
 
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Escape) {
-                    _window.close();
+                    stop();
                 }
             }
 
@@ -71,6 +70,20 @@ void raytracer::core::Application::run()
 /**
 * private
 */
+
+void raytracer::core::Application::stop()
+{
+    _window.close();
+}
+
+void raytracer::core::Application::fullscreen()
+{
+    static bool is_fullscreen = false;
+    const sf::VideoMode mode = is_fullscreen ? sf::VideoMode::getDesktopMode() : sf::VideoMode(1920, 1080);
+
+    is_fullscreen = !is_fullscreen;
+    _window.setSize({mode.width, mode.height});
+}
 
 void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
 {
@@ -97,20 +110,27 @@ void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
     container.addWidget(preview);
 }
 
+// clang-format off
 void raytracer::core::Application::setupUI()
 {
     ui::UIManager &ui = ui::UIManager::getInstance();
     ui::Container &container = ui.getContainer();
 
-    const auto button_factory = [&ui](const std::string &text, const sf::Vector2f &position, const sf::Vector2f &size) {
+    /**
+    * * Buttons
+    */
+    const auto button_factory = [&ui](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
+    {
         auto button = std::make_shared<ui::Button>(position, size, text, ui.getFont());
-        button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
+        button->setOnClick(callback);
         return button;
-    };
+   };
 
-    container.addWidget(button_factory("File", sf::Vector2f(50.f, 50.f), sf::Vector2f(80.f, 50.f)));
-    container.addWidget(button_factory("Export", sf::Vector2f(175.f, 50.f), sf::Vector2f(105.f, 50.f)));
-    container.addWidget(button_factory("Settings", sf::Vector2f(325.f, 50.f), sf::Vector2f(130.f, 50.f)));
-    container.addWidget(button_factory("_", sf::Vector2f(1790.f, 50.f), sf::Vector2f(36.f, 50.f)));
-    container.addWidget(button_factory("X", sf::Vector2f(1850.f, 50.f), sf::Vector2f(36.f, 50.f)));
+    container.addWidget(button_factory("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
+    container.addWidget(button_factory("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f)));
+    container.addWidget(button_factory("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
+    container.addWidget(button_factory("[]", Vec2(1790.f, 50.f), Vec2(40.f, 50.f), [this]() { this->fullscreen(); }));
+    container.addWidget(button_factory("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [this]() { this->stop(); }));
+
 }
+// clang-format on

@@ -12,7 +12,7 @@
 #include "Macro.hpp"
 
 raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt) :
-    etaExt(etaExt), etaInt(etaInt)
+    _etaExt(etaExt), _etaInt(etaInt)
 {
 }
 
@@ -20,9 +20,9 @@ raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(cons
     const math::Intersect &isect, std::mt19937 &rng) const
 {
     const bool entering = (wo.dot(isect.normal) < 0);
-    const math::Vector3D N = entering ? isect.normal : -isect.normal;  // on veut cosi = dot(-wo, N) >= 0
-    const double eta_i = entering ? etaInt : etaExt;
-    const double eta_t = entering ? etaExt : etaInt;
+    const math::Vector3D N = entering ? isect.normal : -isect.normal;
+    const double eta_i = entering ? _etaInt : _etaExt;
+    const double eta_t = entering ? _etaExt : _etaInt;
     const double eta   = eta_i / eta_t;
 
     const math::Vector3D V = wo.normalize();
@@ -38,7 +38,7 @@ raytracer::material::BSDFSample raytracer::material::DielectricBSDF::sample(cons
 
     // schlick
     const double R0 = ((eta_t - eta_i)/(eta_t + eta_i));
-    const double reflect_prob = R0*R0 + (1.0 - R0*R0) * std::pow(1.0 - cosi, 5.0);  // :contentReference[oaicite:9]{index=9}
+    const double reflect_prob = R0*R0 + (1.0 - R0*R0) * std::pow(1.0 - cosi, 5.0);
 
     // pick random choice reflect / refract
     std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -56,8 +56,8 @@ math::RGBColor raytracer::material::DielectricBSDF::evaluate(const math::Vector3
 {
     const bool entering = (wo.dot(isect.normal) < 0.0);
     const math::Vector3D N = entering ?  isect.normal : -isect.normal;
-    const double eta_i = entering ? etaInt : etaExt;
-    const double eta_t = entering ? etaExt : etaInt;
+    const double eta_i = entering ? _etaInt : _etaExt;
+    const double eta_t = entering ? _etaExt : _etaInt;
     const double eta = eta_i / eta_t;
 
     const math::Vector3D V = wo.normalize();

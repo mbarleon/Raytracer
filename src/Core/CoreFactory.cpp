@@ -16,6 +16,7 @@
 #include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
 #include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
 #include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
+#include "../Elements/Scene/Materials/BSDF/Metal/Metal.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -177,6 +178,10 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
         const double ior_in = get_value<double>(refract_obj.at("inside"));
         const double ior_out = get_value<double>(refract_obj.at("outside"));
         bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
+    } else if (materialId == std::string("metal")) {
+        const auto color = get_color(obj.at("color"));
+        const double roughness = get_value<double>(obj.at("roughness"));
+        bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
     } else {
         throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
     }

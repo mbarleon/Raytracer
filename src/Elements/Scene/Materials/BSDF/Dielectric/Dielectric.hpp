@@ -12,8 +12,8 @@
 namespace raytracer::material {
 class DielectricBSDF : public BSDF {
     public:
-        double etaExt;
-        double etaInt;
+        double _etaExt;
+        double _etaInt;
 
         DielectricBSDF(double etaExt, double etaInt);
         ~DielectricBSDF() override = default;

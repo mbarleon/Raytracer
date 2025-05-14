@@ -32,14 +32,15 @@
                 {
                     "position": { "x": -1, "y": 0, "z": -1 },
                     "radius": 0.5,
-                    "material": "specular",
+                    "material": "metal",
+                    "roughness": 0.1,
                     "color": { "r": 0, "g": 255, "b": 0 }
                 },
                 {
                     "position": { "x": 0, "y": 0, "z": -1 },
                     "radius": 0.5,
                     "material": "diffuse",
-                    "color": { "r": 255, "g": 0, "b": 0 }
+                    "color": { "r": 255, "g": 255, "b": 0 }
                 },
                 {
                     "position": { "x": 1, "y": 0, "z": -1 },
@@ -54,11 +55,8 @@
                 {
                     "position": { "x": 0, "y": -100.5, "z": -1 },
                     "radius": 100,
-                    "material": "dielectric",
-                    "refraction": {
-                        "inside": 0.0,
-                        "outside": 0.0
-                    },
+                    "material": "metal",
+                    "roughness": 1.0,
                     "color": { "r": 255, "g": 255, "b": 255 }
                 }
             ]

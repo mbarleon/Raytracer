@@ -9,7 +9,7 @@
 
 #include "../Elements/Camera/Camera.hpp"
 #include "../Elements/Scene/Materials/Material.hpp"
-#include "../Elements/Render/Render.hpp"
+#include "../Elements/Render/RenderConfig.hpp"
 #include "Macro.hpp"
 #include <unordered_map>
 #include <memory>
@@ -26,7 +26,7 @@ class Core final
     private:
         std::vector<std::shared_ptr<shape::IShape>> _shapes;
         std::vector<std::shared_ptr<light::ILight>> _lights;
-        std::unique_ptr<Render> _render;
+        std::unique_ptr<RenderConfig> _render;
         std::unique_ptr<Camera> _camera;
 };
 }// namespace raytracer

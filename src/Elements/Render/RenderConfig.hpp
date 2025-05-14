@@ -14,7 +14,7 @@
 
 // clang-format off
 namespace raytracer {
-struct Render {
+struct RenderConfig {
 	Antialiasing antialiasing;
 	math::RGBColor background;
 	Lighting lighting;

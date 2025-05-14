@@ -9,6 +9,7 @@
 
 raytracer::Tank::Tank(): weightSum(0.0), count(0)
 {
+    sample.pdf = 0.0;
 }
 
 void raytracer::Tank::add(const LightSample &candidate, double w, std::mt19937 &gen)

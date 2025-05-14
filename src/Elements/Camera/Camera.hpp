@@ -22,7 +22,7 @@ namespace raytracer {
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
             void render(const IShapesList &shapes, const ILightsList &lights,
-                const Render &render) const;
+                const RenderConfig &config) const;
 
         private:
             math::Vector2u _resolution;

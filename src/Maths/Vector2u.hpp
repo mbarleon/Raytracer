@@ -19,8 +19,8 @@ using uint = unsigned int;
  * @details Define a Vector of two unsigned int {x, y}
  */
 typedef struct Vector2u {
-    uint x;
-    uint y;
+    uint _x;
+    uint _y;
 } Vector2u;
 // clang-format on
 

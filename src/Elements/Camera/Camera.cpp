@@ -44,7 +44,7 @@ int getPixelColor(double c, double gamma)
 };
 
 void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
-    const Render &render) const
+    const RenderConfig &config) const
 {
     const unsigned int nproc = std::thread::hardware_concurrency();
 
@@ -58,30 +58,30 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     threads.reserve(nproc);
 
     std::atomic<unsigned> linesDone(0);
-    std::vector<std::vector<Tank>> restirGrid(_resolution.y, std::vector<Tank>(_resolution.x));
+    std::vector<std::vector<Tank>> restirGrid(_resolution._y, std::vector<Tank>(_resolution._x));
 
     const auto sparseWorker = [&](unsigned threadId) {
-        std::mt19937 rng = material::getRng(threadId, _resolution.x, _resolution.y);
+        std::mt19937 rng = material::getRng(threadId, _resolution._x, _resolution._y);
         math::Ray cameraRay;
 
         // jitter
         std::uniform_real_distribution<double> jitterX(-0.5, 0.5);
         std::uniform_real_distribution<double> jitterY(-0.5, 0.5);
 
-        for (unsigned y = threadId; y < _resolution.y; y += nproc) {
-            const double v0 = (y + 0.5) / static_cast<double>(_resolution.y);
+        for (unsigned y = threadId; y < _resolution._y; y += nproc) {
+            const double v0 = (y + 0.5) / static_cast<double>(_resolution._y);
 
-            for (unsigned x = 0; x < _resolution.x; ++x) {
-                const double u0 = (x + 0.5) / static_cast<double>(_resolution.x);
+            for (unsigned x = 0; x < _resolution._x; ++x) {
+                const double u0 = (x + 0.5) / static_cast<double>(_resolution._x);
 
-                for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    double du = u0 + jitterX(rng) * (1.0 / _resolution.x);
-                    double dv = v0 + jitterY(rng) * (1.0 / _resolution.y);
+                for (unsigned c = 0; c < config.antialiasing.samples; ++c) {
+                    double du = u0 + jitterX(rng) * (1.0 / _resolution._x);
+                    double dv = v0 + jitterY(rng) * (1.0 / _resolution._y);
                     du = std::clamp(du, 0.0, 1.0);
                     dv = std::clamp(dv, 0.0, 1.0);
                     generateRay(du, dv, cameraRay);
 
-                    const LightSample sample = getRayColor(cameraRay, shapes, lights, render, 0, rng);
+                    const LightSample sample = getRayColor(cameraRay, shapes, lights, config, 0, rng);
                     const double L = 0.2126 * sample.radiance._x +
                         0.7152 * sample.radiance._y + 0.0722 * sample.radiance._z;
                     const double w = sample.isDelta ? L : L / std::max(sample.pdf, EPSILON);
@@ -90,9 +90,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
             }
 
             const unsigned done = linesDone.fetch_add(1) + 1;
-            if (done % 10 == 0 || done == _resolution.y) {
+            if (done % 10 == 0 || done == _resolution._y) {
                 const std::lock_guard<std::mutex> lock(progressBarMutex);
-                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution.y));
+                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution._y));
             }
         }
     };
@@ -107,19 +107,19 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     // TODO: restir spatial merge
 
     // image generation
-    std::ofstream ppm(render.output.file);
+    std::ofstream ppm(config.output.file);
 
     if (!ppm) {
         throw exception::Error("Camera", "Unable to open output file.");
     }
-    ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-    for (unsigned y = 0; y < _resolution.y; ++y) {
-        for (unsigned x = 0; x < _resolution.x; ++x) {
+    ppm << "P3\n" << _resolution._x << " " << _resolution._y << "\n255\n";
+    for (unsigned y = 0; y < _resolution._y; ++y) {
+        for (unsigned x = 0; x < _resolution._x; ++x) {
             math::RGBColor pixel = restirGrid[y][x].estimate();
-            ppm << getPixelColor(pixel._x, render.lighting.gamma) << ' '
-                << getPixelColor(pixel._y, render.lighting.gamma) << ' '
-                << getPixelColor(pixel._z, render.lighting.gamma) << '\n';
-        }        
+            ppm << getPixelColor(pixel._x, config.lighting.gamma) << ' '
+                << getPixelColor(pixel._y, config.lighting.gamma) << ' '
+                << getPixelColor(pixel._z, config.lighting.gamma) << '\n';
+        }
     }
 }
 
@@ -156,7 +156,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 {
     cameraRay._origin = _position;
 
-    const double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
+    const double aspect_ratio = static_cast<double>(_resolution._x) / static_cast<double>(_resolution._y);
     const double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;

@@ -161,8 +161,7 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
  * @brief get material from ParsedJson
  * @details uses get_string for material name lookup
  * @param proto ParsedJson object
- * @param materials MaterialsList to search
- * @return shared pointer to Material
+ * @return struct Material
  */
 unit_static raytracer::material::Material get_material(const JsonMap &obj)
 {
@@ -351,7 +350,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
  * @param render_json ParsedJson object
  * @return unique pointer to Render
  */
-std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
+std::unique_ptr<raytracer::RenderConfig> create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
@@ -379,7 +378,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::Render>(anti, background, light, mdepth, output);
+    return std::make_unique<raytracer::RenderConfig>(anti, background, light, mdepth, output);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -9,11 +9,11 @@
 
 math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
     const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const Render &render, std::mt19937 &rng)
+    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColor();
-    math::RGBColor Lo = baseColor * render.lighting.ambient.coef;
+    math::RGBColor Lo = baseColor * config.lighting.ambient.coef;
 
     for (const auto &light : lights) {
         const auto ls = light->sample(isect.point);
@@ -33,13 +33,13 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
 
         // diffuse
         const math::RGBColor f_diff = bsdf->evaluate(viewDir, L, isect, rng);
-        Lo += f_diff * ls.radiance * cosNL * render.lighting.diffuse;
+        Lo += f_diff * ls.radiance * cosNL * config.lighting.diffuse;
 
         // specular
         const math::Vector3D R = material::reflect(-L, isect.normal).normalize();
         const double RdotV = std::max(0.0, R.dot(viewDir));
         const double shininess = isect.object->getShininess();
-        const math::RGBColor f_spec = baseColor * render.lighting.specular *
+        const math::RGBColor f_spec = baseColor * config.lighting.specular *
             std::pow(RdotV, shininess);
 
         Lo += f_spec * ls.radiance * cosNL;

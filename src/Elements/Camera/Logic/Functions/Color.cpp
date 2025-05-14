@@ -5,8 +5,8 @@
 ** Background
 */
 
-#include "../Pathtracer.hpp"
 #include "../../../Scene/Materials/Utils/Utils.hpp"
+#include "../Pathtracer.hpp"
 #include <algorithm>
 
 math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
@@ -17,17 +17,16 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v)
     return (1.0 - t) * math::RGBColor(0) + t * math::RGBColor(0.1, 0.0, 0.3);
 }
 
-raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
-    const IShapesList &shapes, const ILightsList &lights, const Render &render,
-    unsigned depth, const math::RGBColor &throughput)
+raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes, const ILightsList &lights,
+    const RenderConfig &render, unsigned depth, const math::RGBColor &throughput)
 {
     if (depth > render.maxDepth) {
-        return { math::RGBColor(0), 1.0 };
+        return {math::RGBColor(0), 1.0};
     }
 
     math::Intersect isect;
     if (!findClosestIntersection(ray, shapes, isect, true)) {
-        return { getBackgroundColor(ray._dir) * throughput, 1.0 };
+        return {getBackgroundColor(ray._dir) * throughput, 1.0};
     }
 
     // direct light
@@ -42,7 +41,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     // bsdf sampling
     const auto bsdfS = isect.object->getMaterial().sample(-ray._dir, isect);
     if (bsdfS.pdf < EPSILON) {
-        return { radiance * throughput, 1.0 };
+        return {radiance * throughput, 1.0};
     }
 
     // russian roulette
@@ -50,13 +49,13 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const double pContinue = std::min(1.0, newThroughput.maxComponent());
 
     if (material::getRandomDouble() >= pContinue) {
-        return { radiance * throughput, 1.0 };
+        return {radiance * throughput, 1.0};
     }
     newThroughput /= pContinue;
 
     // recursive bounce
-    const math::Ray nextRay = { isect.point + bsdfS.direction * EPSILON, bsdfS.direction };
+    const math::Ray nextRay = {isect.point + bsdfS.direction * EPSILON, bsdfS.direction};
     const LightSample next = getRayColor(nextRay, shapes, lights, render, depth + 1, newThroughput);
 
-    return { radiance * throughput + next.radiance, bsdfS.pdf };
+    return {radiance * throughput + next.radiance, bsdfS.pdf};
 }

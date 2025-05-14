@@ -10,14 +10,14 @@
 #include "../ALight.hpp"
 
 namespace raytracer::light {
-class Directional : public ALight {
+class Directional : public ALight
+{
     public:
-        Directional(const math::RGBColor &color, const math::Vector3D &direction,
-            double intensity);
+        Directional(const math::RGBColor &color, const math::Vector3D &direction, double intensity);
 
         material::BSDFSample sample(const math::Point3D &targetPoint) const override;
 
     private:
         math::Vector3D _direction;
 };
-};
+};// namespace raytracer::light

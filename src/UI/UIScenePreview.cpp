@@ -6,24 +6,23 @@
 */
 
 #include "UIScenePreview.hpp"
-#include "../Core/CoreFactory.hpp"
-#include "../Parser/Parser.hpp"
 
-raytracer::ui::UIScenePreview::UIScenePreview(const char *RESTRICT filename)
+raytracer::ui::UIScenePreview::UIScenePreview(const PixelBuffer &image)
 {
-    const parser::JsonValue jsonc = parser::parseJsonc(filename);
-    const auto &root = std::get<JsonMap>(jsonc);
-    const auto &scene = std::get<JsonMap>(root.at("scene").value);
-    const auto &shapes = scene.at("shapes");
-    const auto &lights = scene.at("lights");
-
-    _shapes = primitive_factory(shapes);
-    _lights = light_factory(lights);
+    _texture.loadFromImage(image);
+    _sprite.setTexture(_texture);
+    _sprite.setScale(_get_scale(sf::Vector2f(_texture.getSize())));
 }
 
-void raytracer::ui::UIScenePreview::render(sf::RenderWindow __attribute__((unused)) & window) noexcept
+void raytracer::ui::UIScenePreview::render(sf::RenderWindow &window) noexcept
 {
-    //
+    static bool is_first = true;
+
+    if (is_first) {
+        _center_sprite(window, _sprite);
+    }
+
+    window.draw(_sprite);
 }
 
 void raytracer::ui::UIScenePreview::update(const float __attribute__((unused)) dt) noexcept

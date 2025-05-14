@@ -10,7 +10,8 @@
 #include "../BSDF.hpp"
 
 namespace raytracer::material {
-class DielectricBSDF : public BSDF {
+class DielectricBSDF : public BSDF
+{
     public:
         double etaExt;
         double etaInt;
@@ -18,10 +19,8 @@ class DielectricBSDF : public BSDF {
         DielectricBSDF(double etaExt, double etaInt);
         ~DielectricBSDF() override = default;
 
-        BSDFSample sample(const math::Vector3D &wo,
-            const math::Intersect &isect) const override;
-        
-        math::RGBColor evaluate(const math::Vector3D &wo, const math::Vector3D &wi,
-            const math::Intersect &isect) const override;
+        BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect) const override;
+
+        math::RGBColor evaluate(const math::Vector3D &wo, const math::Vector3D &wi, const math::Intersect &isect) const override;
 };
-};
+};// namespace raytracer::material

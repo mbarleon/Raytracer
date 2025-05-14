@@ -6,16 +6,15 @@
 */
 
 #include "CoreFactory.hpp"
-#include "../../include/Logger.hpp"
+#include "../Elements/Scene/Lights/Directional/Directional.hpp"
+#include "../Elements/Scene/Lights/Point/Point.hpp"
+#include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
+#include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
+#include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
 #include "../Elements/Scene/Shapes/Plane/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
-#include "../Elements/Scene/Lights/Point/Point.hpp"
-#include "../Elements/Scene/Lights/Directional/Directional.hpp"
-#include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
-#include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
-#include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -69,8 +68,7 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 }
 
 template<typename LightCreator>
-unit_static void emplace_lights(const JsonMap &lights, const std::string &key,
-    ILightsList &lightSrc, LightCreator creator)
+unit_static void emplace_lights(const JsonMap &lights, const std::string &key, ILightsList &lightSrc, LightCreator creator)
 {
     const auto it = lights.find(key);
 
@@ -178,7 +176,7 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
         const double ior_out = get_value<double>(refract_obj.at("outside"));
         bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
     } else {
-        throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
+        throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
     }
     return raytracer::material::Material(bsdf);
 }
@@ -338,9 +336,9 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
  * @brief entry Point: Create render settings
  * @details uses get_value for JsonMap and other extractions
  * @param render_json ParsedJson object
- * @return unique pointer to Render
+ * @return unique pointer to RenderConfig
  */
-std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
+const raytracer::RenderConfig create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
@@ -356,7 +354,7 @@ std::unique_ptr<raytracer::Render> create_render(const ParsedJson &render_json)
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::Render>(anti, mdepth, light, output);
+    return {anti, mdepth, light, output};
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

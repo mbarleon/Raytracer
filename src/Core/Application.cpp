@@ -6,15 +6,19 @@
 */
 
 #include "Application.hpp"
+#include "../Parser/Parser.hpp"
 #include "../UI/UIButton.hpp"
 #include "../UI/UIManager.hpp"
+#include "../UI/UIScenePreview.hpp"
+#include "CoreFactory.hpp"
+#include "CoreRender.hpp"
 #include <iostream>
 
 /**
  * public
  */
 
-raytracer::core::Application::Application()
+raytracer::core::Application::Application(const char *RESTRICT filename)
 {
     sf::ContextSettings settings;
 
@@ -29,9 +33,12 @@ raytracer::core::Application::Application()
 
     ui::UIManager::getInstance().initialize(_window);
 
+    setupPreview(filename);
     setupUI();
 }
 
+//TODO: add backend module bc not clean here
+//TODO: add an observer (decorator) EventManager
 void raytracer::core::Application::run()
 {
     sf::Clock clock;
@@ -64,6 +71,31 @@ void raytracer::core::Application::run()
 /**
 * private
 */
+
+void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
+{
+    const parser::JsonValue jsonc = parser::parseJsonc(filename);
+    const JsonMap &root = std::get<JsonMap>(jsonc);
+    const ParsedJson &render = root.at("render");
+    const ParsedJson &camera = root.at("camera");
+    const JsonMap &scene = std::get<JsonMap>(root.at("scene").value);
+    const ParsedJson &shapes = scene.at("shapes");
+    const ParsedJson &lights = scene.at("lights");
+
+    const IShapesList shapes_list = primitive_factory(shapes);
+    const ILightsList lights_list = light_factory(lights);
+    const RenderConfig render_config = create_render(render);
+
+    _camera = create_camera(camera);
+
+    const RaytraceGrid2D grid2 = _camera->render(shapes_list, lights_list, render_config);
+
+    ui::UIManager &ui = ui::UIManager::getInstance();
+    ui::Container &container = ui.getContainer();
+    const auto preview = std::make_shared<ui::UIScenePreview>(core::Render::toImage(grid2));
+
+    container.addWidget(preview);
+}
 
 void raytracer::core::Application::setupUI()
 {

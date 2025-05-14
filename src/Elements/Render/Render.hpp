@@ -8,16 +8,16 @@
 #pragma once
 
 #include "Config/Antialiasing.hpp"
-#include "Config/Output.hpp"
 #include "Config/Lighting.hpp"
+#include "Config/Output.hpp"
 
 // clang-format off
 namespace raytracer {
-typedef struct render {
+struct RenderConfig {
 	Antialiasing antialiasing;
 	unsigned int maxDepth;
 	Lighting lighting;
 	RenderOutput output;
-} Render;
+};
 };// namespace raytracer
 // clang-format on

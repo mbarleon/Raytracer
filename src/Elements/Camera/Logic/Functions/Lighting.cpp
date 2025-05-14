@@ -7,9 +7,8 @@
 
 #include "../Pathtracer.hpp"
 
-math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
-    const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const Render &render)
+math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::Vector3D &viewDir, const ILightsList &lights,
+    const IShapesList &shapes, const RenderConfig &render)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColor();
@@ -18,11 +17,10 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
     for (const auto &light : lights) {
         const auto ls = light->sample(isect.point);
         const math::Vector3D L = ls.direction.normalize();
-        const math::Ray shadow = { isect.point + isect.normal * EPSILON, L };
+        const math::Ray shadow = {isect.point + isect.normal * EPSILON, L};
 
         math::Intersect occ;
-        if (findClosestIntersection(shadow, shapes, occ, true) &&
-        occ.distance + EPSILON < ls.pdf) {
+        if (findClosestIntersection(shadow, shapes, occ, true) && occ.distance + EPSILON < ls.pdf) {
             continue;
         }
 
@@ -38,27 +36,24 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
         // specular
         const math::Vector3D R = material::reflect(-L, isect.normal).normalize();
         const double RdotV = std::max(0.0, R.dot(viewDir));
-        const double shininess = 100.0; // mat.getShininess()
-        const math::RGBColor f_spec = baseColor * render.lighting.specular *
-            std::pow(RdotV, shininess);
+        const double shininess = 100.0;// mat.getShininess()
+        const math::RGBColor f_spec = baseColor * render.lighting.specular * std::pow(RdotV, shininess);
 
         Lo += f_spec * ls.radiance * cosNL;
     }
     return Lo;
 }
 
-double raytracer::ambientOcclusion(const math::Intersect &isect,
-    const IShapesList &shapes, int N)
+double raytracer::ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes, int N)
 {
     const int total = N * N;
-    const double maxDistance = 1.0; // shape -> getAOMaxDistance
+    const double maxDistance = 1.0;// shape -> getAOMaxDistance
     double occlusion = 0.0;
 
     const math::Vector3D T = isect.normal.orthonormal();
     const math::Vector3D B = isect.normal.cross(T);
 
-    std::mt19937_64 rng(std::hash<const void*>{}(isect.object.get()) ^ 
-        std::hash<double>{}(isect.point._x));
+    std::mt19937_64 rng(std::hash<const void *>{}(isect.object.get()) ^ std::hash<double>{}(isect.point._x));
     std::uniform_real_distribution<double> u01(0.0, 1.0);
 
     for (int a = 0; a < total; ++a) {
@@ -78,7 +73,7 @@ double raytracer::ambientOcclusion(const math::Intersect &isect,
 
         const math::Vector3D dir = (T * x + B * y + isect.normal * z).normalize();
 
-        const math::Ray ray = { isect.point + dir * EPSILON, dir };
+        const math::Ray ray = {isect.point + dir * EPSILON, dir};
         math::Intersect tmp;
         if (findClosestIntersection(ray, shapes, tmp, true)) {
             const double d = tmp.distance;

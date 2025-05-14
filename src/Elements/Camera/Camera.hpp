@@ -7,12 +7,13 @@
 
 #pragma once
 
-#include "Logic/Pathtracer.hpp"
 #include "../../Maths/Vector2u.hpp"
+#include "Logic/Pathtracer.hpp"
 
 // clang-format off
 
 namespace raytracer {
+
     class Camera final
     {
         public:
@@ -21,8 +22,8 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            void render(const IShapesList &shapes, const ILightsList &lights,
-                const Render &render) const;
+            const raytracer::RaytraceGrid2D render(const IShapesList &shapes, const ILightsList &lights,
+                const RenderConfig &render) const;
 
         private:
             math::Vector2u _resolution;

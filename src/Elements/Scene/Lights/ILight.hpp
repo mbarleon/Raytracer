@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "../../../Maths/Ray.hpp"
 #include "../Materials/BSDF/Sample.hpp"
 
 namespace raytracer::light {
-class ILight {
+class ILight
+{
     public:
         virtual ~ILight() = default;
 
@@ -20,4 +20,4 @@ class ILight {
 
         virtual material::BSDFSample sample(const math::Point3D &targetPoint) const = 0;
 };
-};
+};// namespace raytracer::light

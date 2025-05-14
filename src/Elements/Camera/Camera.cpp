@@ -6,17 +6,17 @@
 */
 
 #include "Camera.hpp"
+#include "../../Maths/Intersect.hpp"
+#include "../Render/ReSTIR/Tank.hpp"
 #include "Logger.hpp"
+#include "Logic/Pathtracer.hpp"
+#include <algorithm>
 #include <atomic>
 #include <fstream>
 #include <mutex>
 #include <random>
 #include <sys/stat.h>
 #include <thread>
-#include <algorithm>
-#include "../../Maths/Intersect.hpp"
-#include "../Render/ReSTIR/Tank.hpp"
-#include "Logic/Pathtracer.hpp"
 
 // clang-format off
 
@@ -34,10 +34,10 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
-    const Render &render) const
+const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
+    const RenderConfig &render) const
 {
-    const unsigned int nproc = std::thread::hardware_concurrency();
+    const unsigned int nproc = (std::thread::hardware_concurrency()) - 1; //TEST: testing -1 for now because of SFML
 
     if (nproc == 0) {
         throw exception::Error("raytracer::Camera::render()", "No threads available");
@@ -49,19 +49,19 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     threads.reserve(nproc);
 
     std::atomic<unsigned> linesDone(0);
-    std::vector<std::vector<Tank>> restirGrid(_resolution.y, std::vector<Tank>(_resolution.x));
+    RaytraceGrid2D restirGrid(_resolution._y, std::vector<Tank>(_resolution._x));
 
     const auto sparseWorker = [&](unsigned threadId) {
-        for (unsigned y = threadId; y < _resolution.y; y += nproc) {
-            for (unsigned x = 0; x < _resolution.x; ++x) {
-                std::mt19937 rng(x + y * _resolution.x);
-                const double u0 = (x + 0.5) / double(_resolution.x);
-                const double v0 = (y + 0.5) / double(_resolution.y);
+        for (unsigned y = threadId; y < _resolution._y; y += nproc) {
+            for (unsigned x = 0; x < _resolution._x; ++x) {
+                std::mt19937 rng(x + y * _resolution._x);
+                const double u0 = (x + 0.5) / double(_resolution._x);
+                const double v0 = (y + 0.5) / double(_resolution._y);
                 math::Ray cameraRay;
 
                 for (unsigned c = 0; c < render.antialiasing.samples; ++c) {
-                    double du = u0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.x);
-                    double dv = v0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution.y);
+                    double du = u0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution._x);
+                    double dv = v0 + (static_cast<double>(rng()) / static_cast<double>(rng.max()) - 0.5) * (1.0/_resolution._y);
 
                     du = std::clamp(du, 0.0, 1.0);
                     dv = std::clamp(dv, 0.0, 1.0);
@@ -75,9 +75,9 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
             }
 
             const unsigned done = linesDone.fetch_add(1) + 1;
-            if (done % 10 == 0 || done == _resolution.y) {
+            if (done % 10 == 0 || done == _resolution._y) {
                 const std::lock_guard<std::mutex> lock(progressBarMutex);
-                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution.y));
+                logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution._y));
             }
         }
     };
@@ -89,20 +89,21 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
         t.join();
     }
 
+    return restirGrid;
     // apply image blur
 
     // image generation
-    std::ofstream ppm(render.output.file);
-    ppm << "P3\n" << _resolution.x << " " << _resolution.y << "\n255\n";
-    for (unsigned y = 0; y < _resolution.y; ++y) {
-        for (unsigned x = 0; x < _resolution.x; ++x) {
-            math::RGBColor pixel = restirGrid[y][x].estimate();
-            pixel.realign();
-            ppm << static_cast<int>(pixel._x) << ' '
-                << static_cast<int>(pixel._y) << ' '
-                << static_cast<int>(pixel._z) << '\n';
-        }        
-    }
+    // std::ofstream ppm(render.output.file);
+    // ppm << "P3\n" << _resolution._x << " " << _resolution._y << "\n255\n";
+    // for (unsigned y = 0; y < _resolution._y; ++y) {
+    //     for (unsigned x = 0; x < _resolution._x; ++x) {
+    //         math::RGBColor pixel = restirGrid[y][x].estimate();
+    //         pixel.realign();
+    //         ppm << static_cast<int>(pixel._x) << ' '
+    //             << static_cast<int>(pixel._y) << ' '
+    //             << static_cast<int>(pixel._z) << '\n';
+    //     }        
+    // }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +139,7 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 {
     cameraRay._origin = _position;
 
-    const double aspect_ratio = static_cast<double>(_resolution.x) / static_cast<double>(_resolution.y);
+    const double aspect_ratio = static_cast<double>(_resolution._x) / static_cast<double>(_resolution._y);
     const double fov_adjustment = std::tan((_fov * M_PI / 180.0) / 2.0);
 
     cameraRay._dir._x = (2.0 * u - 1.0) * aspect_ratio * fov_adjustment;

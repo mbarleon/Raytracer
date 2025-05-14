@@ -10,7 +10,8 @@
 #include "ILight.hpp"
 
 namespace raytracer::light {
-class ALight : public ILight {
+class ALight : public ILight
+{
     public:
         ALight(const math::RGBColor &color, double intensity);
         ~ALight() override = default;
@@ -22,4 +23,4 @@ class ALight : public ILight {
         math::RGBColor _color;
         double _intensity;
 };
-};
+};// namespace raytracer::light

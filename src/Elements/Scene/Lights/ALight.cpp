@@ -7,8 +7,7 @@
 
 #include "ALight.hpp"
 
-raytracer::light::ALight::ALight(const math::RGBColor &color, double intensity) :
-    _color(color), _intensity(intensity)
+raytracer::light::ALight::ALight(const math::RGBColor &color, double intensity) : _color(color), _intensity(intensity)
 {
 }
 

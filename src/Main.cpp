@@ -11,11 +11,11 @@
 #include "Macro.hpp"
 #include "Parser/ParseArguments.hpp"
 
-int main(const int argc, char **argv)
+int main(const int argc, const char **argv)
 {
     try {
         if (raytracer::parser::parse_arguments(argc, argv)) {
-            raytracer::core::Application app;
+            raytracer::core::Application app(argv[1]);
 
             app.run();
         }

@@ -54,7 +54,8 @@ void raytracer::core::Application::run()
             ui::UIManager::getInstance().events(event);
         }
 
-        float dt = clock.restart().asSeconds();
+        const float dt = clock.restart().asSeconds();
+
         ui::UIManager::getInstance().update(dt);
         ui::UIManager::getInstance().render();
     }
@@ -69,9 +70,15 @@ void raytracer::core::Application::setupUI()
     ui::UIManager &ui = ui::UIManager::getInstance();
     ui::Container &container = ui.getContainer();
 
-    auto button =
-        std::make_shared<ui::Button>(sf::Vector2f(50.f, 50.f), sf::Vector2f(100.f, 50.f), std::string("File"), ui.getFont());
+    const auto button_factory = [&ui](const std::string &text, const sf::Vector2f &position, const sf::Vector2f &size) {
+        auto button = std::make_shared<ui::Button>(position, size, text, ui.getFont());
+        button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
+        return button;
+    };
 
-    button->setOnClick([]() { std::cout << "Button clicked!" << std::endl; });
-    container.addWidget(button);
+    container.addWidget(button_factory("File", sf::Vector2f(50.f, 50.f), sf::Vector2f(80.f, 50.f)));
+    container.addWidget(button_factory("Export", sf::Vector2f(175.f, 50.f), sf::Vector2f(105.f, 50.f)));
+    container.addWidget(button_factory("Settings", sf::Vector2f(325.f, 50.f), sf::Vector2f(130.f, 50.f)));
+    container.addWidget(button_factory("_", sf::Vector2f(1790.f, 50.f), sf::Vector2f(36.f, 50.f)));
+    container.addWidget(button_factory("X", sf::Vector2f(1850.f, 50.f), sf::Vector2f(36.f, 50.f)));
 }

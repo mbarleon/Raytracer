@@ -8,6 +8,7 @@
 #pragma once
 
 #include <ostream>
+#include <type_traits>
 
 namespace math {
 
@@ -21,6 +22,17 @@ using uint = unsigned int;
 typedef struct Vector2u {
     uint _x;
     uint _y;
+
+    /**
+     * @brief __ctor__
+     * @details construct a vector2u with <Any> x and <Any> y
+     */
+    template<typename T, typename U, typename = std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U>>>
+    Vector2u(T x, U y) : _x(static_cast<uint>(x)), _y(static_cast<uint>(y))
+    {
+        /* __ctor__ */
+    }
+
 } Vector2u;
 // clang-format on
 

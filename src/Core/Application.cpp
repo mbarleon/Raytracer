@@ -12,6 +12,7 @@
 #include "../UI/UIScenePreview.hpp"
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
+#include "Logger.hpp"
 
 /**
  * public
@@ -85,6 +86,53 @@ void raytracer::core::Application::fullscreen()
     _window.setSize({mode.width, mode.height});
 }
 
+sf::Image previewRenderSimple(const std::vector<std::shared_ptr<raytracer::shape::IShape>> &shapes,
+    const math::Vector2u &resolution)
+{
+    sf::Image image;
+    image.create(resolution._x, resolution._y, sf::Color::Black);
+
+    const math::Point3D cameraPos(0, 0, -5);// Caméra virtuelle fixe
+    const double fov = 60.0;                // Champ de vision (degré)
+    const double aspect = static_cast<double>(resolution._x) / resolution._y;
+    const double scale = std::tan(fov * 0.5 * M_PI / 180.0);
+
+    for (unsigned y = 0; y < resolution._y; ++y) {
+        for (unsigned x = 0; x < resolution._x; ++x) {
+            double px = (2 * (x + 0.5) / static_cast<double>(resolution._x) - 1) * aspect * scale;
+            double py = (1 - 2 * (y + 0.5) / static_cast<double>(resolution._y)) * scale;
+
+            math::Vector3D rayDir(px, py, 1);// vers Z+
+            rayDir = rayDir.normalize();
+
+            math::Ray ray;
+            ray._origin = cameraPos;
+            ray._dir = rayDir;
+
+            double minDist = std::numeric_limits<double>::max();
+            math::RGBColor color;
+
+            for (const auto &shape : shapes) {
+                math::Point3D intersection;
+                if (shape->intersect(ray, intersection, true)) {
+                    double dist = (intersection - ray._origin).length();
+                    if (dist < minDist) {
+                        minDist = dist;
+                        color = shape->getColor();
+                    }
+                }
+            }
+
+            sf::Color pixelColor(static_cast<sf::Uint8>(std::clamp(color._x * 255.0, 0.0, 255.0)),
+                static_cast<sf::Uint8>(std::clamp(color._y * 255.0, 0.0, 255.0)),
+                static_cast<sf::Uint8>(std::clamp(color._z * 255.0, 0.0, 255.0)));
+            image.setPixel(x, y, pixelColor);
+        }
+    }
+
+    return image;
+}
+
 void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
 {
     const parser::JsonValue jsonc = parser::parseJsonc(filename);
@@ -101,11 +149,12 @@ void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
 
     _camera = create_camera(camera);
 
-    const RaytraceGrid2D grid2 = _camera->render(shapes_list, lights_list, render_config);
+    // const RaytraceGrid2D grid2 = _camera->render(shapes_list, lights_list, render_config);
 
     ui::UIManager &ui = ui::UIManager::getInstance();
     ui::Container &container = ui.getContainer();
-    const auto preview = std::make_shared<ui::UIScenePreview>(core::Render::toImage(grid2));
+    const auto preview = std::make_shared<ui::UIScenePreview>(previewRenderSimple(shapes_list, _camera->getResolution()));
+    // const auto preview = std::make_shared<ui::UIScenePreview>(core::Render::toImage(grid2));
 
     container.addWidget(preview);
 }

@@ -90,20 +90,6 @@ const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &sha
     }
 
     return restirGrid;
-    // apply image blur
-
-    // image generation
-    // std::ofstream ppm(render.output.file);
-    // ppm << "P3\n" << _resolution._x << " " << _resolution._y << "\n255\n";
-    // for (unsigned y = 0; y < _resolution._y; ++y) {
-    //     for (unsigned x = 0; x < _resolution._x; ++x) {
-    //         math::RGBColor pixel = restirGrid[y][x].estimate();
-    //         pixel.realign();
-    //         ppm << static_cast<int>(pixel._x) << ' '
-    //             << static_cast<int>(pixel._y) << ' '
-    //             << static_cast<int>(pixel._z) << '\n';
-    //     }        
-    // }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,3 +136,8 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 }
 
 // clang-format on
+
+const math::Vector2u raytracer::Camera::getResolution() const noexcept
+{
+    return _resolution;
+}

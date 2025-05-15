@@ -22,6 +22,7 @@ namespace raytracer {
             ~Camera() = default;
 
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
+            const math::Vector2u getResolution() const noexcept;
             const raytracer::RaytraceGrid2D render(const IShapesList &shapes, const ILightsList &lights,
                 const RenderConfig &render) const;
 

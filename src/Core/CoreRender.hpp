@@ -7,10 +7,13 @@
 
 #pragma once
 
+#include "../Elements/Camera/Camera.hpp"
 #include "../Elements/Camera/Logic/Pathtracer.hpp"
 #include <SFML/Graphics/Image.hpp>
 
 namespace raytracer::core {
+
+#define DEFAULT_SIZE {1920, 1080}
 
 /**
 * @class Render
@@ -19,9 +22,16 @@ namespace raytracer::core {
 class Render
 {
     public:
-        static void toPPM(const RaytraceGrid2D &grid2, const char *filename = "output.ppm");
-        static void toPNG(const RaytraceGrid2D &grid2, const char *filename = "output.png");
-        static const sf::Image toImage(const RaytraceGrid2D &grid2);
+        template<typename Grid>
+        static void toPPM(const Grid &grid, const char *filename = "output.ppm");
+
+        template<typename Grid>
+        static void toPNG(const Grid &grid, const char *filename = "output.png");
+
+        template<typename Grid>
+        static const sf::Image toImage(const Grid &grid);
+
+        static const sf::Image toPreview(const IShapesList &shapes, const Camera &camera);
 
     private:
         explicit Render() = default;

@@ -171,8 +171,7 @@ std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
 
 bool math::Vector3D::nearZero() const
 {
-    return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) &&
-        (std::fabs(_z) < EPSILON);
+    return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) && (std::fabs(_z) < EPSILON);
 }
 
 void math::Vector3D::realign()

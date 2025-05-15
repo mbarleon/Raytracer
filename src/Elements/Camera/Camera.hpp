@@ -22,9 +22,6 @@ namespace raytracer {
 
             void generateRay(const double u, const double v, math::Ray &cameraRay) const noexcept;
 
-            [[nodiscard]] uint getFov() const noexcept;
-            [[nodiscard]] const math::Point3D getPosition() const noexcept;
-            [[nodiscard]] const math::Vector3D getRotation() const noexcept;
             [[nodiscard]] const math::Vector2u getResolution() const noexcept;
             [[nodiscard]] const raytracer::RaytraceGrid2D render(const IShapesList &shapes, const ILightsList &lights, const RenderConfig &render) const;
 

@@ -32,21 +32,6 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint raytracer::Camera::getFov() const noexcept
-{
-    return _fov;
-}
-
-const math::Point3D raytracer::Camera::getPosition() const noexcept
-{
-    return _position;
-}
-
-const math::Vector3D raytracer::Camera::getRotation() const noexcept
-{
-    return _rotation;
-}
-
 const math::Vector2u raytracer::Camera::getResolution() const noexcept
 {
     return _resolution;

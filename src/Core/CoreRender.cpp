@@ -123,27 +123,16 @@ const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, co
     const uint width = resolution._x;
     const uint height = resolution._y;
 
-    sf::Image image;
-    image.create(width, height, sf::Color::Black);
-
     std::vector<std::vector<math::RGBColor>> grid2d(height, std::vector<math::RGBColor>(width));
 
-    const double fov = camera.getFov();
-    const double aspect = static_cast<double>(width) / height;
-    const double scale = std::tan(fov * 0.5 * DEGREE_TO_RADIANT);
-    const math::Point3D camera_pos = camera.getPosition();
-
     _forEach([&](math::RGBColor &pixel, const math::Vector2u &pos) {
-        const double px = (2.0 * (pos._x + 0.5) / width - 1.0) * aspect * scale;
-        const double py = (1.0 - 2.0 * (pos._y + 0.5) / height) * scale;
+        const double u = static_cast<double>(pos._x) / static_cast<double>(width);
+        const double v = static_cast<double>(pos._y) / static_cast<double>(height);
 
-        math::Vector3D dir(px, py, 1.0);
-        dir = dir.normalize();
-
-        const math::Ray ray(camera_pos, dir);
+        math::Ray ray;
+        camera.generateRay(u, v, ray);
 
         for (const auto &shape : shapes) {
-
             math::Point3D hitPoint;
 
             if (shape->intersect(ray, hitPoint, true)) {

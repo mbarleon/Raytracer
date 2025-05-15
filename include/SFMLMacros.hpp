@@ -24,6 +24,8 @@
 * @brief macros and type definitions for SFML
 */
 
+#define UNUSED __attribute__((unused))
+
 #define RT_DEFAULT_FONT_PATH "assets/fonts/jetbrains.ttf"
 
 #define RT_MAX_PIXEL_BUFFER_WIDTH 1280

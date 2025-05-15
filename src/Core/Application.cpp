@@ -9,6 +9,7 @@
 #include "../Parser/Parser.hpp"
 #include "../UI/UIButton.hpp"
 #include "../UI/UIManager.hpp"
+#include "../UI/UIRectangle.hpp"
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
 #include "SFMLMacros.hpp"
@@ -114,11 +115,24 @@ void raytracer::core::Application::setupUI()
     ui::Container &container = ui.getContainer();
 
     /**
+    * * Rectangles
+    */
+    static const auto rectangle_factory = [&](const Vec2 &position, const Vec2 &size)
+    {
+        const auto rectangle = std::make_shared<ui::Rectangle>(position, size);
+
+        return rectangle;
+    };
+
+    container.addWidget(rectangle_factory(Vec2(0, 0), Vec2(1920, 150)));
+
+    /**
     * * Buttons
     */
-    const auto button_factory = [&ui](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
+    static const auto button_factory = [&ui](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
     {
         auto button = std::make_shared<ui::Button>(position, size, text, ui.getFont());
+
         button->setOnClick(callback);
         return button;
     };

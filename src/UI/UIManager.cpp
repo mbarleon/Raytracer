@@ -55,7 +55,7 @@ void raytracer::ui::UIManager::update(const float dt) noexcept
 void raytracer::ui::UIManager::render() noexcept
 {
     if (_window) {
-        _window->clear();
+        _window->clear(sf::Color::White);
         _container->render(*_window);
         _window->display();
     }

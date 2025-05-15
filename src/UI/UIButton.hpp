@@ -8,22 +8,23 @@
 #pragma once
 
 #include "IWidget.hpp"
+#include "SFMLMacros.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <string>
 
 namespace raytracer::ui {
 
-class Button : public IWidget
+class Button final : public IWidget
 {
     public:
-        explicit Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font,
+        explicit Button(const Vec2 &position, const Vec2 &size, const std::string &label, sf::Font &font,
             const uint fontSize = 24);
 
         void setOnClick(std::function<void()> callback);
 
         void render(sf::RenderWindow &window) noexcept override;
-        void update(float dt) noexcept override;
+        void update(__attribute__((unused)) const float dt) noexcept override;
         void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
 
     private:

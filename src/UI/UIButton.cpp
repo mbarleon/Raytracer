@@ -7,7 +7,7 @@
 
 #include "UIButton.hpp"
 
-raytracer::ui::Button::Button(const sf::Vector2f &position, const sf::Vector2f &size, const std::string &label, sf::Font &font,
+raytracer::ui::Button::Button(const Vec2 &position, const Vec2 &size, const std::string &label, sf::Font &font,
     const uint fontSize)
 {
     _shape.setPosition(position);
@@ -18,7 +18,7 @@ raytracer::ui::Button::Button(const sf::Vector2f &position, const sf::Vector2f &
     _text.setString(label);
     _text.setCharacterSize(fontSize);
     _text.setFillColor(sf::Color::Black);
-    _text.setPosition(position + sf::Vector2f(10, 10));
+    _text.setPosition(position + Vec2(10, 10));
 }
 
 void raytracer::ui::Button::setOnClick(std::function<void()> callback)
@@ -39,12 +39,11 @@ void raytracer::ui::Button::update(float __attribute__((unused)) dt) noexcept
 
 void raytracer::ui::Button::onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept
 {
-    // if hoover, then color is darker
-
+    //TODO: switch case ⚠️📔
     if (event.type == sf::Event::MouseMoved) {
 
         const sf::Vector2i mouse_position(event.mouseMove.x, event.mouseMove.y);
-        const sf::Vector2f pixel2f = window.mapPixelToCoords(mouse_position);
+        const Vec2 pixel2f = window.mapPixelToCoords(mouse_position);
 
         if (_shape.getGlobalBounds().contains(pixel2f)) {
             _shape.setFillColor(sf::Color(200, 200, 200));
@@ -56,7 +55,7 @@ void raytracer::ui::Button::onEvent(const sf::Event &event, const sf::RenderWind
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 
         const sf::Vector2i click_position(event.mouseButton.x, event.mouseButton.y);
-        const sf::Vector2f pixel2f = window.mapPixelToCoords(click_position);
+        const Vec2 pixel2f = window.mapPixelToCoords(click_position);
 
         if (_shape.getGlobalBounds().contains(pixel2f) && _onClick) {
             _onClick();

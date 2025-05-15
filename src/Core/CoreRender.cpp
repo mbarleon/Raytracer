@@ -111,6 +111,12 @@ const sf::Image raytracer::core::Render::toImage(const Grid &grid)
     return image;
 }
 
+/**
+* @brief toPreview
+* @details generates a preview image of the scene using the provided shapes and camera.
+* @param shapes the list of shapes in the scene.
+* @param camera the camera used to render the scene.
+*/
 const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, const Camera &camera)
 {
     const auto resolution = camera.getResolution();
@@ -130,18 +136,22 @@ const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, co
     _forEach([&](math::RGBColor &pixel, const math::Vector2u &pos) {
         const double px = (2.0 * (pos._x + 0.5) / width - 1.0) * aspect * scale;
         const double py = (1.0 - 2.0 * (pos._y + 0.5) / height) * scale;
+
         math::Vector3D dir(px, py, 1.0);
         dir = dir.normalize();
 
-        math::Ray ray(cameraPos, dir);
+        const math::Ray ray(cameraPos, dir);
 
         for (const auto &shape : shapes) {
+
             math::Point3D hitPoint;
+
             if (shape->intersect(ray, hitPoint, true)) {
                 pixel = shape->getColor();
                 break;
             }
         }
+
     }, grid2d, resolution);
 
     return toImage(grid2d);

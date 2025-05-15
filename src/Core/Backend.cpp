@@ -6,6 +6,7 @@
 */
 
 #include "Backend.hpp"
+#include "../UI/UIManager.hpp"
 #include "SFMLMacros.hpp"
 
 /*
@@ -72,7 +73,7 @@ sf::RenderWindow &raytracer::core::Backend::getWindow() noexcept
 */
 void raytracer::core::Backend::stop() noexcept
 {
-    _window.close();
+    this->close(_window);
 }
 
 /**
@@ -82,19 +83,44 @@ void raytracer::core::Backend::stop() noexcept
 */
 const sf::Event raytracer::core::Backend::event() noexcept
 {
+    return event_logic(_window);
+}
+
+/**
+* @brief Backend::exportTo
+*/
+void raytracer::core::Backend::exportScene() noexcept
+{
+    sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
+    ui::UIManager &ui = ui::UIManager::getInstance();
+    // ui::Container &container = ui.getContainer();
+
+    ui.initialize(window);
+    while (window.isOpen()) {
+        ui.events(event_logic(window));
+        ui.render();
+    }
+}
+
+/**
+* private
+*/
+
+const sf::Event raytracer::core::Backend::event_logic(sf::RenderWindow &window) noexcept
+{
     sf::Event event;
 
-    while (_window.pollEvent(event)) {
+    while (window.pollEvent(event)) {
 
         switch (event.type) {
 
             case sf::Event::Closed:
-                stop();
+                this->close(window);
                 break;
 
             case sf::Event::KeyPressed:
                 if (event.key.code == sf::Keyboard::Escape) {
-                    stop();
+                    this->close(window);
                 }
 
             default:
@@ -103,4 +129,9 @@ const sf::Event raytracer::core::Backend::event() noexcept
     }
 
     return event;
+}
+
+void raytracer::core::Backend::close(sf::RenderWindow &window) noexcept
+{
+    window.close();
 }

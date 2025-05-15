@@ -34,4 +34,5 @@ class Container : public IWidget
     protected:
         std::vector<std::shared_ptr<IWidget>> _children;
 };
+
 }// namespace raytracer::ui

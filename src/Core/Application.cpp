@@ -138,10 +138,10 @@ void raytracer::core::Application::setupUI()
     };
 
     container.addWidget(button_factory("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
-    container.addWidget(button_factory("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f)));
+    container.addWidget(button_factory("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(); }));
     container.addWidget(button_factory("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
-    container.addWidget(button_factory("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [this]() { _backend->fullscreen(); }));
-    container.addWidget(button_factory("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [this]() { _backend->stop(); }));
+    container.addWidget(button_factory("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [&]() { _backend->fullscreen(); }));
+    container.addWidget(button_factory("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [&]() { _backend->stop(); }));
     container.addWidget(button_factory("RT ON", Vec2(1725.f, 275.f), Vec2(110.f, 50.f), [this]() { this->raytrace(); }));
 
 }

@@ -20,6 +20,7 @@ class Backend final
 
         void stop() noexcept;
         void fullscreen() noexcept;
+        void exportScene() noexcept;
 
         [[nodiscard]] bool is_running() const noexcept;
         [[nodiscard]] float getDeltaTime() noexcept;
@@ -31,5 +32,7 @@ class Backend final
         sf::RenderWindow _window;
 
         void update() noexcept;
+        void close(sf::RenderWindow &window) noexcept;
+        [[nodiscard]] const sf::Event event_logic(sf::RenderWindow &window) noexcept;
 };
 }// namespace raytracer::core

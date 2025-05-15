@@ -11,7 +11,6 @@
 #include "Logic/Pathtracer.hpp"
 
 // clang-format off
-
 namespace raytracer {
 
     class Camera final
@@ -21,10 +20,13 @@ namespace raytracer {
                 const math::Vector3D &rotation, const unsigned int fov);
             ~Camera() = default;
 
-            void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
-            const math::Vector2u getResolution() const noexcept;
-            const raytracer::RaytraceGrid2D render(const IShapesList &shapes, const ILightsList &lights,
-                const RenderConfig &render) const;
+            void generateRay(const double u, const double v, math::Ray &cameraRay) const noexcept;
+
+            [[nodiscard]] uint getFov() const noexcept;
+            [[nodiscard]] const math::Point3D getPosition() const noexcept;
+            [[nodiscard]] const math::Vector3D getRotation() const noexcept;
+            [[nodiscard]] const math::Vector2u getResolution() const noexcept;
+            [[nodiscard]] const raytracer::RaytraceGrid2D render(const IShapesList &shapes, const ILightsList &lights, const RenderConfig &render) const;
 
         private:
             math::Vector2u _resolution;

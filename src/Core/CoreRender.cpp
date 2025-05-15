@@ -119,7 +119,7 @@ const sf::Image raytracer::core::Render::toImage(const Grid &grid)
 */
 const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, const Camera &camera)
 {
-    const auto resolution = camera.getResolution();
+    const math::Vector2u resolution = camera.getResolution();
     const uint width = resolution._x;
     const uint height = resolution._y;
 
@@ -128,10 +128,10 @@ const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, co
 
     std::vector<std::vector<math::RGBColor>> grid2d(height, std::vector<math::RGBColor>(width));
 
-    const double fov = 60.0;
+    const double fov = camera.getFov();
     const double aspect = static_cast<double>(width) / height;
-    const double scale = std::tan(fov * 0.5 * M_PI / 180.0);
-    const math::Point3D cameraPos(0, 0, -5);
+    const double scale = std::tan(fov * 0.5 * DEGREE_TO_RADIANT);
+    const math::Point3D camera_pos = camera.getPosition();
 
     _forEach([&](math::RGBColor &pixel, const math::Vector2u &pos) {
         const double px = (2.0 * (pos._x + 0.5) / width - 1.0) * aspect * scale;
@@ -140,7 +140,7 @@ const sf::Image raytracer::core::Render::toPreview(const IShapesList &shapes, co
         math::Vector3D dir(px, py, 1.0);
         dir = dir.normalize();
 
-        const math::Ray ray(cameraPos, dir);
+        const math::Ray ray(camera_pos, dir);
 
         for (const auto &shape : shapes) {
 

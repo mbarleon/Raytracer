@@ -6,13 +6,11 @@
 */
 
 #include "Camera.hpp"
-#include "../../Maths/Intersect.hpp"
 #include "../Render/ReSTIR/Tank.hpp"
 #include "Logger.hpp"
 #include "Logic/Pathtracer.hpp"
 #include <algorithm>
 #include <atomic>
-#include <fstream>
 #include <mutex>
 #include <random>
 #include <sys/stat.h>
@@ -33,6 +31,26 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+uint raytracer::Camera::getFov() const noexcept
+{
+    return _fov;
+}
+
+const math::Point3D raytracer::Camera::getPosition() const noexcept
+{
+    return _position;
+}
+
+const math::Vector3D raytracer::Camera::getRotation() const noexcept
+{
+    return _rotation;
+}
+
+const math::Vector2u raytracer::Camera::getResolution() const noexcept
+{
+    return _resolution;
+}
 
 const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
     const RenderConfig &render) const
@@ -136,8 +154,3 @@ void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) co
 }
 
 // clang-format on
-
-const math::Vector2u raytracer::Camera::getResolution() const noexcept
-{
-    return _resolution;
-}

@@ -17,7 +17,7 @@ namespace raytracer::core {
 
 /**
 * @class Render
-* @brief Singleton class to render objects to format
+* @pattern Singleton class to render objects to format
 */
 class Render
 {

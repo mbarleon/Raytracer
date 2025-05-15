@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include "IEventObserver.hpp"
 #include "NonCopyable.hpp"
-#include <memory>
+#include "SFMLMacros.hpp"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <vector>
 
 namespace raytracer::ui {
@@ -23,19 +23,12 @@ class EventManager final : public NonCopyable
     public:
         static EventManager &getInstance() noexcept;
 
-        void subscribe(const std::shared_ptr<IEventObserver> &observer) noexcept;
-        void unsubscribe(const std::shared_ptr<IEventObserver> &observer) noexcept;
+        void subscribe(const EventDecorator &observer) noexcept;
+        void unsubscribe(const EventDecorator &observer) noexcept;
         void dispatch(const sf::Event &event, const sf::RenderWindow &window) noexcept;
 
     private:
-        constexpr explicit EventManager() = default;
-        constexpr ~EventManager() = default;
-
-        EventManager(const EventManager &) = delete;
-        EventManager &operator=(const EventManager &) = delete;
-        EventManager(EventManager &&) = delete;
-
-        std::vector<std::shared_ptr<IEventObserver>> _observers;
+        std::vector<EventDecorator> _observers;
 };
 
 }// namespace raytracer::ui

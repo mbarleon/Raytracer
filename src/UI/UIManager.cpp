@@ -8,6 +8,7 @@
 #include "UIManager.hpp"
 #include "Error.hpp"
 #include "Events/EventManager.hpp"
+#include "SFMLMacros.hpp"
 
 raytracer::ui::UIManager &raytracer::ui::UIManager::getInstance() noexcept
 {
@@ -30,7 +31,7 @@ void raytracer::ui::UIManager::initialize(sf::RenderWindow &window)
 {
     _window = &window;
 
-    if (!_font.loadFromFile("assets/fonts/jetbrains.ttf")) {
+    if (!_font.loadFromFile(RT_DEFAULT_FONT_PATH)) {
         throw exception::Error("UIManager::initialize", "Failed to load font");
     }
     _container = std::make_shared<Container>();

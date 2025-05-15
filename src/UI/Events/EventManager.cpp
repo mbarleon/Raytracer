@@ -6,6 +6,7 @@
 */
 
 #include "EventManager.hpp"
+#include "IEventObserver.hpp"
 
 /*
 * public
@@ -23,7 +24,7 @@ raytracer::ui::EventManager &raytracer::ui::EventManager::getInstance() noexcept
 * @details constructor
 * @return void
 */
-void raytracer::ui::EventManager::subscribe(const std::shared_ptr<IEventObserver> &observer) noexcept
+void raytracer::ui::EventManager::subscribe(const EventDecorator &observer) noexcept
 {
     _observers.push_back(observer);
 }
@@ -33,7 +34,7 @@ void raytracer::ui::EventManager::subscribe(const std::shared_ptr<IEventObserver
 * @details unsubscribes an observer from the event manager.
 * @return void
 */
-void raytracer::ui::EventManager::unsubscribe(const std::shared_ptr<IEventObserver> &observer) noexcept
+void raytracer::ui::EventManager::unsubscribe(const EventDecorator &observer) noexcept
 {
     _observers.erase(std::remove(_observers.begin(), _observers.end(), observer), _observers.end());
 }

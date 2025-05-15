@@ -8,15 +8,15 @@
 #pragma once
 
 #include "../Elements/Camera/Camera.hpp"
+#include "../UI/UIScenePreview.hpp"
+#include "Backend.hpp"
 #include "Logger.hpp"
 #include "Macro.hpp"
 #include "NonCopyable.hpp"
-#include <SFML/Graphics.hpp>
 #include <functional>
 
 namespace raytracer::core {
 
-using Vec2 = sf::Vector2f;
 using Callback = std::function<void()>;
 
 /**
@@ -33,14 +33,19 @@ class Application final : public NonCopyable
 
     private:
         void setupUI();
-        void setupPreview(const char *RESTRICT filename);
+        void setupPreview();
+        void setupConfig(const char *RESTRICT filename);
 
-        void stop();
-        void fullscreen();
+        void raytrace();
 
         IShapesList _shapes;
-        sf::RenderWindow _window;
+        ILightsList _lights;
+        RenderConfig _config;
+
+        bool _running = true;
         std::unique_ptr<Camera> _camera;
+        std::unique_ptr<Backend> _backend;
+        std::shared_ptr<ui::UIScenePreview> _scene_preview;
 };
 
 /**

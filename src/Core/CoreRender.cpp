@@ -8,6 +8,7 @@
 #include "CoreRender.hpp"
 #include "../Maths/Vector2u.hpp"
 #include "Error.hpp"
+#include "SFMLMacros.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -32,7 +33,7 @@ struct has_estimate<T, std::void_t<decltype(std::declval<T>().estimate())>> : st
  * @return void
  */
 template<typename Func, typename Grid>
-static void _forEach(const Func &&func, Grid &grid, const math::Vector2u size = DEFAULT_SIZE) noexcept
+static void _forEach(const Func &&func, Grid &grid, const math::Vector2u size = RT_DEFAULT_SIZE) noexcept
 {
     if (size._y == 0) {
         return;

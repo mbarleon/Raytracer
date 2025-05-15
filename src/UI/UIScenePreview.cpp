@@ -7,9 +7,9 @@
 
 #include "UIScenePreview.hpp"
 
-raytracer::ui::UIScenePreview::UIScenePreview(const PixelBuffer &image)
+raytracer::ui::UIScenePreview::UIScenePreview(const PixelBuffer &buffer)
 {
-    _texture.loadFromImage(image);
+    _texture.loadFromImage(buffer);
     _sprite.setTexture(_texture);
     _sprite.setScale(_get_scale(sf::Vector2f(_texture.getSize())));
 }
@@ -34,4 +34,9 @@ void raytracer::ui::UIScenePreview::onEvent(const sf::Event __attribute__((unuse
     const sf::RenderWindow __attribute__((unused)) & window) noexcept
 {
     //
+}
+
+void raytracer::ui::UIScenePreview::setImage(const PixelBuffer &buffer) noexcept
+{
+    _texture.loadFromImage(buffer);
 }

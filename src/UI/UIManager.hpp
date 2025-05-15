@@ -8,14 +8,12 @@
 #pragma once
 
 #include "NonCopyable.hpp"
+#include "SFMLMacros.hpp"
 #include "UIContainer.hpp"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <memory>
 
 namespace raytracer::ui {
-
-using ContainerPtr = std::shared_ptr<Container>;
 
 /**
 * @class UIManager
@@ -36,14 +34,6 @@ class UIManager final : public NonCopyable
         /* TODO: set theme | get theme */
 
     private:
-        explicit UIManager() = default;
-        ~UIManager() = default;
-
-        constexpr UIManager(const UIManager &) = delete;
-        constexpr UIManager &operator=(const UIManager &) = delete;
-        constexpr UIManager(UIManager &&) = delete;
-        constexpr UIManager &operator=(UIManager &&) = delete;
-
         sf::Font _font;
         sf::RenderWindow *_window = nullptr;
         ContainerPtr _container = nullptr;

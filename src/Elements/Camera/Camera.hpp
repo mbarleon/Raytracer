@@ -16,10 +16,12 @@ namespace raytracer {
     class Camera final
     {
         public:
+            Camera() = default;
             explicit Camera(const math::Vector2u &resolution, const math::Point3D &position,
                 const math::Vector3D &rotation, const unsigned int fov);
             ~Camera() = default;
 
+            uint getFOV() const;
             void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
             void render(const IShapesList &shapes, const ILightsList &lights,
                 const RenderConfig &config) const;

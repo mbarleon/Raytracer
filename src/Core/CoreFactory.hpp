@@ -27,8 +27,8 @@ using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 
 ILightsList light_factory(const ParsedJson &json_lights);
 IShapesList primitive_factory(const ParsedJson &json_primitives);
-std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json);
-std::unique_ptr<raytracer::RenderConfig> create_render(const ParsedJson &render_json);
+raytracer::Camera create_camera(const ParsedJson &camera_json);
+raytracer::RenderConfig create_render(const ParsedJson &render_json);
 
 #if defined(UNIT_TESTS)
     #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"

@@ -151,6 +151,11 @@ static const math::Vector3D applyRotation(const math::Vector3D &dir, const math:
     );
 }
 
+uint raytracer::Camera::getFOV() const
+{
+    return _fov;
+}
+
 void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) const noexcept
 {
     cameraRay._origin = _position;

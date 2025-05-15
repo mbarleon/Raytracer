@@ -324,7 +324,7 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
  * @param camera_json ParsedJson object
  * @return unique pointer to Camera
  */
-std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
+raytracer::Camera create_camera(const ParsedJson &camera_json)
 {
     const auto &obj = get_value<JsonMap>(camera_json);
     const math::Vector2u vec2 = get_vec2u(obj.at("resolution"));
@@ -337,7 +337,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 
     const uint fov = static_cast<uint>(get_value<double>(obj.at("fov")));
 
-    return std::make_unique<raytracer::Camera>(vec2, pos, rot, fov);
+    return raytracer::Camera(vec2, pos, rot, fov);
 }
 
 /**
@@ -346,7 +346,7 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
  * @param render_json ParsedJson object
  * @return unique pointer to Render
  */
-std::unique_ptr<raytracer::RenderConfig> create_render(const ParsedJson &render_json)
+raytracer::RenderConfig create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
@@ -374,7 +374,7 @@ std::unique_ptr<raytracer::RenderConfig> create_render(const ParsedJson &render_
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return std::make_unique<raytracer::RenderConfig>(anti, background, light, mdepth, output);
+    return { anti, background, light, mdepth, output };
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

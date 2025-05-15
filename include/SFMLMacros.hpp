@@ -41,6 +41,8 @@
 #define RT_WINDOW_STYLE (sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize)
 #define RT_WINDOW_TITLE "Raytracer"
 
+using u8 = sf::Uint8;
+
 namespace raytracer {
 
 using Vec2 = sf::Vector2f;

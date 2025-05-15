@@ -106,29 +106,25 @@ class Render final : public NonCopyable
             const auto height = grid.size();
             const auto width = height > 0 ? grid.front().size() : 0;
 
-            PixelBuffer image;
-            image.create(static_cast<uint>(width), static_cast<uint>(height));
+            PixelBuffer buffer;
+            buffer.create(static_cast<uint>(width), static_cast<uint>(height));
 
-            _forEach([&image](const auto &pixel, const math::Vector2u &pos)
+            _forEach([&buffer](const auto &pixel, const math::Vector2u &pos)
                 {
-                    math::RGBColor rgbc;
+                    math::RGBColor color;
 
                     using PixelType = std::decay_t<decltype(pixel)>;
                     if constexpr (has_estimate<PixelType>::value) {
-                        rgbc = pixel.estimate();
+                        color = pixel.estimate();
                     } else {
-                        rgbc = pixel;
+                        color = pixel;
                     }
-                    rgbc.realign();
+                    color.realign();
 
-                    image.setPixel(pos._x, pos._y, {
-                        static_cast<sf::Uint8>(std::clamp(rgbc._x, 0.0, 1.0) * 255.0),
-                        static_cast<sf::Uint8>(std::clamp(rgbc._y, 0.0, 1.0) * 255.0),
-                        static_cast<sf::Uint8>(std::clamp(rgbc._z, 0.0, 1.0) * 255.0)
-                    });
+                    buffer.setPixel(pos._x, pos._y, sf::Color( static_cast<u8>(color._x), static_cast<u8>(color._y), static_cast<u8>(color._z)));
                 }, const_cast<Grid &>(grid), {width, height});
 
-            return image;
+            return buffer;
         }
 
         /**

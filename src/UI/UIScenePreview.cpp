@@ -38,5 +38,5 @@ void raytracer::ui::UIScenePreview::onEvent(const sf::Event __attribute__((unuse
 
 void raytracer::ui::UIScenePreview::setImage(const PixelBuffer &buffer) noexcept
 {
-    _texture.loadFromImage(buffer);
+    _texture.update(buffer);
 }

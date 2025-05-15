@@ -27,6 +27,11 @@ raytracer::core::Application::Application(const char *RESTRICT filename)
     setupUI();
 }
 
+/**
+* @brief Application::run
+* @details run the Raytracer Application
+* @return void
+*/
 void raytracer::core::Application::run()
 {
     ui::UIManager &ui = ui::UIManager::getInstance();
@@ -89,13 +94,13 @@ void raytracer::core::Application::raytrace()
     PixelBuffer buffer;
 
     if (is_on) {
+        buffer = Render::toPreview(_shapes, *_camera);
 
+    } else {
         const RaytraceGrid2D grid2d = _camera->render(_shapes, _lights, _config);
 
         buffer = Render::toImage(grid2d);
-
-    } else {
-        buffer = Render::toPreview(_shapes, *_camera);
+        Render::toPPM(grid2d);
     }
 
     _scene_preview->setImage(buffer);
@@ -116,7 +121,7 @@ void raytracer::core::Application::setupUI()
         auto button = std::make_shared<ui::Button>(position, size, text, ui.getFont());
         button->setOnClick(callback);
         return button;
-   };
+    };
 
     container.addWidget(button_factory("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
     container.addWidget(button_factory("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f)));

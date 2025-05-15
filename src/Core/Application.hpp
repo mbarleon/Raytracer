@@ -14,11 +14,8 @@
 #include "Logger.hpp"
 #include "Macro.hpp"
 #include "NonCopyable.hpp"
-#include <functional>
 
 namespace raytracer::core {
-
-using Callback = std::function<void()>;
 
 /**
 * @class Application
@@ -48,12 +45,4 @@ class Application final : public NonCopyable
         std::unique_ptr<Backend> _backend;
         std::shared_ptr<ui::UIScenePreview> _scene_preview;
 };
-
-/**
-* @brief default debug callback for buttons
-*/
-static inline void _clicked()
-{
-    logger::debug("clicked!");
-}
 }// namespace raytracer::core

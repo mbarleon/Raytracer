@@ -110,32 +110,19 @@ void raytracer::core::Application::setupUI()
     /**
     * * Rectangles
     */
-    static const auto rectangle_factory = [&](const Vec2 &position, const Vec2 &size)
-    {
-        const auto rectangle = std::make_shared<ui::Rectangle>(position, size);
 
-        return rectangle;
-    };
-
-    container.addWidget(rectangle_factory(Vec2(0, 0), Vec2(1920, 150)));
+    container.addWidget(_ui->createRectangle(Vec2(0, 0), Vec2(1920, 150)));
 
     /**
     * * Buttons
     */
-    static const auto button_factory = [&](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
-    {
-        auto button = std::make_shared<ui::Button>(position, size, text, _ui->getFont());
 
-        button->setOnClick(callback);
-        return button;
-    };
-
-    container.addWidget(button_factory("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
-    container.addWidget(button_factory("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(); }));
-    container.addWidget(button_factory("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
-    container.addWidget(button_factory("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [&]() { _backend->fullscreen(); }));
-    container.addWidget(button_factory("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [&]() { _backend->stop(); }));
-    container.addWidget(button_factory("RT ON", Vec2(1725.f, 275.f), Vec2(110.f, 50.f), [this]() { this->raytrace(); }));
+    container.addWidget(_ui->createButton("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
+    container.addWidget(_ui->createButton("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(); }));
+    container.addWidget(_ui->createButton("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
+    container.addWidget(_ui->createButton("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [&]() { _backend->fullscreen(); }));
+    container.addWidget(_ui->createButton("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [&]() { _backend->stop(); }));
+    container.addWidget(_ui->createButton("RT ON", Vec2(1725.f, 275.f), Vec2(110.f, 50.f), [this]() { this->raytrace(); }));
 
 }
 // clang-format on

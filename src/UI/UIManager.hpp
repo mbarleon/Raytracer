@@ -7,12 +7,29 @@
 
 #pragma once
 
+#include "Logger.hpp"
 #include "SFMLMacros.hpp"
+#include "UIButton.hpp"
 #include "UIContainer.hpp"
+#include "UIRectangle.hpp"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace raytracer::ui {
+
+using ButtonPtr = std::shared_ptr<Button>;
+using RectanglePtr = std::shared_ptr<Rectangle>;
+using Callback = std::function<void()>;
+
+/**
+* @brief default debug callback for buttons
+*/
+static inline void _clicked()
+{
+    logger::debug("clicked!");
+}
+
+// clang-format off
 
 /**
 * @class UIManager
@@ -21,12 +38,13 @@ namespace raytracer::ui {
 class UIManager final
 {
     public:
-        UIManager(sf::RenderWindow &window);
+        explicit UIManager(sf::RenderWindow &window);
+        ~UIManager() = default;
 
         [[nodiscard]] Container &getContainer() noexcept;
-        [[nodiscard]] sf::Font &getFont() noexcept;
+        [[nodiscard]] RectanglePtr createRectangle(const Vec2 &pos, const Vec2 &size);
+        [[nodiscard]] ButtonPtr createButton(const std::string &text, const Vec2 &pos, const Vec2 &size, Callback callback = _clicked, const uint fontSize = 24) noexcept;
 
-        void initialize(sf::RenderWindow &window);
         void events(const sf::Event &event) noexcept;
         void update(const float dt) noexcept;
         void render() noexcept;
@@ -34,8 +52,11 @@ class UIManager final
         /* TODO: set theme | get theme */
 
     private:
+        void initialize(sf::RenderWindow &window);
+
         sf::Font _font;
         sf::RenderWindow *_window = nullptr;
         ContainerPtr _container = nullptr;
 };
+// clang-format on
 }// namespace raytracer::ui

@@ -174,3 +174,26 @@ bool math::Vector3D::nearZero() const
     return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) &&
         (std::fabs(_z) < EPSILON);
 }
+
+math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
+{
+    const double cosX = std::cos(rot._x), sinX = std::sin(rot._x);
+    const double cosY = std::cos(rot._y), sinY = std::sin(rot._y);
+    const double cosZ = std::cos(rot._z), sinZ = std::sin(rot._z);
+
+    const double m00 = cosY * cosZ;
+    const double m01 = cosZ * sinX * sinY - sinZ * cosX;
+    const double m02 = cosZ * cosX * sinY + sinZ * sinX;
+    const double m10 = cosY * sinZ;
+    const double m11 = sinZ * sinX * sinY + cosZ * cosX;
+    const double m12 = sinZ * cosX * sinY - cosZ * sinX;
+    const double m20 = -sinY;
+    const double m21 = cosY * sinX;
+    const double m22 = cosY * cosX;
+
+    return math::Vector3D(
+        m00 * dir._x + m01 * dir._y + m02 * dir._z,
+        m10 * dir._x + m11 * dir._y + m12 * dir._z,
+        m20 * dir._x + m21 * dir._y + m22 * dir._z
+    );
+}

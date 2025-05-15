@@ -89,8 +89,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
                 }
             }
 
-            const unsigned done = linesDone.fetch_add(1) + 1;
-            if (done % 10 == 0 || done == _resolution._y) {
+            if (const unsigned done = linesDone.fetch_add(1) + 1; done % 10 == 0 || done == _resolution._y) {
                 const std::lock_guard<std::mutex> lock(progressBarMutex);
                 logger::progress_bar(1.0f, static_cast<float>(done) / static_cast<float>(_resolution._y));
             }

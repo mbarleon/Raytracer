@@ -20,8 +20,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
         const math::Vector3D L = ls.direction.normalize();
         const math::Ray shadow = { isect.point + isect.normal * EPSILON, L };
 
-        math::Intersect occ;
-        if (findClosestIntersection(shadow, shapes, occ, true) &&
+        if (math::Intersect occ; findClosestIntersection(shadow, shapes, occ, true) &&
         occ.distance + EPSILON < ls.pdf) {
             continue;
         }
@@ -75,10 +74,9 @@ double raytracer::ambientOcclusion(const math::Intersect &isect,
         const double z = std::sqrt(std::max(0.0, 1.0 - du));
 
         const math::Vector3D dir = (T * x + B * y + isect.normal * z).normalize();
-
         const math::Ray ray = { isect.point + dir * EPSILON, dir };
-        math::Intersect tmp;
-        if (findClosestIntersection(ray, shapes, tmp, true)) {
+
+        if (math::Intersect tmp; findClosestIntersection(ray, shapes, tmp, true)) {
             const double d = tmp.distance;
             const double w = std::exp(-d / maxDistance);
             occlusion += w;

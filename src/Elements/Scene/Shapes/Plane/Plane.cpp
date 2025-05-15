@@ -10,14 +10,12 @@
 #include "Macro.hpp"
 #include <cmath>
 
-using namespace raytracer::shape;
-
-Plane::Plane(char axis, double position) noexcept : _axis(axis), _position(position)
+raytracer::shape::Plane::Plane(char axis, double position) noexcept : _axis(axis), _position(position)
 {
     logger::debug("Plane built: axis=", axis, " position=", position);
 }
 
-math::Vector3D Plane::getPosition() const
+math::Vector3D raytracer::shape::Plane::getPosition() const
 {
     switch (_axis) {
         case 'X':
@@ -29,7 +27,7 @@ math::Vector3D Plane::getPosition() const
     }
 }
 
-math::Vector3D Plane::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
+math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
 {
     switch (_axis) {
         case 'X':
@@ -41,7 +39,7 @@ math::Vector3D Plane::getNormalAt(const math::Point3D __attribute__((unused)) & 
     }
 }
 
-bool Plane::intersect(const math::Ray &ray, math::Point3D &intPoint, __attribute__((unused)) const bool cullBackFaces) const noexcept
+bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &intPoint, __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     double t;
 

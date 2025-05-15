@@ -55,9 +55,7 @@ T get_value(const ParsedJson &proto)
 template<typename ShapeCreator>
 unit_static void emplace_shapes(const JsonMap &primitives, const std::string &key, IShapesList &shapes, ShapeCreator creator)
 {
-    const auto it = primitives.find(key);
-
-    if (it != primitives.end() && std::holds_alternative<Shapes>(it->second.value)) {
+    if (const auto it = primitives.find(key); it != primitives.end() && std::holds_alternative<Shapes>(it->second.value)) {
 
         const auto &shape_array = std::get<Shapes>(it->second.value);
 
@@ -73,9 +71,7 @@ template<typename LightCreator>
 unit_static void emplace_lights(const JsonMap &lights, const std::string &key,
     ILightsList &lightSrc, LightCreator creator)
 {
-    const auto it = lights.find(key);
-
-    if (it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
+    if (const auto it = lights.find(key); it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
 
         const auto &light_array = std::get<Shapes>(it->second.value);
 

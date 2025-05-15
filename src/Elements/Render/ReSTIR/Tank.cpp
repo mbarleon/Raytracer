@@ -19,8 +19,7 @@ void raytracer::Tank::add(const LightSample &candidate, double w, std::mt19937 &
     weightSum += wNum;
     ++count;
 
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) < wNum / weightSum) {
+    if (std::uniform_real_distribution<> dist(0.0, 1.0); dist(gen) < wNum / weightSum) {
         sample = candidate;
     }
 }
@@ -34,8 +33,7 @@ void raytracer::Tank::merge(const struct Tank &other, std::mt19937 &gen)
     weightSum += other.weightSum;
     count += other.count;
 
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) < other.weightSum / weightSum) {
+    if (std::uniform_real_distribution<> dist(0.0, 1.0); dist(gen) < other.weightSum / weightSum) {
         sample = other.sample;
     }
 }

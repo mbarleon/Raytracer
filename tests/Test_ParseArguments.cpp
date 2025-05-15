@@ -29,8 +29,8 @@ Test(parser_arguments, test_parse_arguments_invalid_argc)
 
 Test(parse_arguments, test_parse_arguments_invalid_filename)
 {
-    const char *argv[2] = {"raytracer", "flake.nixxxxx"};
     try {
+        const char *argv[2] = {"raytracer", "flake.nixxxxx"};
         const bool __attribute__((unused)) rv = raytracer::parser::parse_arguments(2, (char **) argv);
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.what(), "invalid config file: flake.nixxxxx file not found.");

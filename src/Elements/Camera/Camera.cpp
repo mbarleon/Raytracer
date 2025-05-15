@@ -34,7 +34,7 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int getPixelColor(double c, double gamma)
+int getPixelColor(const double c, double gamma)
 {
     double mapped = c / (1.0 + c);
     mapped = std::clamp(mapped, 0.0, 1.0);
@@ -60,7 +60,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     std::atomic<unsigned> linesDone(0);
     std::vector<std::vector<Tank>> restirGrid(_resolution._y, std::vector<Tank>(_resolution._x));
 
-    const auto sparseWorker = [&](unsigned threadId) {
+    const auto sparseWorker = [&](const unsigned threadId) {
         std::mt19937 rng = material::getRng(threadId, _resolution._x, _resolution._y);
         math::Ray cameraRay;
 
@@ -114,7 +114,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     ppm << "P3\n" << _resolution._x << " " << _resolution._y << "\n255\n";
     for (unsigned y = 0; y < _resolution._y; ++y) {
         for (unsigned x = 0; x < _resolution._x; ++x) {
-            math::RGBColor pixel = restirGrid[y][x].estimate();
+            const math::RGBColor pixel = restirGrid[y][x].estimate();
             ppm << getPixelColor(pixel._x, config.lighting.gamma) << ' '
                 << getPixelColor(pixel._y, config.lighting.gamma) << ' '
                 << getPixelColor(pixel._z, config.lighting.gamma) << '\n';

@@ -55,11 +55,10 @@ Test(RGBColor, multiplication_operator)
 Test(RGBColor, scalar_multiplication_operator)
 {
     const math::RGBColor color(0.5, 0.25, 0.75);
-    const double scalar = 2.0;
+    constexpr double scalar = 2.0;
     const math::RGBColor result = color * scalar;
 
     cr_assert_eq(result._x, 1.0, "Red value should be 1.0");
     cr_assert_eq(result._y, 0.5, "Green value should be 0.5");
     cr_assert_eq(result._z, 1.5, "Blue value should be 1.5");
 }
-

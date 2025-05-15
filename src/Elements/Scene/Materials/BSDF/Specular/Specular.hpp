@@ -10,7 +10,7 @@
 #include "../BSDF.hpp"
 
 namespace raytracer::material {
-class SpecularBSDF : public BSDF {
+class SpecularBSDF final : public BSDF {
     public:
         SpecularBSDF() = default;
         ~SpecularBSDF() override = default;

@@ -10,7 +10,7 @@
 #include "../ALight.hpp"
 
 namespace raytracer::light {
-class Directional : public ALight {
+class Directional final : public ALight {
     public:
         Directional(const math::RGBColor &color, const math::Vector3D &direction,
             const double intensity);

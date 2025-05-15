@@ -16,7 +16,7 @@ class AShape : public IShape
         ~AShape() override = default;
 
         void setMaterial(const material::Material &material) override;
-        void setColor(math::RGBColor color) override;
+        void setColor(const math::RGBColor &color) override;
         void setShininess(const double shininess) override;
 
         material::Material getMaterial() const override;

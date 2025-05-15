@@ -10,7 +10,7 @@
 #include "../BSDF.hpp"
 
 namespace raytracer::material {
-class DiffuseBSDF : public BSDF {
+class DiffuseBSDF final : public BSDF {
     public:
         DiffuseBSDF() = default;
         ~DiffuseBSDF() override = default;

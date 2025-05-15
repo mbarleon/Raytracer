@@ -11,7 +11,7 @@
 #include <algorithm>
 #include "Macro.hpp"
 
-raytracer::material::DielectricBSDF::DielectricBSDF(double etaExt, double etaInt) :
+raytracer::material::DielectricBSDF::DielectricBSDF(const double etaExt, const double etaInt) :
     _etaExt(etaExt), _etaInt(etaInt)
 {
 }

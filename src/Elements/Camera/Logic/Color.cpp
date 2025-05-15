@@ -19,7 +19,7 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v, const math
 
 raytracer::LightSample raytracer::getRayColor(const math::Ray &ray,
     const IShapesList &shapes, const ILightsList &lights, const RenderConfig &config,
-    unsigned depth, std::mt19937 &rng, const math::RGBColor &throughput)
+    const unsigned depth, std::mt19937 &rng, const math::RGBColor &throughput)
 {
     if (depth > config.maxDepth) {
         return { math::RGBColor(0), 1.0 };

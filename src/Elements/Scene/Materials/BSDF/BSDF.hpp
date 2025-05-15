@@ -20,8 +20,6 @@ class BSDF {
     public:
         virtual ~BSDF() = default;
 
-        // wo : direction sortante (vers la caméra)
-        // isect : infos d’intersection, incluant objet et normale
         virtual BSDFSample sample(const math::Vector3D &wo,
             const math::Intersect &isect, std::mt19937 &rng) const = 0;
         

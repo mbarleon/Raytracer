@@ -15,8 +15,8 @@ namespace raytracer::material {
 struct Material {
     std::shared_ptr<BSDF> bsdf;
 
-    Material();
-    Material(const std::shared_ptr<BSDF> &bsdf);
+    explicit Material();
+    explicit Material(const std::shared_ptr<BSDF> &bsdf);
 
     BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect,
         std::mt19937 &rng) const;

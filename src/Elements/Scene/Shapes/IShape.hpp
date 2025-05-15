@@ -19,7 +19,7 @@ class IShape
         virtual ~IShape() = default;
 
         virtual void setMaterial(const material::Material &material) = 0;
-        virtual void setColor(math::RGBColor color) = 0;
+        virtual void setColor(const math::RGBColor &color) = 0;
         virtual void setShininess(const double shininess) = 0;
 
         [[nodiscard]] virtual material::Material getMaterial() const = 0;

@@ -12,7 +12,7 @@ void raytracer::shape::AShape::setMaterial(const material::Material &material)
     _material = material;
 }
 
-void raytracer::shape::AShape::setColor(math::RGBColor color)
+void raytracer::shape::AShape::setColor(const math::RGBColor &color)
 {
     _color = color;
 }

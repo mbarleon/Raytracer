@@ -10,12 +10,12 @@
 #include "../BSDF.hpp"
 
 namespace raytracer::material {
-class DielectricBSDF : public BSDF {
+class DielectricBSDF final : public BSDF {
     public:
         double _etaExt;
         double _etaInt;
 
-        DielectricBSDF(double etaExt, double etaInt);
+        DielectricBSDF(const double etaExt, const double etaInt);
         ~DielectricBSDF() override = default;
 
         BSDFSample sample(const math::Vector3D &wo,

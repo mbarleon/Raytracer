@@ -12,7 +12,7 @@ raytracer::light::Directional::Directional(const math::RGBColor &color,
     const math::Vector3D &direction, const double intensity)
     : ALight(color, intensity), _direction(direction.normalize())
 {
-    logger::debug("Light directional was built: ", direction, ".");
+    logger::debug("Directional light was built: ", direction, ".");
 }
 
 raytracer::material::BSDFSample raytracer::light::Directional::sample(const math::Point3D __attribute__((unused)) &targetPoint) const

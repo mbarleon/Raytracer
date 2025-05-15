@@ -92,14 +92,13 @@ const sf::Event raytracer::core::Backend::event() noexcept
 void raytracer::core::Backend::exportScene() noexcept
 {
     sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
-    ui::UIManager &ui = ui::UIManager::getInstance();
-    // ui::Container &container = ui.getContainer();
 
-    ui.initialize(window);
     while (window.isOpen()) {
-        ui.events(event_logic(window));
-        ui.render();
+        (void) event_logic(window);
+        window.clear(sf::Color::White);
+        window.display();
     }
+    window.clear();
 }
 
 /**
@@ -119,6 +118,7 @@ const sf::Event raytracer::core::Backend::event_logic(sf::RenderWindow &window) 
                 break;
 
             case sf::Event::KeyPressed:
+            case sf::Event::KeyReleased:
                 if (event.key.code == sf::Keyboard::Escape) {
                     this->close(window);
                 }

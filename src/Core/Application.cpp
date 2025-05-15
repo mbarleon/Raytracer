@@ -104,7 +104,7 @@ void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
 
     ui::UIManager &ui = ui::UIManager::getInstance();
     ui::Container &container = ui.getContainer();
-    const auto preview = std::make_shared<ui::UIScenePreview>(previewRenderSimple(shapes_list, _camera->getResolution()));
+    const auto preview = std::make_shared<ui::UIScenePreview>(Render::toPreview(shapes_list, *_camera));
 
     container.addWidget(preview);
 }

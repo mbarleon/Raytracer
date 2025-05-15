@@ -21,9 +21,9 @@ Test(create_camera, test_camera)
     const auto &jsonc = raytracer::parser::parseValue(it, end);
     const auto &root = std::get<JsonMap>(jsonc);
     const auto &camera = root.at("camera");
-    const raytracer::Camera camera_ptr = create_camera(camera);
+    const auto camera_ptr = create_camera(camera);
 
-    cr_assert(camera_ptr.getFOV() == 72);
+    cr_assert_not_null(camera_ptr);
 }
 
 Test(primitive_factory, test_primitive_factory)

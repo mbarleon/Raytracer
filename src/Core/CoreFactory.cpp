@@ -349,7 +349,7 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
  * @param camera_json ParsedJson object
  * @return unique pointer to Camera
  */
-raytracer::Camera create_camera(const ParsedJson &camera_json)
+std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
 {
     const auto &obj = get_value<JsonMap>(camera_json);
     const math::Vector2u vec2 = get_vec2u(obj.at("resolution"));
@@ -362,7 +362,7 @@ raytracer::Camera create_camera(const ParsedJson &camera_json)
 
     const uint fov = static_cast<uint>(get_value<double>(obj.at("fov")));
 
-    return raytracer::Camera(vec2, pos, rot, fov);
+    return std::make_unique<raytracer::Camera>(vec2, pos, rot, fov);
 }
 
 /**

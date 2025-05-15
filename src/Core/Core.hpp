@@ -27,6 +27,6 @@ class Core final
         std::vector<std::shared_ptr<shape::IShape>> _shapes;
         std::vector<std::shared_ptr<light::ILight>> _lights;
         RenderConfig _render;
-        Camera _camera;
+        std::unique_ptr<Camera> _camera;
 };
 }// namespace raytracer

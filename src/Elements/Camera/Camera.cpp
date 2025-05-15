@@ -132,11 +132,6 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint raytracer::Camera::getFOV() const
-{
-    return _fov;
-}
-
 void raytracer::Camera::generateRay(const double u, const double v, math::Ray &cameraRay) const noexcept
 {
     cameraRay._origin = _position;

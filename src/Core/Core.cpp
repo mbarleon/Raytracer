@@ -37,8 +37,12 @@ void raytracer::Core::run(const char *RESTRICT filename)
         _lights = light_factory(lights);
 
         _render = create_render(render);
-        _camera = create_camera(camera);
-        _camera.render(_shapes, _lights, _render);
+        try {
+            _camera = create_camera(camera);
+        } catch (const std::bad_alloc &e) {
+            throw exception::Error("Core", "Camera bad allocation", e.what());
+        }
+        _camera->render(_shapes, _lights, _render);
     } catch (const std::out_of_range &e) {
         throw raytracer::exception::Error("Core", "Invalid configuration file", e.what());
     }

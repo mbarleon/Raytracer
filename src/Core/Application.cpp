@@ -95,16 +95,15 @@ void raytracer::core::Application::setupPreview(const char *RESTRICT filename)
     const JsonMap &scene = std::get<JsonMap>(root.at("scene").value);
     const ParsedJson &shapes = scene.at("shapes");
     const ParsedJson &lights = scene.at("lights");
-
-    const IShapesList shapes_list = primitive_factory(shapes);
     const ILightsList lights_list = light_factory(lights);
     const RenderConfig render_config = create_render(render);
 
+    _shapes = primitive_factory(shapes);
     _camera = create_camera(camera);
 
     ui::UIManager &ui = ui::UIManager::getInstance();
     ui::Container &container = ui.getContainer();
-    const auto preview = std::make_shared<ui::UIScenePreview>(Render::toPreview(shapes_list, *_camera));
+    const auto preview = std::make_shared<ui::UIScenePreview>(Render::toPreview(_shapes, *_camera));
 
     container.addWidget(preview);
 }

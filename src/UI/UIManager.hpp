@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "NonCopyable.hpp"
 #include "UIContainer.hpp"
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -20,7 +21,7 @@ using ContainerPtr = std::shared_ptr<Container>;
 * @class UIManager
 * @brief Singleton class to manage the UI components and events.
 */
-class UIManager final
+class UIManager final : public NonCopyable
 {
     public:
         [[nodiscard]] static UIManager &getInstance() noexcept;

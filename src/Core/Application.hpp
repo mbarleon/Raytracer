@@ -10,6 +10,7 @@
 #include "../Elements/Camera/Camera.hpp"
 #include "Logger.hpp"
 #include "Macro.hpp"
+#include "NonCopyable.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
 
@@ -22,7 +23,7 @@ using Callback = std::function<void()>;
 * @class Application
 * @brief Main Core entry-point class for the raytracer application.
 */
-class Application final
+class Application final : public NonCopyable
 {
     public:
         explicit Application(const char *RESTRICT filename);
@@ -37,6 +38,7 @@ class Application final
         void stop();
         void fullscreen();
 
+        IShapesList _shapes;
         sf::RenderWindow _window;
         std::unique_ptr<Camera> _camera;
 };

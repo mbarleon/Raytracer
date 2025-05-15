@@ -41,9 +41,10 @@ void raytracer::ui::Button::onEvent(const sf::Event &event, const sf::RenderWind
 {
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 
-        const auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+        const sf::Vector2i click_position(event.mouseButton.x, event.mouseButton.y);
+        const sf::Vector2f pixel2f = window.mapPixelToCoords(click_position);
 
-        if (_shape.getGlobalBounds().contains(mousePos) && _onClick) {
+        if (_shape.getGlobalBounds().contains(pixel2f) && _onClick) {
             _onClick();
         }
     }

@@ -9,6 +9,7 @@
 #include "Logger.hpp"
 #include "Macro.hpp"
 #include <cmath>
+#include <limits>
 
 raytracer::shape::Plane::Plane(char axis, double position) noexcept : _axis(axis), _position(position)
 {
@@ -37,6 +38,11 @@ math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attrib
         default:
             return math::Vector3D(0.0, 0.0, 1.0);
     }
+}
+
+double raytracer::shape::Plane::getAOMaxDistance() const
+{
+    return std::numeric_limits<double>::infinity();
 }
 
 bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &intPoint, __attribute__((unused)) const bool cullBackFaces) const noexcept

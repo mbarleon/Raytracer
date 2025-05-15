@@ -27,6 +27,7 @@ class IShape
         [[nodiscard]] virtual double getShininess() const = 0;
         [[nodiscard]] virtual math::Vector3D getPosition() const = 0;
         [[nodiscard]] virtual math::Vector3D getNormalAt(const math::Point3D &point) const noexcept = 0;
+        [[nodiscard]] virtual double getAOMaxDistance() const = 0;
 
         [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept = 0;
 };

@@ -17,6 +17,8 @@ class Plane final : public AShape
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
+        double getAOMaxDistance() const override;
+
         bool intersect(const math::Ray &ray, math::Point3D &intPoint,
             bool cullBackFaces) const noexcept override;
 

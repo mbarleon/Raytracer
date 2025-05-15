@@ -19,6 +19,11 @@ raytracer::shape::Rectangle::Rectangle(const math::Point3D &origin, const math::
     logger::debug("Rectangle was built: origin ", origin, " bottom_side ", bottom_side, " left_side ", left_side, ".");
 }
 
+double raytracer::shape::Rectangle::getAOMaxDistance() const
+{
+    return 2.0; // To correct
+}
+
 /**
  * @brief
  * @details

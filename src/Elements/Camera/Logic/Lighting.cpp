@@ -50,7 +50,6 @@ double raytracer::ambientOcclusion(const math::Intersect &isect,
     const IShapesList &shapes, int N, std::mt19937 &rng)
 {
     const int total = N * N;
-    const double maxDistance = 1.0; // shape -> getAOMaxDistance
     double occlusion = 0.0;
 
     const math::Vector3D T = isect.normal.orthonormal().cross(isect.normal).normalize();
@@ -78,7 +77,7 @@ double raytracer::ambientOcclusion(const math::Intersect &isect,
 
         if (math::Intersect tmp; findClosestIntersection(ray, shapes, tmp, true)) {
             const double d = tmp.distance;
-            const double w = std::exp(-d / maxDistance);
+            const double w = std::exp(-d / tmp.object->getAOMaxDistance());
             occlusion += w;
         }
     }

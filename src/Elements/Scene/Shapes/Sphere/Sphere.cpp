@@ -40,6 +40,11 @@ math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point)
     return normal.normalize();
 }
 
+double raytracer::shape::Sphere::getAOMaxDistance() const
+{
+    return 2.0 * _radius;
+}
+
 /**
 * @brief
 * @details

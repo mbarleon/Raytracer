@@ -21,6 +21,7 @@ class Backend final
         void stop() noexcept;
         void fullscreen() noexcept;
 
+        [[nodiscard]] bool is_running() const noexcept;
         [[nodiscard]] float getDeltaTime() noexcept;
         [[nodiscard]] const sf::Event event() noexcept;
         [[nodiscard]] sf::RenderWindow &getWindow() noexcept;

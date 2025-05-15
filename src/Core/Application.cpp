@@ -31,7 +31,7 @@ void raytracer::core::Application::run()
 {
     ui::UIManager &ui = ui::UIManager::getInstance();
 
-    while (_running) {
+    while (_backend->is_running()) {
         ui.events(_backend->event());
         ui.update(_backend->getDeltaTime());
         ui.render();

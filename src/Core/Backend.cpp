@@ -26,6 +26,11 @@ raytracer::core::Backend::Backend()
     _window.setFramerateLimit(RT_DEFAULT_FPS);
 }
 
+bool raytracer::core::Backend::is_running() const noexcept
+{
+    return _window.isOpen();
+}
+
 /**
 * @brief Backend::fullscreen
 * @details set the window to fullscreen <|> DEAFULT_SIZE

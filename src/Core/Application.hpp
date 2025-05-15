@@ -42,7 +42,6 @@ class Application final : public NonCopyable
         ILightsList _lights;
         RenderConfig _config;
 
-        bool _running = true;
         std::unique_ptr<Camera> _camera;
         std::unique_ptr<Backend> _backend;
         std::shared_ptr<ui::UIScenePreview> _scene_preview;

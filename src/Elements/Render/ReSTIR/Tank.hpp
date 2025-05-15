@@ -23,7 +23,7 @@ struct Tank {
     int count;
 
     Tank();
-    void add(const LightSample &candidate, double w, std::mt19937 &gen);
+    void add(const LightSample &candidate, const double w, std::mt19937 &gen);
     void merge(const Tank &other, std::mt19937 &gen);
     math::RGBColor estimate() const;
     void clear();

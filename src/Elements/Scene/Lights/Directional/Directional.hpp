@@ -13,7 +13,7 @@ namespace raytracer::light {
 class Directional : public ALight {
     public:
         Directional(const math::RGBColor &color, const math::Vector3D &direction,
-            double intensity);
+            const double intensity);
 
         material::BSDFSample sample(const math::Point3D &targetPoint) const override;
 

@@ -22,7 +22,7 @@ namespace raytracer {
             ~Camera() = default;
 
             uint getFOV() const;
-            void generateRay(double u, double v, math::Ray &cameraRay) const noexcept;
+            void generateRay(const double u, const double v, math::Ray &cameraRay) const noexcept;
             void render(const IShapesList &shapes, const ILightsList &lights,
                 const RenderConfig &config) const;
 

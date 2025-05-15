@@ -156,7 +156,7 @@ uint raytracer::Camera::getFOV() const
     return _fov;
 }
 
-void raytracer::Camera::generateRay(double u, double v, math::Ray &cameraRay) const noexcept
+void raytracer::Camera::generateRay(const double u, const double v, math::Ray &cameraRay) const noexcept
 {
     cameraRay._origin = _position;
 

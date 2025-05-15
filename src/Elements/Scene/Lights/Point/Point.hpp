@@ -13,7 +13,7 @@ namespace raytracer::light {
 class Point final : public ALight {
     public:
         Point(const math::RGBColor &color, const math::Point3D &position,
-            double intensity);
+            const double intensity);
         
         material::BSDFSample sample(const math::Point3D &targetPoint) const override;
 

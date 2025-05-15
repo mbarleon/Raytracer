@@ -9,7 +9,7 @@
 #include "Logger.hpp"
 
 raytracer::light::Directional::Directional(const math::RGBColor &color,
-    const math::Vector3D &direction, double intensity)
+    const math::Vector3D &direction, const double intensity)
     : ALight(color, intensity), _direction(direction.normalize())
 {
     logger::debug("Light directional was built: ", direction, ".");

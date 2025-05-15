@@ -18,8 +18,8 @@ class Vector3D
         double _z;
 
         explicit Vector3D();
-        explicit Vector3D(double all);
-        explicit Vector3D(double x, double y, double z);
+        explicit Vector3D(const double all);
+        explicit Vector3D(const double x, const double y, const double z);
 
         [[nodiscard]] double length() const;
         [[nodiscard]] double lengthSquared() const;
@@ -37,11 +37,11 @@ class Vector3D
         Vector3D operator/(const Vector3D &other) const;
         Vector3D &operator/=(const Vector3D &other);
 
-        Vector3D operator*(double scalar) const;
-        Vector3D &operator*=(double scalar);
+        Vector3D operator*(const double scalar) const;
+        Vector3D &operator*=(const double scalar);
 
-        Vector3D operator/(double scalar) const;
-        Vector3D &operator/=(double scalar);
+        Vector3D operator/(const double scalar) const;
+        Vector3D &operator/=(const double scalar);
 
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;

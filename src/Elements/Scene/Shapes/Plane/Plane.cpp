@@ -11,7 +11,7 @@
 #include <cmath>
 #include <limits>
 
-raytracer::shape::Plane::Plane(char axis, double position) noexcept : _axis(axis), _position(position)
+raytracer::shape::Plane::Plane(const char axis, const double position) noexcept : _axis(axis), _position(position)
 {
     logger::debug("Plane built: axis=", axis, " position=", position);
 }

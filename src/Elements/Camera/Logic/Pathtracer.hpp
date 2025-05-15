@@ -28,7 +28,7 @@ math::RGBColor phongDirect(const math::Intersect &isect, const math::Vector3D &v
     const ILightsList &lights, const IShapesList &shapes, const RenderConfig &config,
     std::mt19937 &rng);
 double ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes,
-    unsigned int aoSamples, std::mt19937 &rng);
+    const unsigned int aoSamples, std::mt19937 &rng);
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v, const math::RGBColor &background);

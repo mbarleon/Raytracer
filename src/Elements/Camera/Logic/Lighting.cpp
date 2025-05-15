@@ -47,7 +47,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
 }
 
 double raytracer::ambientOcclusion(const math::Intersect &isect,
-    const IShapesList &shapes, unsigned int aoSamples, std::mt19937 &rng)
+    const IShapesList &shapes, const unsigned int aoSamples, std::mt19937 &rng)
 {
     const unsigned int total = aoSamples * aoSamples;
     double occlusion = 0.0;

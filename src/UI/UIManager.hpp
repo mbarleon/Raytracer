@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "NonCopyable.hpp"
 #include "SFMLMacros.hpp"
 #include "UIContainer.hpp"
 #include <SFML/Graphics/Font.hpp>
@@ -17,12 +16,13 @@ namespace raytracer::ui {
 
 /**
 * @class UIManager
-* @brief Singleton class to manage the UI components and events.
+* @brief class to manage the UI components and events.
 */
-class UIManager final : public NonCopyable
+class UIManager final
 {
     public:
-        [[nodiscard]] static UIManager &getInstance() noexcept;
+        UIManager(sf::RenderWindow &window);
+
         [[nodiscard]] Container &getContainer() noexcept;
         [[nodiscard]] sf::Font &getFont() noexcept;
 

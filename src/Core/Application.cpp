@@ -8,7 +8,6 @@
 #include "Application.hpp"
 #include "../Parser/Parser.hpp"
 #include "../UI/UIButton.hpp"
-#include "../UI/UIManager.hpp"
 #include "../UI/UIRectangle.hpp"
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
@@ -21,7 +20,7 @@
 raytracer::core::Application::Application(const char *RESTRICT filename)
 {
     _backend = std::make_unique<Backend>();
-    ui::UIManager::getInstance().initialize(_backend->getWindow());
+    _ui = std::make_unique<ui::UIManager>(_backend->getWindow());
 
     setupConfig(filename);
     setupPreview();
@@ -35,12 +34,10 @@ raytracer::core::Application::Application(const char *RESTRICT filename)
 */
 void raytracer::core::Application::run()
 {
-    ui::UIManager &ui = ui::UIManager::getInstance();
-
     while (_backend->is_running()) {
-        ui.events(_backend->event());
-        ui.update(_backend->getDeltaTime());
-        ui.render();
+        _ui->events(_backend->event());
+        _ui->update(_backend->getDeltaTime());
+        _ui->render();
     }
 }
 
@@ -77,11 +74,8 @@ void raytracer::core::Application::setupConfig(const char *RESTRICT filename)
 */
 void raytracer::core::Application::setupPreview()
 {
-    ui::UIManager &ui = ui::UIManager::getInstance();
-    ui::Container &container = ui.getContainer();
-
     _scene_preview = std::make_shared<ui::UIScenePreview>(Render::toPreview(_shapes, *_camera));
-    container.addWidget(_scene_preview);
+    _ui->getContainer().addWidget(_scene_preview);
 }
 
 /**
@@ -111,8 +105,7 @@ void raytracer::core::Application::raytrace()
 // clang-format off
 void raytracer::core::Application::setupUI()
 {
-    ui::UIManager &ui = ui::UIManager::getInstance();
-    ui::Container &container = ui.getContainer();
+    ui::Container &container = _ui->getContainer();
 
     /**
     * * Rectangles
@@ -129,9 +122,9 @@ void raytracer::core::Application::setupUI()
     /**
     * * Buttons
     */
-    static const auto button_factory = [&ui](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
+    static const auto button_factory = [&](const std::string &text, const Vec2 &position, const Vec2 &size, Callback callback = _clicked)
     {
-        auto button = std::make_shared<ui::Button>(position, size, text, ui.getFont());
+        auto button = std::make_shared<ui::Button>(position, size, text, _ui->getFont());
 
         button->setOnClick(callback);
         return button;

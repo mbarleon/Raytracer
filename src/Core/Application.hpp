@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../Elements/Camera/Camera.hpp"
+#include "../UI/UIManager.hpp"
 #include "../UI/UIScenePreview.hpp"
 #include "Backend.hpp"
 #include "Logger.hpp"
@@ -42,6 +43,7 @@ class Application final : public NonCopyable
         ILightsList _lights;
         RenderConfig _config;
 
+        std::unique_ptr<ui::UIManager> _ui;
         std::unique_ptr<Camera> _camera;
         std::unique_ptr<Backend> _backend;
         std::shared_ptr<ui::UIScenePreview> _scene_preview;

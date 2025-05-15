@@ -10,11 +10,13 @@
 #include "Events/EventManager.hpp"
 #include "SFMLMacros.hpp"
 
-raytracer::ui::UIManager &raytracer::ui::UIManager::getInstance() noexcept
-{
-    static UIManager instance;
+/**
+* public
+*/
 
-    return instance;
+raytracer::ui::UIManager::UIManager(sf::RenderWindow &window)
+{
+    initialize(window);
 }
 
 raytracer::ui::Container &raytracer::ui::UIManager::getContainer() noexcept

@@ -11,6 +11,8 @@
 #define RT_SFML_USE_INLINES
 #include "SFMLMacros.hpp"
 
+#include <SFML/Graphics/Sprite.hpp>
+
 namespace raytracer::ui {
 
 /**

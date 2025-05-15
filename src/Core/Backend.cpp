@@ -92,13 +92,12 @@ const sf::Event raytracer::core::Backend::event() noexcept
 void raytracer::core::Backend::exportScene() noexcept
 {
     sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
+    ui::UIManager ui(window);
 
     while (window.isOpen()) {
-        (void) event_logic(window);
-        window.clear(sf::Color::White);
-        window.display();
+        ui.events(event_logic(window));
+        ui.render();
     }
-    window.clear();
 }
 
 /**

@@ -7,6 +7,7 @@
 
 #include "UIManager.hpp"
 #include "Error.hpp"
+#include "Events/EventManager.hpp"
 
 raytracer::ui::UIManager &raytracer::ui::UIManager::getInstance() noexcept
 {
@@ -33,12 +34,13 @@ void raytracer::ui::UIManager::initialize(sf::RenderWindow &window)
         throw exception::Error("UIManager::initialize", "Failed to load font");
     }
     _container = std::make_shared<Container>();
+    EventManager::getInstance().subscribe(_container);
 }
 
 void raytracer::ui::UIManager::events(const sf::Event &event) noexcept
 {
     if (_window) {
-        _container->events(event, *_window);
+        _container->onEvent(event, *_window);
     }
 }
 

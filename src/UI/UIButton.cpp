@@ -37,11 +37,14 @@ void raytracer::ui::Button::update(float __attribute__((unused)) dt) noexcept
     /* */
 }
 
-void raytracer::ui::Button::events(const sf::Event &event, const sf::RenderWindow &window) noexcept
+void raytracer::ui::Button::onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept
 {
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+
         const auto mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
-        if (_shape.getGlobalBounds().contains(mousePos) && _onClick)
+
+        if (_shape.getGlobalBounds().contains(mousePos) && _onClick) {
             _onClick();
+        }
     }
 }

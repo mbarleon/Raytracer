@@ -33,7 +33,7 @@ class UIScenePreview final : public IWidget
 
         void render(sf::RenderWindow &window) noexcept override;
         void update(const float dt) noexcept override;
-        void events(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
+        void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
 
     private:
         PixelBuffer _buffer;

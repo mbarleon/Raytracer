@@ -29,7 +29,7 @@ class Container : public IWidget
 
         void update(const float dt) noexcept override;
         void render(sf::RenderWindow &window) noexcept override;
-        void events(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
+        void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
 
     protected:
         std::vector<std::shared_ptr<IWidget>> _children;

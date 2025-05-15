@@ -30,7 +30,7 @@ void raytracer::ui::UIScenePreview::update(const float __attribute__((unused)) d
     //
 }
 
-void raytracer::ui::UIScenePreview::events(const sf::Event __attribute__((unused)) & event,
+void raytracer::ui::UIScenePreview::onEvent(const sf::Event __attribute__((unused)) & event,
     const sf::RenderWindow __attribute__((unused)) & window) noexcept
 {
     //

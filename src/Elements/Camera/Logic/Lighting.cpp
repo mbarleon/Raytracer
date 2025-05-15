@@ -47,9 +47,9 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect,
 }
 
 double raytracer::ambientOcclusion(const math::Intersect &isect,
-    const IShapesList &shapes, int N, std::mt19937 &rng)
+    const IShapesList &shapes, unsigned int aoSamples, std::mt19937 &rng)
 {
-    const int total = N * N;
+    const unsigned int total = aoSamples * aoSamples;
     double occlusion = 0.0;
 
     const math::Vector3D T = isect.normal.orthonormal().cross(isect.normal).normalize();
@@ -57,13 +57,13 @@ double raytracer::ambientOcclusion(const math::Intersect &isect,
 
     std::uniform_real_distribution<double> u01(0.0, 1.0);
 
-    for (int a = 0; a < total; ++a) {
-        const int i = a % N;
-        const int j = a / N;
+    for (unsigned int a = 0; a < total; ++a) {
+        const unsigned int i = a % aoSamples;
+        const unsigned int j = a / aoSamples;
 
         // jitter
-        const double du = (i + u01(rng)) / static_cast<double>(N);
-        const double dv = (j + u01(rng)) / static_cast<double>(N);
+        const double du = (i + u01(rng)) / static_cast<double>(aoSamples);
+        const double dv = (j + u01(rng)) / static_cast<double>(aoSamples);
 
         // cos-weighted sample
         const double r = std::sqrt(du);

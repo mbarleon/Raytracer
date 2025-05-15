@@ -164,21 +164,25 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
     const std::string materialId = get_string(obj.at("material"));
     std::shared_ptr<raytracer::material::BSDF> bsdf;
 
-    if (materialId == std::string("diffuse")) {
-        bsdf = std::make_shared<raytracer::material::DiffuseBSDF>();
-    } else if (materialId == std::string("specular")) {
-        bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
-    } else if (materialId == std::string("dielectric")) {
-        const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
-        const double ior_in = get_value<double>(refract_obj.at("inside"));
-        const double ior_out = get_value<double>(refract_obj.at("outside"));
-        bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
-    } else if (materialId == std::string("metal")) {
-        const auto color = get_color(obj.at("color"));
-        const double roughness = get_value<double>(obj.at("roughness"));
-        bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
-    } else {
-        throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
+    try {
+        if (materialId == std::string("diffuse")) {
+            bsdf = std::make_shared<raytracer::material::DiffuseBSDF>();
+        } else if (materialId == std::string("specular")) {
+            bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
+        } else if (materialId == std::string("dielectric")) {
+            const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
+            const double ior_in = get_value<double>(refract_obj.at("inside"));
+            const double ior_out = get_value<double>(refract_obj.at("outside"));
+            bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
+        } else if (materialId == std::string("metal")) {
+            const auto color = get_color(obj.at("color"));
+            const double roughness = get_value<double>(obj.at("roughness"));
+            bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
+        } else {
+            throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
+        }
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Bad material allocation", e.what());
     }
     return raytracer::material::Material(bsdf);
 }
@@ -230,8 +234,13 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::Sphere> sphere = nullptr;
 
-    auto sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    try {
+        sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Sphere bad allocation", e.what());
+    }
     sphere->setMaterial(material);
     sphere->setColor(color);
     sphere->setShininess(shininess);
@@ -254,8 +263,13 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::Rectangle> rectangle = nullptr;
 
-    auto rectangle = std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    try {
+        rectangle = std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Rectangle bad allocation", e.what());
+    }
     rectangle->setMaterial(material);
     rectangle->setColor(color);
     rectangle->setShininess(shininess);
@@ -282,7 +296,13 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
         throw raytracer::exception::Error("Core", "Invalid plane axis");
     }
 
-    auto plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    std::shared_ptr<raytracer::shape::Plane> plane = nullptr;
+
+    try {
+        plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Plane bad allocation", e.what());
+    }
     plane->setMaterial(material);
     plane->setColor(color);
     plane->setShininess(shininess);
@@ -304,8 +324,13 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::STLShape> stl = nullptr;
 
-    auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
+    try {
+        stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "STL bad allocation", e.what());
+    }
     stl->setMaterial(material);
     stl->setColor(color);
     stl->setShininess(shininess);
@@ -388,9 +413,12 @@ ILightsList light_factory(const ParsedJson &json_lights)
     const auto &lights = get_value<JsonMap>(json_lights);
     ILightsList lightSrc;
 
-    emplace_lights(lights, "points", lightSrc, create_light_point);
-    emplace_lights(lights, "directionals", lightSrc, create_light_directional);
-
+    try {
+        emplace_lights(lights, "points", lightSrc, create_light_point);
+        emplace_lights(lights, "directionals", lightSrc, create_light_directional);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Light bad allocation", e.what());
+    }
     return lightSrc;
 }
 

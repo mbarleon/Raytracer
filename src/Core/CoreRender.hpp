@@ -64,6 +64,14 @@ class Render final : public NonCopyable
     public:
 
         /**
+        * @brief converts a PixelBuffer to a PPM file
+        * @param PixelBuffer the PixelBuffer to convert.
+        * @param filename the name of the output file. (default is "output.ppm")
+        * @return void
+        */
+        static void toPPM(const PixelBuffer &buffer, const char *filename = "output.ppm");
+
+        /**
         * @brief converts a RaytraceGrid2D to a PPM file.
         * @param grid2 the RaytraceGrid2D to convert.
         * @param filename the name of the output file. (default is "output.ppm")
@@ -90,10 +98,7 @@ class Render final : public NonCopyable
                 }, const_cast<Grid &>(grid), {width, height});
         }
 
-        // ⚠️ WARN todo!!! ⚠️
-        template<typename Grid>
-        static void toPNG(const Grid &grid, const char *filename = "output.png");
-
+        static void toImageFmt(const PixelBuffer &buffer, const char *filename = "output.png");
 
         /**
         * @brief converts a RaytraceGrid2D to an PixelBuffer.

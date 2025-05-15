@@ -11,7 +11,6 @@
 #include "../UI/UIManager.hpp"
 #include "../UI/UIScenePreview.hpp"
 #include "Backend.hpp"
-#include "Logger.hpp"
 #include "Macro.hpp"
 #include "NonCopyable.hpp"
 
@@ -28,6 +27,8 @@ class Application final : public NonCopyable
         ~Application() = default;
 
         void run();
+
+        static PixelBuffer _pixelBuffer;
 
     private:
         void setupUI();

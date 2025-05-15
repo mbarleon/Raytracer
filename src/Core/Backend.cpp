@@ -6,8 +6,8 @@
 */
 
 #include "Backend.hpp"
+#include "../Maths/Vector2u.hpp"
 #include "../UI/UIManager.hpp"
-#include "SFMLMacros.hpp"
 
 /*
  * public
@@ -87,15 +87,26 @@ const sf::Event raytracer::core::Backend::event() noexcept
 }
 
 /**
-* @brief Backend::exportTo
+* @brief Backend::exportScene
+* @details creates a popup asking for the export scene filename
+* @return void
 */
-void raytracer::core::Backend::exportScene() noexcept
+void raytracer::core::Backend::exportScene(CallbackStr callback) noexcept
 {
+    const math::Vector2u ws(RT_POPUP_SIZE);
     sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
     ui::UIManager ui(window);
-
+    const auto &w = ui.createTextInput(
+        ui::_to_vec2f({0, ws._y / 2}),
+        [&](const std::string &filename) {
+            callback(filename);
+            window.close();
+        },
+        24);
+    ui.getContainer().addWidget(w);
     while (window.isOpen()) {
-        ui.events(event_logic(window));
+        const sf::Event &event = event_logic(window);
+        ui.events(event);
         ui.render();
     }
 }

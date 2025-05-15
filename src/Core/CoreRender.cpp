@@ -10,6 +10,34 @@
 // clang-format off
 
 /**
+* @brief converts a PixelBuffer to a PPM file
+* @param PixelBuffer the PixelBuffer to convert.
+* @param filename the name of the output file. (default is "output.ppm")
+* @return void
+*/
+void raytracer::core::Render::toPPM(const sf::Image &image, const char *filename)
+{
+    std::ofstream ppm(filename);
+
+    if (!ppm) {
+        throw exception::Error("Render", "Unable to open output file.");
+    }
+
+    const uint width = image.getSize().x;
+    const uint height = image.getSize().y;
+
+    ppm << "P3\n" << width << " " << height << "\n255\n";
+    for (uint y = 0; y < height; ++y) {
+        for (uint x = 0; x < width; ++x) {
+            sf::Color color = image.getPixel(x, y);
+            ppm << static_cast<int>(color.r) << ' '
+                << static_cast<int>(color.g) << ' '
+                << static_cast<int>(color.b) << '\n';
+        }
+    }
+}
+
+/**
 * @brief toPreview
 * @details generates a preview image of the scene using the provided shapes and camera.
 * @param shapes the list of shapes in the scene.
@@ -42,6 +70,23 @@ const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesLis
     }, grid2d, resolution);
 
     return toImage(grid2d);
+}
+#include "Logger.hpp"
+
+/**
+* @brief Render::toImageFmt
+* @details render a PixelBuffer to <filename>. If no filename is precised, defaulting to `output.png`
+* @return void
+*/
+void raytracer::core::Render::toImageFmt(const PixelBuffer &buffer, const char *filename)
+{
+    if (buffer.getSize().x == 0 || buffer.getSize().y == 0) {
+        logger::debug("Render::toImageFmt: Cannot save empty image");
+        return;
+    }
+    if (!buffer.saveToFile(filename ? filename : "output.png")) {
+        logger::debug("Render::toImageFmt: Failed to save image to ", filename);
+    }
 }
 
 // clang-format on

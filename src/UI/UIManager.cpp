@@ -20,6 +20,12 @@ raytracer::ui::UIManager::UIManager(sf::RenderWindow &window)
 }
 
 // clang-format off
+
+raytracer::ui::TextInputPtr raytracer::ui::UIManager::createTextInput(const Vec2 &pos, CallbackStr callback, const uint fontSize) noexcept
+{ 
+    return std::make_shared<TextInput>(pos, _font, callback, fontSize);
+}
+
 raytracer::ui::ButtonPtr raytracer::ui::UIManager::createButton(const std::string &text, const Vec2 &pos, const Vec2 &size, Callback callback, const uint fontSize) noexcept
 {
     ButtonPtr button = std::make_shared<Button>(pos, size, text, _font, fontSize);
@@ -41,9 +47,7 @@ raytracer::ui::Container &raytracer::ui::UIManager::getContainer() noexcept
 
 void raytracer::ui::UIManager::events(const sf::Event &event) noexcept
 {
-    if (_window) {
-        _container->onEvent(event, *_window);
-    }
+    EventManager::getInstance().dispatch(event, *_window);
 }
 
 void raytracer::ui::UIManager::update(const float dt) noexcept

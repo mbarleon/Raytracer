@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define RT_SFML_USE_INLINES
+#include "SFMLMacros.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -20,7 +22,7 @@ class Backend final
 
         void stop() noexcept;
         void fullscreen() noexcept;
-        void exportScene() noexcept;
+        void exportScene(CallbackStr callback) noexcept;
 
         [[nodiscard]] bool is_running() const noexcept;
         [[nodiscard]] float getDeltaTime() noexcept;

@@ -7,8 +7,6 @@
 
 #include "Application.hpp"
 #include "../Parser/Parser.hpp"
-#include "../UI/UIButton.hpp"
-#include "../UI/UIRectangle.hpp"
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
 #include "SFMLMacros.hpp"
@@ -40,6 +38,8 @@ void raytracer::core::Application::run()
         _ui->render();
     }
 }
+
+raytracer::PixelBuffer raytracer::core::Application::_pixelBuffer;
 
 /**
 * private
@@ -74,7 +74,8 @@ void raytracer::core::Application::setupConfig(const char *RESTRICT filename)
 */
 void raytracer::core::Application::setupPreview()
 {
-    _scene_preview = std::make_shared<ui::UIScenePreview>(Render::toPreview(_shapes, *_camera));
+    _pixelBuffer = Render::toPreview(_shapes, *_camera);
+    _scene_preview = std::make_shared<ui::UIScenePreview>(_pixelBuffer);
     _ui->getContainer().addWidget(_scene_preview);
 }
 
@@ -86,20 +87,56 @@ void raytracer::core::Application::setupPreview()
 void raytracer::core::Application::raytrace()
 {
     static bool is_on = false;
-    PixelBuffer buffer;
 
     if (is_on) {
-        buffer = Render::toPreview(_shapes, *_camera);
+        _pixelBuffer = Render::toPreview(_shapes, *_camera);
 
     } else {
         const RaytraceGrid2D grid2d = _camera->render(_shapes, _lights, _config);
 
-        buffer = Render::toImage(grid2d);
-        Render::toPPM(grid2d);
+        _pixelBuffer = Render::toImage(grid2d);
     }
 
-    _scene_preview->setImage(buffer);
+    _scene_preview->setImage(_pixelBuffer);
     is_on = !is_on;
+}
+
+#include <cstring>
+
+static const char *_find_extension(const std::string &str) noexcept
+{
+    const std::string::size_type idx = str.rfind('.');
+
+    if (idx == std::string::npos) {
+        return nullptr;
+    }
+    return str.c_str() + idx + 1;
+}
+
+static void exportTo(const std::string &filename)
+{
+    const char *extension = _find_extension(filename);
+
+    if (extension == nullptr) {
+        const std::string filename_png = filename + ".png";
+        raytracer::logger::debug("exportTo: no extension found, defaulting to PNG.");
+        raytracer::core::Render::toImageFmt(raytracer::core::Application::_pixelBuffer, filename_png.c_str());
+        return;
+    }
+
+    if (strcmp(extension, "ppm") == 0) {
+        raytracer::logger::debug("exportTo: exporting to PPM.");
+        raytracer::core::Render::toPPM(raytracer::core::Application::_pixelBuffer, filename.c_str());
+    } else if (strcmp(extension, "jpg") == 0) {
+        raytracer::logger::debug("exportTo: exporting to JPG.");
+        raytracer::core::Render::toImageFmt(raytracer::core::Application::_pixelBuffer, filename.c_str());
+    } else if (strcmp(extension, "png") == 0) {
+        raytracer::logger::debug("exportTo: exporting to PNG.");
+        raytracer::core::Render::toImageFmt(raytracer::core::Application::_pixelBuffer, filename.c_str());
+    } else {
+        raytracer::logger::debug("exportTo: extension found but not yet supported. Defaulting to PNG.");
+        raytracer::core::Render::toImageFmt(raytracer::core::Application::_pixelBuffer, filename.c_str());
+    }
 }
 
 // clang-format off
@@ -118,7 +155,7 @@ void raytracer::core::Application::setupUI()
     */
 
     container.addWidget(_ui->createButton("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
-    container.addWidget(_ui->createButton("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(); }));
+    container.addWidget(_ui->createButton("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(exportTo); }));
     container.addWidget(_ui->createButton("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
     container.addWidget(_ui->createButton("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [&]() { _backend->fullscreen(); }));
     container.addWidget(_ui->createButton("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [&]() { _backend->stop(); }));

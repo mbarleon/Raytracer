@@ -8,6 +8,7 @@
 #pragma once
 
 #include <SFML/Graphics/Image.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 
 #if defined(RT_SFML_USE_INLINES)
@@ -17,6 +18,7 @@
 
 #endif
 
+#include <functional>
 #include <memory>
 
 /**
@@ -32,7 +34,7 @@
 #define RT_MAX_PIXEL_BUFFER_HEIGHT 720
 #define RT_DEFAULT_SCALE 1.f
 #define RT_DEFAULT_SIZE {1920, 1080}
-#define RT_POPUP_SIZE {300, 200}
+#define RT_POPUP_SIZE {600, 250}
 #define RT_DEFAULT_FPS 60
 
 #define RT_DEFAULT_ANTIALIASING_LEVEL 8
@@ -50,6 +52,8 @@ namespace raytracer {
 
 using Vec2 = sf::Vector2f;
 using PixelBuffer = sf::Image;
+using Callback = std::function<void()>;
+using CallbackStr = std::function<void(const std::string &)>;
 
 namespace ui {
 class Container;

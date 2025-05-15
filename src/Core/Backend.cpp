@@ -98,8 +98,9 @@ const sf::Event raytracer::core::Backend::event() noexcept
                 }
 
             default:
-                return event;
+                break;
         }
     }
+
     return event;
 }

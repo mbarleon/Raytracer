@@ -10,6 +10,7 @@
 #include "../Elements/Scene/Shapes/IShape.hpp"
 #include "CoreFactory.hpp"
 #include <unordered_map>
+#include "Error.hpp"
 
 /*
 * public
@@ -23,17 +24,22 @@
 void raytracer::Core::run(const char *RESTRICT filename)
 {
     const parser::JsonValue jsonc = parser::parseJsonc(filename);
-    const auto &root = std::get<JsonMap>(jsonc);
-    const auto &render = root.at("render");
-    const auto &camera = root.at("camera");
-    const auto &scene = std::get<JsonMap>(root.at("scene").value);
-    const auto &shapes = scene.at("shapes");
-    const auto &lights = scene.at("lights");
 
-    _shapes = primitive_factory(shapes);
-    _lights = light_factory(lights);
+    try {
+        const auto &root = std::get<JsonMap>(jsonc);
+        const auto &render = root.at("render");
+        const auto &camera = root.at("camera");
+        const auto &scene = std::get<JsonMap>(root.at("scene").value);
+        const auto &shapes = scene.at("shapes");
+        const auto &lights = scene.at("lights");
 
-    _render = create_render(render);
-    _camera = create_camera(camera);
-    _camera.render(_shapes, _lights, _render);
+        _shapes = primitive_factory(shapes);
+        _lights = light_factory(lights);
+
+        _render = create_render(render);
+        _camera = create_camera(camera);
+        _camera.render(_shapes, _lights, _render);
+    } catch (const std::out_of_range &e) {
+        throw raytracer::exception::Error("Core", "Invalid configuration file", e.what());
+    }
 }

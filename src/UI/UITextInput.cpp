@@ -48,9 +48,11 @@ void raytracer::ui::TextInput::onEvent(const sf::Event& event, const sf::RenderW
             const sf::Uint32 unicode = event.text.unicode;
 
             if (unicode == BACKSPACE) {
-                if (!_buffer.empty()) {
+                if (!_buffer.empty() && (was_pressed || last_char != BACKSPACE)) {
                     _buffer.pop_back();
                     _text.setString(_buffer);
+                    last_char = BACKSPACE;
+                    was_pressed = true;
                 }
                 return;
             }

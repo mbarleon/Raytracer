@@ -8,6 +8,7 @@
 #include "Backend.hpp"
 #include "../Maths/Vector2u.hpp"
 #include "../UI/UIManager.hpp"
+#include "SFMLMacros.hpp"
 
 /*
  * public
@@ -96,17 +97,17 @@ void raytracer::core::Backend::exportScene(CallbackStr callback) noexcept
     const math::Vector2u ws(RT_POPUP_SIZE);
     sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
     ui::UIManager ui(window);
-    const auto &w = ui.createTextInput(
-        ui::_to_vec2f({0, ws._y / 2}),
-        [&](const std::string &filename) {
-            callback(filename);
-            window.close();
-        },
-        24);
-    ui.getContainer().addWidget(w);
+    ui::Container &c = ui.getContainer();
+
+    c.addWidget(ui.createRectangle(ui::_to_vec2f({3, 3}), {594.f, 244.f}));
+    c.addWidget(ui.createRectangle(ui::_to_vec2f({3, 3}), {594.f, 94.f}));
+    c.addWidget(ui.createText("Export to:", ui::_to_vec2f({245, 40})));
+    c.addWidget(ui.createTextInput(ui::_to_vec2f({20, ws._y / 2}), [&](const std::string &filename) {
+        callback(filename);
+        window.close();
+    }));
     while (window.isOpen()) {
-        const sf::Event &event = event_logic(window);
-        ui.events(event);
+        ui.events(event_logic(window));
         ui.render();
     }
 }

@@ -21,6 +21,11 @@ raytracer::ui::UIManager::UIManager(sf::RenderWindow &window)
 
 // clang-format off
 
+raytracer::ui::TextPtr raytracer::ui::UIManager::createText(const std::string &str, const Vec2 &pos, const uint fontSize) noexcept
+{
+    return std::make_shared<Text>(str, pos, _font, fontSize);
+}
+
 raytracer::ui::TextInputPtr raytracer::ui::UIManager::createTextInput(const Vec2 &pos, CallbackStr callback, const uint fontSize) noexcept
 { 
     return std::make_shared<TextInput>(pos, _font, callback, fontSize);

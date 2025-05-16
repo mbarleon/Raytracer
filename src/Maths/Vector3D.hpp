@@ -18,8 +18,8 @@ class Vector3D
         double _z;
 
         explicit Vector3D();
-        explicit Vector3D(double all);
-        explicit Vector3D(double x, double y, double z);
+        explicit Vector3D(const double all);
+        explicit Vector3D(const double x, const double y, const double z);
 
         /**
          * @brief __ctor__
@@ -48,19 +48,20 @@ class Vector3D
         Vector3D operator/(const Vector3D &other) const;
         Vector3D &operator/=(const Vector3D &other);
 
-        Vector3D operator*(double scalar) const;
-        Vector3D &operator*=(double scalar);
+        Vector3D operator*(const double scalar) const;
+        Vector3D &operator*=(const double scalar);
 
-        Vector3D operator/(double scalar) const;
-        Vector3D &operator/=(double scalar);
+        Vector3D operator/(const double scalar) const;
+        Vector3D &operator/=(const double scalar);
 
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;
         [[nodiscard]] Vector3D orthonormal() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
         [[nodiscard]] double maxComponent() const;
-        void realign();
-        bool nearZero() const;
+        [[nodiscard]] bool nearZero() const;
+        void realign() noexcept;
+        static Vector3D applyRotation(const Vector3D &dir, const Vector3D &rot);
 
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;
@@ -92,4 +93,4 @@ inline Vector3D operator*(const double scalar, const Vector3D &vector)
 */
 using Point3D = Vector3D;
 using RGBColor = Vector3D;
-};// namespace math
+}// namespace math

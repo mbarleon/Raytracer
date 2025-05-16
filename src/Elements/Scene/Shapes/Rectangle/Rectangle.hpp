@@ -17,13 +17,14 @@ class Rectangle final : public AShape
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
+        double getAOMaxDistance() const override;
 
         [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint,
-            bool cullBackFaces) const noexcept override;
+            const bool cullBackFaces) const noexcept override;
 
     private:
         math::Point3D _origin;
         math::Vector3D _bottom_side;
         math::Vector3D _left_side;
 };
-};// namespace raytracer::shape
+}// namespace raytracer::shape

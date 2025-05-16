@@ -11,9 +11,9 @@
 
 // clang-format off
 namespace raytracer {
-typedef struct antialiasing {
+struct Antialiasing {
     unsigned int samples;
-    unsigned int radius;
-} Antialiasing;
-};// namespace raytracer
+    std::string mode;
+};
+}// namespace raytracer
 // clang-format on

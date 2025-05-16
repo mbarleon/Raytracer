@@ -13,7 +13,7 @@ namespace raytracer::light {
 class ALight : public ILight
 {
     public:
-        ALight(const math::RGBColor &color, double intensity);
+        ALight(const math::RGBColor &color, const double intensity);
         ~ALight() override = default;
 
         [[nodiscard]] math::RGBColor getColor() const override;
@@ -23,4 +23,4 @@ class ALight : public ILight
         math::RGBColor _color;
         double _intensity;
 };
-};// namespace raytracer::light
+}// namespace raytracer::light

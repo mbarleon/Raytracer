@@ -5,7 +5,7 @@
 ** Test_Sphere.cpp
 */
 
-#include "../src/Elements/Scene/Shapes/Sphere.hpp"
+#include "../src/Elements/Scene/Shapes/Sphere/Sphere.hpp"
 #include <criterion/criterion.h>
 #include <criterion/internal/assert.h>
 #include <criterion/new/assert.h>
@@ -14,7 +14,7 @@
 Test(sphere, intersection_exists)
 {
     const raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const math::Ray ray(math::Point3D(0, 0, -5), math::Vector3D(0, 0, 1));
+    const math::Ray ray = {math::Point3D(0, 0, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = sphere.intersect(ray, intPoint, false);
 
@@ -24,7 +24,7 @@ Test(sphere, intersection_exists)
 Test(sphere, no_intersection)
 {
     const raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const math::Ray ray(math::Point3D(0, 5, -5), math::Vector3D(0, 0, 1));
+    const math::Ray ray = {math::Point3D(0, 5, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = sphere.intersect(ray, intPoint, false);
 
@@ -34,7 +34,7 @@ Test(sphere, no_intersection)
 Test(sphere, tangent_intersection)
 {
     const raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const math::Ray ray(math::Point3D(0, 1, -5), math::Vector3D(0, 0, 1));
+    const math::Ray ray = {math::Point3D(0, 1, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = sphere.intersect(ray, intPoint, false);
 
@@ -44,7 +44,7 @@ Test(sphere, tangent_intersection)
 Test(sphere, inside_sphere)
 {
     const raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const math::Ray ray(math::Point3D(0, 0, 0), math::Vector3D(0, 0, 1));
+    const math::Ray ray = {math::Point3D(0, 0, 0), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = sphere.intersect(ray, intPoint, false);
 
@@ -54,34 +54,12 @@ Test(sphere, inside_sphere)
 Test(sphere, set_color)
 {
     raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const raytracer::RGBColor color(0.5, 0.5, 0.5);
+    const math::RGBColor color(0.5, 0.5, 0.5);
 
     sphere.setColor(color);
-    cr_assert_eq(color.r, sphere.getColor().r, "Sphere color should be set correctly (r)");
-    cr_assert_eq(color.g, sphere.getColor().g, "Sphere color should be set correctly (g)");
-    cr_assert_eq(color.b, sphere.getColor().b, "Sphere color should be set correctly (b)");
-}
-
-Test(sphere, set_material)
-{
-    raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    std::shared_ptr<raytracer::Material> material = std::make_shared<raytracer::Material>();
-
-    material.get()->emissiveIntensity = 0.1;
-    material.get()->reflectivity = 0.2;
-    material.get()->refractiveIndex = 0.3;
-    material.get()->shininess = 0.4;
-
-    sphere.setMaterial(material);
-
-    cr_assert_eq(sphere.getMaterial()->emissiveIntensity, material.get()->emissiveIntensity,
-        "Sphere material should be set correctly (emissiveIntensity)");
-    cr_assert_eq(sphere.getMaterial()->reflectivity, material.get()->reflectivity,
-        "Sphere material should be set correctly (reflectivity)");
-    cr_assert_eq(sphere.getMaterial()->refractiveIndex, material.get()->refractiveIndex,
-        "Sphere material should be set correctly (refractiveIndex)");
-    cr_assert_eq(sphere.getMaterial()->shininess, material.get()->shininess,
-        "Sphere material should be set correctly (shininess)");
+    cr_assert_eq(color._x, sphere.getColor()._x, "Sphere color should be set correctly (r)");
+    cr_assert_eq(color._y, sphere.getColor()._y, "Sphere color should be set correctly (g)");
+    cr_assert_eq(color._z, sphere.getColor()._z, "Sphere color should be set correctly (b)");
 }
 
 Test(sphere, get_position)

@@ -46,7 +46,6 @@ Test(Vector3D, general_operations)
     c = c / 2;
     c *= 2;
     c /= 2;
-    -c;
     cr_assert_eq(b - a, e);
     cr_assert_eq(c._x, 5.0);
     cr_assert_eq(c._y, 7.0);

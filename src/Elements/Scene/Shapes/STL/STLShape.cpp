@@ -287,6 +287,11 @@ math::Vector3D raytracer::shape::STLShape::getNormalAt(const math::Point3D &poin
     return math::Vector3D(_center_x, _center_y, _center_z).normalize();
 }
 
+double raytracer::shape::STLShape::getAOMaxDistance() const
+{
+    return 10 * _scale;
+}
+
 void raytracer::shape::STLShape::_buildBVH()
 {
     std::vector<size_t> indices(_triangles.size());

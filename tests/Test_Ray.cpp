@@ -19,7 +19,7 @@ Test(ray, test_ray_at)
 {
     const math::Vector3D vec3(0.1, 2.0, 4.0);
     const math::Point3D p3(4.0, 5.0, 6.0);
-    const math::Ray ray(p3, vec3);
+    const math::Ray ray = {p3, vec3};
 
     cr_assert(ray._origin._z == p3._z);
     cr_assert(ray.at(42)._z == 174);

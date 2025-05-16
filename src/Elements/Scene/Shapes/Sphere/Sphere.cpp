@@ -40,6 +40,11 @@ math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point)
     return normal.normalize();
 }
 
+double raytracer::shape::Sphere::getAOMaxDistance() const
+{
+    return 2.0 * _radius;
+}
+
 /**
 * @brief
 * @details
@@ -61,12 +66,15 @@ bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &in
     const double sqrtDisc = std::sqrt(discriminant);
     const double t1 = (-b - sqrtDisc) / (2.0 * a);
     const double t2 = (-b + sqrtDisc) / (2.0 * a);
+    const double t = (t1 >= 0.0 ? t1 : (t2 >= 0.0 ? t2 : -1.0));
 
-    if (t1 >= 0.0)
-        intPoint = ray._origin + ray._dir * t1;
-    else if (t2 >= 0.0)
-        intPoint = ray._origin + ray._dir * t2;
-    else
+    if (t < 0.0) {
         return false;
+    }
+    intPoint = ray._origin + ray._dir * t;
+
+    if (const math::Vector3D N = (intPoint - _center).normalize(); cullBackFaces && ray._dir.dot(N) >= 0.0) {
+        return false;
+    }
     return true;
 }

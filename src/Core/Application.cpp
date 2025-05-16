@@ -54,17 +54,25 @@ raytracer::PixelBuffer raytracer::core::Application::_pixelBuffer;
 void raytracer::core::Application::setupConfig(const char *RESTRICT filename)
 {
     const parser::JsonValue jsonc = parser::parseJsonc(filename);
-    const JsonMap &root = std::get<JsonMap>(jsonc);
-    const ParsedJson &render = root.at("render");
-    const ParsedJson &camera = root.at("camera");
-    const JsonMap &scene = std::get<JsonMap>(root.at("scene").value);
-    const ParsedJson &shapes = scene.at("shapes");
-    const ParsedJson &lights = scene.at("lights");
 
-    _shapes = primitive_factory(shapes);
-    _lights = light_factory(lights);
-    _camera = create_camera(camera);
-    _config = create_render(render);
+    try {
+        const JsonMap &root = std::get<JsonMap>(jsonc);
+        const ParsedJson &render = root.at("render");
+        const ParsedJson &camera = root.at("camera");
+        const JsonMap &scene = std::get<JsonMap>(root.at("scene").value);
+        const ParsedJson &shapes = scene.at("shapes");
+        const ParsedJson &lights = scene.at("lights");
+
+        _shapes = primitive_factory(shapes);
+        _lights = light_factory(lights);
+        _camera = create_camera(camera);
+        _config = create_render(render);
+
+    } catch (const std::out_of_range &e) {
+        throw exception::Error("Application::setupConfig", "Invalid configuration file", e.what());
+    } catch (const std::bad_alloc &e) {
+        throw exception::Error("Application::setupConfig", "Camera bad allocation", e.what());
+    }
 }
 
 /**

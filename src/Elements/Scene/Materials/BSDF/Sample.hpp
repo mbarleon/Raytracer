@@ -9,12 +9,14 @@
 
 #include "../../../../Maths/Vector3D.hpp"
 
-// clang-format off
 namespace raytracer::material {
+
+// clang-format off
 struct BSDFSample {
     math::Vector3D direction;
     double pdf;
     math::RGBColor radiance;
+    bool isDelta = false;
 };
-};// namespace raytracer::material
 // clang-format on
+}// namespace raytracer::material

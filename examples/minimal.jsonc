@@ -2,55 +2,113 @@
     "render": {
         "antialiasing": {
             "samples": 1, // 40 for absolute realism, 1 for fast rendering
-            "radius": 1
+            "mode": "classic" // none, classic, adaptive
         },
-        "max-depth": 4, // reflection and refraction limit
+        "background-color": {
+            "r": 26,
+            "g": 0,
+            "b": 77
+        },
         "lighting": {
-            "ambient": 0.6,
+            "gamma": 3.0,
+            "ambient": {
+                "coef": 0.6,
+                "samples": 10 // 20 for absolute realism, 1 for fast rendering
+            },
             "diffuse": 1.0,
             "specular": 0.6
         },
+        "max-depth": 4, // reflection and refraction limit
         "output": {
             "file": "output.ppm",
             "format": "ppm" // "ppm", "png", "jpg"
         }
     },
     "camera": {
-        "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 0, "y": 0, "z": -3 },
-        "rotation": { "x": 0, "y": 0, "z": 0 },
+        "resolution": {
+            "width": 1920,
+            "height": 1080
+        },
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": -3
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
         "fov": 72
     },
     "scene": {
         "shapes": {
             "spheres": [
                 {
-                    "position": { "x": -1, "y": 0, "z": -1 },
+                    "position": {
+                        "x": -1,
+                        "y": 0,
+                        "z": -1
+                    },
                     "radius": 0.5,
-                    "material": "specular",
-                    "color": { "r": 0, "g": 255, "b": 0 }
+                    "material": "metal",
+                    "roughness": 0.1,
+                    "color": {
+                        "r": 0,
+                        "g": 255,
+                        "b": 0
+                    },
+                    "shininess": 100.0
                 },
                 {
-                    "position": { "x": 0, "y": 0, "z": -1 },
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "z": -1
+                    },
                     "radius": 0.5,
                     "material": "diffuse",
-                    "color": { "r": 255, "g": 0, "b": 0 }
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 0
+                    },
+                    "shininess": 100.0
                 },
                 {
-                    "position": { "x": 1, "y": 0, "z": -1 },
+                    "position": {
+                        "x": 1,
+                        "y": 0,
+                        "z": -1
+                    },
                     "radius": 0.5,
                     "material": "dielectric",
                     "refraction": {
-                        "inside": 1.5,
-                        "outside": 1.0
+                        "inside": 1.0,
+                        "outside": 1.52 // glass
                     },
-                    "color": { "r": 0, "g": 0, "b": 255 }
+                    "color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 255
+                    },
+                    "shininess": 100.0
                 },
                 {
-                    "position": { "x": 0, "y": -100.5, "z": -1 },
+                    "position": {
+                        "x": 0,
+                        "y": -100.5,
+                        "z": -1
+                    },
                     "radius": 100,
-                    "material": "specular",
-                    "color": { "r": 255, "g": 255, "b": 255 }
+                    "material": "metal",
+                    "roughness": 1.0,
+                    "color": {
+                        "r": 255,
+                        "g": 255,
+                        "b": 255
+                    },
+                    "shininess": 100.0
                 }
             ]
             // "planes": [
@@ -58,24 +116,33 @@
             //         "axis": "Y",
             //         "position": -20,
             //         "material": "ground",
-            //         "color": { "r": 64, "g": 64, "b": 255 }
+            //         "color": { "r": 64, "g": 64, "b": 255 },
+            //         "shininess": 100.0
             //     }
             // ]
         },
         "lights": {
             "points": [
-                // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
-                //     "color": { "r": 0, "g": 255, "b": 255 },
-                //     "intensity": 100.0
-                // }
+                {
+                    "position": {
+                        "x": 0,
+                        "y": 2,
+                        "z": 1
+                    },
+                    "color": {
+                        "r": 0,
+                        "g": 255,
+                        "b": 255
+                    },
+                    "intensity": 5.0
+                }
             ],
             "directionals": [
-                {
-                    "direction": { "x": 0, "y": -1, "z": -1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 20.0
-                }
+                // {
+                //     "direction": { "x": 0, "y": -1, "z": -1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 1.0
+                // }
             ]
         }
     }

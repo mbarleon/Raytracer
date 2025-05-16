@@ -7,23 +7,32 @@
 
 #include "Utils.hpp"
 
-double raytracer::material::getRandomDouble()
+double raytracer::material::getRandomDouble(std::mt19937 &rng)
 {
-    return rand() / (RAND_MAX + 1.0);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(rng);
 }
 
-double raytracer::material::getRandomDouble(double min, double max)
+double raytracer::material::getRandomDouble(std::mt19937 &rng, const double min, const double max)
 {
-    return min + (max - min) * getRandomDouble();
+    std::uniform_real_distribution<double> dist(min, max);
+    return dist(rng);
 }
 
-math::Vector3D raytracer::material::getRandomVector()
+math::Vector3D raytracer::material::getRandomVector(std::mt19937 &rng)
 {
-    return math::Vector3D(getRandomDouble(), getRandomDouble(), getRandomDouble());
+    return math::Vector3D(getRandomDouble(rng), getRandomDouble(rng), getRandomDouble(rng));
 }
 
-math::Vector3D raytracer::material::getRandomVector(double min, double max)
+math::Vector3D raytracer::material::getRandomVector(std::mt19937 &rng, const double min, const double max)
 {
-    return math::Vector3D(getRandomDouble(min, max), getRandomDouble(min, max),
-        getRandomDouble(min, max));
+    return math::Vector3D(getRandomDouble(rng, min, max), getRandomDouble(rng, min, max),
+        getRandomDouble(rng, min, max));
 }
+
+std::mt19937 raytracer::material::getRng(const unsigned threadId, const unsigned res_x, const unsigned res_y)
+{
+    std::seed_seq seq { std::random_device{}(), threadId, res_x, res_y };
+
+    return std::mt19937(seq);
+};

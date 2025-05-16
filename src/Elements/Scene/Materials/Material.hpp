@@ -12,13 +12,14 @@
 
 // clang-format off
 namespace raytracer::material {
-typedef struct material {
+struct Material {
     std::shared_ptr<BSDF> bsdf;
 
-    material();
-    material(std::shared_ptr<BSDF> bsdf);
+    explicit Material();
+    explicit Material(const std::shared_ptr<BSDF> &bsdf);
 
-    BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect) const;
-} Material;
-};// namespace raytracer
+    BSDFSample sample(const math::Vector3D &wo, const math::Intersect &isect,
+        std::mt19937 &rng) const;
+};
+}// namespace raytracer
 // clang-format on

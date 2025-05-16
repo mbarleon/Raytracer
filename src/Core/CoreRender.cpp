@@ -6,6 +6,7 @@
 */
 
 #include "CoreRender.hpp"
+#include "Logger.hpp"
 
 // clang-format off
 
@@ -71,7 +72,6 @@ const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesLis
 
     return toImage(grid2d);
 }
-#include "Logger.hpp"
 
 /**
 * @brief Render::toImageFmt

@@ -22,10 +22,11 @@ class STLShape final: public AShape
     public:
         explicit STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename, float scale);
 
-        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, bool cullBackFaces) const noexcept override;
+        [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept override;
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept override;
+        double getAOMaxDistance() const override;
 
     private:
         struct Vertex {

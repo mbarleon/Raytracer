@@ -39,14 +39,13 @@ void raytracer::ui::Button::update(float __attribute__((unused)) dt) noexcept
 
 void raytracer::ui::Button::onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept
 {
-    //TODO: switch case ⚠️📔
     if (event.type == sf::Event::MouseMoved) {
 
         const sf::Vector2i mouse_position(event.mouseMove.x, event.mouseMove.y);
         const Vec2 pixel2f = window.mapPixelToCoords(mouse_position);
 
         if (_shape.getGlobalBounds().contains(pixel2f)) {
-            _shape.setFillColor(sf::Color(200, 200, 200));
+            _shape.setFillColor(sf::Color(200, 200, 200, 150));
         } else {
             _shape.setFillColor(sf::Color::White);
         }

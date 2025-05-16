@@ -24,14 +24,12 @@ class Button final : public IWidget
         void setOnClick(std::function<void()> callback);
 
         void render(sf::RenderWindow &window) noexcept override;
-        void update(__attribute__((unused)) const float dt) noexcept override;
+        void update(UNUSED const float dt) noexcept override;
         void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
 
     private:
         sf::Text _text;
         sf::RectangleShape _shape;
         std::function<void()> _onClick;
-
-        bool _hovered = false;
 };
 }// namespace raytracer::ui

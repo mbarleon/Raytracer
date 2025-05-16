@@ -10,6 +10,7 @@
 #include "CoreFactory.hpp"
 #include "CoreRender.hpp"
 #include "SFMLMacros.hpp"
+#include <cstring>
 
 /**
  * public
@@ -109,8 +110,12 @@ void raytracer::core::Application::raytrace()
     is_on = !is_on;
 }
 
-#include <cstring>
-
+/**
+ * @brief Application::<static>find_extension
+ * @details find the extension of a file
+ * @param str the filename string to search
+ * @return the file extension gefunden
+ */
 static const char *_find_extension(const std::string &str) noexcept
 {
     const std::string::size_type idx = str.rfind('.');
@@ -121,7 +126,13 @@ static const char *_find_extension(const std::string &str) noexcept
     return str.c_str() + idx + 1;
 }
 
-static void exportTo(const std::string &filename)
+/**
+* @brief Application::<static>exportTo
+* @details export the scene to a file, automatic file extension detection
+* @param filename the file name
+* @return void
+*/
+static void _exportTo(const std::string &filename)
 {
     const char *extension = _find_extension(filename);
 
@@ -163,7 +174,7 @@ void raytracer::core::Application::setupUI()
     */
 
     container.addWidget(_ui->createButton("File", Vec2(50.f, 50.f), Vec2(80.f, 50.f)));
-    container.addWidget(_ui->createButton("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(exportTo); }));
+    container.addWidget(_ui->createButton("Export", Vec2(175.f, 50.f), Vec2(105.f, 50.f), [&]() { _backend->exportScene(_exportTo); }));
     container.addWidget(_ui->createButton("Settings", Vec2(325.f, 50.f), Vec2(130.f, 50.f)));
     container.addWidget(_ui->createButton("[]", Vec2(1790.f, 50.f), Vec2(45.f, 50.f), [&]() { _backend->fullscreen(); }));
     container.addWidget(_ui->createButton("X", Vec2(1850.f, 50.f), Vec2(36.f, 50.f), [&]() { _backend->stop(); }));

@@ -11,10 +11,7 @@
 
 Test(test_vector2u, test_vector2u_valid)
 {
-    constexpr math::Vector2u vec2 = {
-        ._x = 24,
-        ._y = 53,
-    };
+    const math::Vector2u vec2(24, 53);
 
     cr_assert_eq(vec2._x, 24);
     cr_assert_eq(vec2._y, 53);
@@ -22,10 +19,7 @@ Test(test_vector2u, test_vector2u_valid)
 
 Test(test_vector2u_print, test_vector2u_valid_print_operator)
 {
-    constexpr math::Vector2u vec2 = {
-        ._x = 24,
-        ._y = 53,
-    };
+    const math::Vector2u vec2(24, 53);
     const std::stringstream buffer;
     std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
 

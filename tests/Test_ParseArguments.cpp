@@ -13,7 +13,7 @@
 Test(parse_arguments, test_parse_arguments_valid)
 {
     const char *argv[2] = {"raytracer", "flake.nix"};
-    const bool result = raytracer::parser::parse_arguments(2, const_cast<char **>(argv));
+    const bool result = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv));
 
     cr_assert_eq(result, true);
 }
@@ -31,7 +31,7 @@ Test(parse_arguments, test_parse_arguments_invalid_filename)
 {
     try {
         const char *argv[2] = {"raytracer", "flake.nixxxxx"};
-        const bool __attribute__((unused)) rv = raytracer::parser::parse_arguments(2, const_cast<char **>(argv));
+        const bool __attribute__((unused)) rv = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv));
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.what(), "invalid config file: flake.nixxxxx file not found.");
     }
@@ -44,8 +44,8 @@ Test(parse_arguments, test_parse_arguments_version)
 
     const char *argv1[2] = {"raytracer", "-v"};
     const char *argv2[2] = {"raytracer", "--version"};
-    const bool rv1 = raytracer::parser::parse_arguments(2, const_cast<char **>(argv1));
-    const bool rv2 = raytracer::parser::parse_arguments(2, const_cast<char **>(argv2));
+    const bool rv1 = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv1));
+    const bool rv2 = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv2));
 
     std::cout.rdbuf(old);
     cr_assert_eq(rv1, false);
@@ -59,8 +59,8 @@ Test(parse_arguments, test_parse_arguments_usage)
 
     const char *argv1[2] = {"raytracer", "-h"};
     const char *argv2[2] = {"raytracer", "--help"};
-    const bool rv1 = raytracer::parser::parse_arguments(2, const_cast<char **>(argv1));
-    const bool rv2 = raytracer::parser::parse_arguments(2, const_cast<char **>(argv2));
+    const bool rv1 = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv1));
+    const bool rv2 = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv2));
 
     std::cout.rdbuf(old);
     cr_assert_eq(rv1, false);

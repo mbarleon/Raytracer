@@ -7,40 +7,43 @@
 
 #include "Tank.hpp"
 
-raytracer::restir_tank::restir_tank(): weightSum(0.0), count(0)
+raytracer::Tank::Tank(): weightSum(0.0), count(0)
 {
+    sample.pdf = 0.0;
 }
 
-void raytracer::restir_tank::add(const LightSample &candidate, double w, std::mt19937 &gen)
+void raytracer::Tank::add(const LightSample &candidate, const double w, std::mt19937 &gen)
 {
+    const double wNum = w * w;
+
+    weightSum += wNum;
     ++count;
-    weightSum += w;
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) * weightSum < w) {
+
+    if (std::uniform_real_distribution<> dist(0.0, 1.0); dist(gen) < wNum / weightSum) {
         sample = candidate;
     }
 }
 
-void raytracer::restir_tank::merge(const struct restir_tank &other, std::mt19937 &gen)
+void raytracer::Tank::merge(const struct Tank &other, std::mt19937 &gen)
 {
-    if (other.weightSum <= 0.0)
+    if (other.weightSum <= 0.0) {
         return;
+    }
 
     weightSum += other.weightSum;
     count += other.count;
 
-    std::uniform_real_distribution<> dist(0.0, 1.0);
-    if (dist(gen) * weightSum < other.weightSum) {
+    if (std::uniform_real_distribution<> dist(0.0, 1.0); dist(gen) < other.weightSum / weightSum) {
         sample = other.sample;
     }
 }
 
-math::RGBColor raytracer::restir_tank::estimate() const
+math::RGBColor raytracer::Tank::estimate() const
 {
     return sample.radiance;
 }
 
-void raytracer::restir_tank::clear()
+void raytracer::Tank::clear()
 {
     sample.radiance = math::RGBColor(0);
     sample.pdf = 0.0;

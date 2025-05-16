@@ -10,6 +10,7 @@
 #include "../Elements/Scene/Lights/Point/Point.hpp"
 #include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
 #include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
+#include "../Elements/Scene/Materials/BSDF/Metal/Metal.hpp"
 #include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
 #include "../Elements/Scene/Shapes/Plane/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
@@ -53,9 +54,7 @@ T get_value(const ParsedJson &proto)
 template<typename ShapeCreator>
 unit_static void emplace_shapes(const JsonMap &primitives, const std::string &key, IShapesList &shapes, ShapeCreator creator)
 {
-    const auto it = primitives.find(key);
-
-    if (it != primitives.end() && std::holds_alternative<Shapes>(it->second.value)) {
+    if (const auto it = primitives.find(key); it != primitives.end() && std::holds_alternative<Shapes>(it->second.value)) {
 
         const auto &shape_array = std::get<Shapes>(it->second.value);
 
@@ -70,9 +69,7 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 template<typename LightCreator>
 unit_static void emplace_lights(const JsonMap &lights, const std::string &key, ILightsList &lightSrc, LightCreator creator)
 {
-    const auto it = lights.find(key);
-
-    if (it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
+    if (const auto it = lights.find(key); it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
 
         const auto &light_array = std::get<Shapes>(it->second.value);
 
@@ -158,25 +155,32 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
  * @brief get material from ParsedJson
  * @details uses get_string for material name lookup
  * @param proto ParsedJson object
- * @param materials MaterialsList to search
- * @return shared pointer to Material
+ * @return struct Material
  */
 unit_static raytracer::material::Material get_material(const JsonMap &obj)
 {
     const std::string materialId = get_string(obj.at("material"));
     std::shared_ptr<raytracer::material::BSDF> bsdf;
 
-    if (materialId == std::string("diffuse")) {
-        bsdf = std::make_shared<raytracer::material::DiffuseBSDF>();
-    } else if (materialId == std::string("specular")) {
-        bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
-    } else if (materialId == std::string("dielectric")) {
-        const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
-        const double ior_in = get_value<double>(refract_obj.at("inside"));
-        const double ior_out = get_value<double>(refract_obj.at("outside"));
-        bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
-    } else {
-        throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
+    try {
+        if (materialId == std::string("diffuse")) {
+            bsdf = std::make_shared<raytracer::material::DiffuseBSDF>();
+        } else if (materialId == std::string("specular")) {
+            bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
+        } else if (materialId == std::string("dielectric")) {
+            const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
+            const double ior_in = get_value<double>(refract_obj.at("inside"));
+            const double ior_out = get_value<double>(refract_obj.at("outside"));
+            bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
+        } else if (materialId == std::string("metal")) {
+            const auto color = get_color(obj.at("color"));
+            const double roughness = get_value<double>(obj.at("roughness"));
+            bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
+        } else {
+            throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
+        }
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Bad material allocation", e.what());
     }
     return raytracer::material::Material(bsdf);
 }
@@ -227,10 +231,17 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const double radius = get_value<double>(obj.at("radius"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
-    const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::Sphere> sphere = nullptr;
 
-    sphere.get()->setMaterial(material);
-    sphere.get()->setColor(color);
+    try {
+        sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Sphere bad allocation", e.what());
+    }
+    sphere->setMaterial(material);
+    sphere->setColor(color);
+    sphere->setShininess(shininess);
     return sphere;
 }
 
@@ -249,11 +260,17 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
-    const std::shared_ptr<raytracer::shape::Rectangle> rectangle =
-        std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::Rectangle> rectangle = nullptr;
 
-    rectangle.get()->setMaterial(material);
-    rectangle.get()->setColor(color);
+    try {
+        rectangle = std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Rectangle bad allocation", e.what());
+    }
+    rectangle->setMaterial(material);
+    rectangle->setColor(color);
+    rectangle->setShininess(shininess);
     return rectangle;
 }
 
@@ -270,16 +287,23 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
     const double position = get_value<double>(obj.at("position"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
+    const double shininess = get_value<double>(obj.at("shininess"));
     const std::string str = get_string(obj.at("axis"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z') {
         throw raytracer::exception::Error("Core", "Invalid plane axis");
     }
 
-    const std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    std::shared_ptr<raytracer::shape::Plane> plane = nullptr;
 
-    plane.get()->setMaterial(material);
-    plane.get()->setColor(color);
+    try {
+        plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Plane bad allocation", e.what());
+    }
+    plane->setMaterial(material);
+    plane->setColor(color);
+    plane->setShininess(shininess);
     return plane;
 }
 
@@ -297,10 +321,17 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
+    const double shininess = get_value<double>(obj.at("shininess"));
+    std::shared_ptr<raytracer::shape::STLShape> stl = nullptr;
 
-    auto stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
+    try {
+        stl = std::make_shared<raytracer::shape::STLShape>(origin, rotation, filename.c_str(), scale);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "STL bad allocation", e.what());
+    }
     stl->setMaterial(material);
     stl->setColor(color);
+    stl->setShininess(shininess);
     return stl;
 }
 
@@ -336,27 +367,32 @@ std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json)
  * @brief entry Point: Create render settings
  * @details uses get_value for JsonMap and other extractions
  * @param render_json ParsedJson object
- * @return unique pointer to RenderConfig
+ * @return unique pointer to Render
  */
-const raytracer::RenderConfig create_render(const ParsedJson &render_json)
+raytracer::RenderConfig create_render(const ParsedJson &render_json)
 {
     const auto &obj = get_value<JsonMap>(render_json);
     const auto &anti_obj = get_value<JsonMap>(obj.at("antialiasing"));
-    const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<double>(anti_obj.at("samples"))),
-        static_cast<unsigned int>(get_value<double>(anti_obj.at("radius")))};
 
-    const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
+    const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<int>(anti_obj.at("samples"))),
+        get_string(anti_obj.at("mode"))};
+
+    const math::RGBColor background = get_color(obj.at("background-color"));
 
     const auto &light_obj = get_value<JsonMap>(obj.at("lighting"));
-    const raytracer::Lighting light = {get_value<double>(light_obj.at("ambient")), get_value<double>(light_obj.at("diffuse")),
-        get_value<double>(light_obj.at("specular"))};
+    const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
+    const raytracer::AmbientOcclusion ambient = {get_value<double>(light_ambient_obj.at("coef")),
+        static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))};
+    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")), ambient,
+        get_value<double>(light_obj.at("diffuse")), get_value<double>(light_obj.at("specular"))};
+
+    const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return {anti, mdepth, light, output};
+    return {anti, background, light, mdepth, output};
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///
@@ -368,9 +404,12 @@ ILightsList light_factory(const ParsedJson &json_lights)
     const auto &lights = get_value<JsonMap>(json_lights);
     ILightsList lightSrc;
 
-    emplace_lights(lights, "points", lightSrc, create_light_point);
-    emplace_lights(lights, "directionals", lightSrc, create_light_directional);
-
+    try {
+        emplace_lights(lights, "points", lightSrc, create_light_point);
+        emplace_lights(lights, "directionals", lightSrc, create_light_directional);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Light bad allocation", e.what());
+    }
     return lightSrc;
 }
 

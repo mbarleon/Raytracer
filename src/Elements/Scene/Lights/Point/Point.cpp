@@ -8,7 +8,7 @@
 #include "Point.hpp"
 #include "Logger.hpp"
 
-raytracer::light::Point::Point(const math::RGBColor &color, const math::Point3D &position, double intensity)
+raytracer::light::Point::Point(const math::RGBColor &color, const math::Point3D &position, const double intensity)
     : ALight(color, intensity), _position(position)
 {
     logger::debug("Light point was built: ", position, ".");

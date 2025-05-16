@@ -93,7 +93,6 @@ class Render final : public NonCopyable
             _forEach( [&ppm] (const auto &pixel, const math::Vector2u &)
                 {
                     math::RGBColor color = pixel.estimate();
-                    color.realign();
                     ppm << static_cast<int>(color._x) << ' ' << static_cast<int>(color._y) << ' ' << static_cast<int>(color._z) << '\n';
                 }, const_cast<Grid &>(grid), {width, height});
         }
@@ -125,7 +124,6 @@ class Render final : public NonCopyable
                         color = pixel;
                     }
                     color.realign();
-
                     buffer.setPixel(pos._x, pos._y, sf::Color( static_cast<u8>(color._x), static_cast<u8>(color._y), static_cast<u8>(color._z)));
                 }, const_cast<Grid &>(grid), {width, height});
 

@@ -8,9 +8,8 @@
 #pragma once
 
 #include "../Elements/Camera/Camera.hpp"
-#include "../Elements/Render/Render.hpp"
+#include "../Elements/Render/RenderConfig.hpp"
 #include "../Elements/Scene/Lights/ILight.hpp"
-#include "../Elements/Scene/Materials/Material.hpp"
 #include "../Elements/Scene/Shapes/IShape.hpp"
 #include "../Parser/ParserTypes.hpp"
 #include <memory>
@@ -28,7 +27,7 @@ using IShapesList = std::vector<std::shared_ptr<raytracer::shape::IShape>>;
 ILightsList light_factory(const ParsedJson &json_lights);
 IShapesList primitive_factory(const ParsedJson &json_primitives);
 std::unique_ptr<raytracer::Camera> create_camera(const ParsedJson &camera_json);
-const raytracer::RenderConfig create_render(const ParsedJson &render_json);
+raytracer::RenderConfig create_render(const ParsedJson &render_json);
 
 #if defined(UNIT_TESTS)
     #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"

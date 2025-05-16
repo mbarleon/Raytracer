@@ -16,7 +16,7 @@ math::Vector3D raytracer::material::reflect(const math::Vector3D &I,
 }
 
 math::Vector3D raytracer::material::refract(const math::Vector3D &I,
-    const math::Vector3D &N, double eta)
+    const math::Vector3D &N, const double eta)
 {
     const double cosi = std::clamp((-I).dot(N), -1.0, 1.0);
     const double sint2 = eta * eta * (1.0 - cosi * cosi);
@@ -25,8 +25,8 @@ math::Vector3D raytracer::material::refract(const math::Vector3D &I,
     return eta * I + (eta * cosi - cost) * N;
 }
 
-double raytracer::material::reflectance(double cosTheta, double iorI,
-    double iorTransmitted)
+double raytracer::material::reflectance(const double cosTheta, const double iorI,
+    const double iorTransmitted)
 {
     double r0 = (iorI - iorTransmitted) / (iorI + iorTransmitted);
 
@@ -34,18 +34,19 @@ double raytracer::material::reflectance(double cosTheta, double iorI,
     return r0 + (1.0f - r0) * std::pow(1.0f - cosTheta, 5.0f);
 }
 
-math::Vector3D raytracer::material::cosineHemisphere(const math::Vector3D &N)
+math::Vector3D raytracer::material::cosineHemisphere(const math::Vector3D &N,
+    std::mt19937 &rng)
 {
-    double r1 = getRandomDouble();
-    double r2 = getRandomDouble();
+    const double r1 = getRandomDouble(rng);
+    const double r2 = getRandomDouble(rng);
 
-    double phi = 2 * M_PI * r1;
-    double x = std::cos(phi) * std::sqrt(r2);
-    double y = std::sin(phi) * std::sqrt(r2);
-    double z = std::sqrt(1.0 - r2);
+    const double phi = 2 * M_PI * r1;
+    const double x = std::cos(phi) * std::sqrt(r2);
+    const double y = std::sin(phi) * std::sqrt(r2);
+    const double z = std::sqrt(1.0 - r2);
 
-    math::Vector3D u = N.orthonormal();
-    math::Vector3D v = N.cross(u);
+    const math::Vector3D u = N.orthonormal().cross(N).normalize();
+    const math::Vector3D v = N.cross(u);
 
     return (u * x + v * y + N * z).normalize();
 }

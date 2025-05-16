@@ -32,7 +32,6 @@ typedef struct Vector2u {
     {
         /* __ctor__ */
     }
-
 } Vector2u;
 // clang-format on
 

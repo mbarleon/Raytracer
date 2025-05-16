@@ -32,7 +32,7 @@ Test(progress_bar, test_progress_bar)
     const std::stringstream buffer;
     std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
 
-    const float y = 100.f;
+    constexpr float y = 100.f;
 
     for (float ny = 0.f; ny < y; ++ny) {
         raytracer::logger::progress_bar(y, ny);
@@ -47,7 +47,7 @@ Test(progress_bar, test_progress_bar_failed)
     const std::stringstream buffer;
     std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
 
-    const float y = 0.f;
+    constexpr float y = 0.f;
 
     for (float ny = 0.f; ny < y; ++ny) {
         raytracer::logger::progress_bar(y, ny);

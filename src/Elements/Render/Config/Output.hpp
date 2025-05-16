@@ -11,9 +11,9 @@
 
 // clang-format off
 namespace raytracer {
-typedef struct render_output {
+struct RenderOutput {
     std::string file;
     std::string format;
-} RenderOutput;
-};// namespace raytracer
+};
+}// namespace raytracer
 // clang-format on

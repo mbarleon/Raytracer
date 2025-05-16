@@ -41,7 +41,7 @@ function _debug()
     _success "command 'cmake' found, building..."
     mkdir -p build
     cd build || _error "mkdir failed"
-    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
+    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DENABLE_DEBUG=ON
     # INFO: Epitech's moulinette does: `cmake --build .` but this is slow as fuc
     if make -j"$(nproc)" raytracer; then
         _success "compiled raytracer"
@@ -84,7 +84,7 @@ function _clean()
 function _fclean()
 {
     _clean
-    rm -rf raytracer unit_tests plugins code_coverage.txt unit_tests-*.profraw unit_tests.profdata
+    rm -rf raytracer unit_tests plugins code_coverage.txt unit_tests-*.profraw unit_tests.profdata vgcore* cmake-build-debug
 }
 
 for args in "$@"
@@ -97,6 +97,7 @@ USAGE:
 
 ARGUMENTS:
       $0 [-h|--help]    displays this message
+      $0 [-d|--debug]   debug flags compilation
       $0 [-c|--clean]   clean the project
       $0 [-f|--fclean]  fclean the project
       $0 [-t|--tests]   run unit tests

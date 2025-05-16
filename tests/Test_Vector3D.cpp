@@ -7,6 +7,8 @@
 
 #include "../src/Maths/Vector3D.hpp"
 #include <criterion/criterion.h>
+#include <sstream>
+#include <streambuf>
 
 Test(Vector3D, default_constructor)
 {
@@ -26,10 +28,12 @@ Test(Vector3D, parameterized_constructor)
     cr_assert_eq(v._z, 3.0);
 }
 
+#include <iostream>
 Test(Vector3D, general_operations)
 {
     const math::Vector3D a(1.0, 2.0, 3.0);
     const math::Vector3D b(4.0, 5.0, 6.0);
+    const math::Vector3D e(3.0, 3.0, 3.0);
     math::Vector3D c = a + b;
 
     cr_assert((c += a)._z == 12);
@@ -42,6 +46,7 @@ Test(Vector3D, general_operations)
     c = c / 2;
     c *= 2;
     c /= 2;
+    cr_assert_eq(b - a, e);
     cr_assert_eq(c._x, 5.0);
     cr_assert_eq(c._y, 7.0);
     cr_assert_eq(c._z, 9.0);
@@ -144,4 +149,17 @@ Test(Vector3D, different)
     cr_assert(a != d);
     cr_assert(a != e);
     cr_assert_eq(a != b, false);
+}
+
+Test(Vector3D, test_vector3d_print)
+{
+    const math::Vector3D vec3(1.0, 2.0, 3.0);
+    const std::stringstream buffer;
+    std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
+
+    std::cout << vec3 << std::endl;
+    std::cout.rdbuf(old);
+    cr_assert(buffer.str().find("1") != std::string::npos);
+    cr_assert(buffer.str().find("2") != std::string::npos);
+    cr_assert(buffer.str().find("3") != std::string::npos);
 }

@@ -20,7 +20,7 @@ struct Ray {
     Point3D _origin;
     Vector3D _dir;
 
-    [[nodiscard]] Point3D at( double t) const noexcept;
+    [[nodiscard]] Point3D at(const double t) const noexcept;
 };
 // clang-format on
 }// namespace math

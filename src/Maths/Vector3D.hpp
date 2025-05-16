@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <ostream>
+
 namespace math {
 class Vector3D
 {
@@ -16,13 +18,16 @@ class Vector3D
         double _z;
 
         explicit Vector3D();
-        explicit Vector3D(double x, double y, double z);
+        explicit Vector3D(const double all);
+        explicit Vector3D(const double x, const double y, const double z);
 
         [[nodiscard]] double length() const;
+        [[nodiscard]] double lengthSquared() const;
 
         Vector3D operator+(const Vector3D &other) const;
         Vector3D &operator+=(const Vector3D &other);
 
+        Vector3D operator-() const;
         Vector3D operator-(const Vector3D &other) const;
         Vector3D &operator-=(const Vector3D &other);
 
@@ -32,19 +37,32 @@ class Vector3D
         Vector3D operator/(const Vector3D &other) const;
         Vector3D &operator/=(const Vector3D &other);
 
-        Vector3D operator*(double scalar) const;
-        Vector3D &operator*=(double scalar);
+        Vector3D operator*(const double scalar) const;
+        Vector3D &operator*=(const double scalar);
 
-        Vector3D operator/(double scalar) const;
-        Vector3D &operator/=(double scalar);
+        Vector3D operator/(const double scalar) const;
+        Vector3D &operator/=(const double scalar);
 
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;
+        [[nodiscard]] Vector3D orthonormal() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
+        [[nodiscard]] double maxComponent() const;
+        [[nodiscard]] bool nearZero() const;
+        static Vector3D applyRotation(const Vector3D &dir, const Vector3D &rot);
 
         bool operator==(const Vector3D &other) const;
         bool operator!=(const Vector3D &other) const;
 };
+
+/**
+ * @brief operator `<<` (iostream | ostream)
+ * @details this operator is declared outside Vector3D to avoid `friend` keyword.
+ * it allows you to std::cout << "vector: " << my_vector3D << std::endl;
+ * the vector is shown as: `{x, y, z}`
+ * @return the result (vector)
+ */
+std::ostream &operator<<(std::ostream &os, const Vector3D &self);
 
 /**
  * @brief operator `*` (scalar, vector)
@@ -62,4 +80,5 @@ inline Vector3D operator*(const double scalar, const Vector3D &vector)
 * we better have to use a `using` macro to create another type.
 */
 using Point3D = Vector3D;
+using RGBColor = Vector3D;
 }// namespace math

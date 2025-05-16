@@ -8,8 +8,10 @@
 #include "Logger.hpp"
 #include <criterion/criterion.h>
 #include <iostream>
+#include <sstream>
+#include <streambuf>
 
-Test(debug, test_logger_debug)
+Test(error, test_logger_error)
 {
     const std::stringstream buffer;
     std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
@@ -23,4 +25,34 @@ Test(debug, test_logger_debug)
     std::cerr.rdbuf(old);
 
     cr_assert(buffer.str().find("wrong") != std::string::npos);
+}
+
+Test(progress_bar, test_progress_bar)
+{
+    const std::stringstream buffer;
+    std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
+
+    constexpr float y = 100.f;
+
+    for (float ny = 0.f; ny < y; ++ny) {
+        raytracer::logger::progress_bar(y, ny);
+    }
+    raytracer::logger::progress_bar(y, y);
+    std::cerr.rdbuf(old);
+    cr_assert(buffer.str().find("[") != std::string::npos);
+}
+
+Test(progress_bar, test_progress_bar_failed)
+{
+    const std::stringstream buffer;
+    std::streambuf *old = std::cerr.rdbuf(buffer.rdbuf());
+
+    constexpr float y = 0.f;
+
+    for (float ny = 0.f; ny < y; ++ny) {
+        raytracer::logger::progress_bar(y, ny);
+    }
+    raytracer::logger::progress_bar(y, y);
+    std::cerr.rdbuf(old);
+    cr_assert(buffer.str().empty() == true);
 }

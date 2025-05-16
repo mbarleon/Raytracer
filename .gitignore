@@ -54,3 +54,9 @@ compile_commands.json
 build/
 !CMakeLists.txt
 cmake-build-debug/
+
+# Temporary image exclusion
+*.ppm
+*.png
+*.stl
+!tests/test-examples/test.stl

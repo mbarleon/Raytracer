@@ -23,3 +23,21 @@
 #else
     #define unit_static static
 #endif
+
+/**
+* @brief DEFAULT MACROS
+* @details default general macros to avoid magic numbers everywhere
+*/
+
+#define DEFAULT_IDENTATION 0
+#define DEFAULT_FIELD_OF_VIEW 70
+
+/**
+* @brief Math Pi / 180.0
+*/
+#define DEGREE_TO_RADIANT 0.017453292519943295
+
+#define MAX_COLOR 255.0
+#define MIN_COLOR 0.0
+
+static constexpr double EPSILON = 1e-8;

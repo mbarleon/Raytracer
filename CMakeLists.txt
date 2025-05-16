@@ -40,12 +40,16 @@ file (GLOB PARSER_SOURCE
 file(GLOB_RECURSE SCENE_SOURCE
     "src/Elements/*.cpp")
 
+file(GLOB_RECURSE UI_SOURCE
+    "src/UI/*.cpp")
+
 
 add_executable(raytracer
     ${UTILS_SOURCE}
     ${MATH_SOURCE}
     ${SCENE_SOURCE}
     ${PARSER_SOURCE}
+    ${UI_SOURCE}
     ${CORE_SOURCE}
     ${MAIN_SOURCE}
 )
@@ -60,6 +64,7 @@ if(ENABLE_DEBUG)
 endif()
 
 target_include_directories(raytracer PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(raytracer PRIVATE sfml-graphics sfml-system sfml-window)
 
 ########################################
 
@@ -71,6 +76,7 @@ add_executable(unit_tests
     ${MATH_SOURCE}
     ${SCENE_SOURCE}
     ${PARSER_SOURCE}
+    ${UI_SOURCE}
     ${CORE_SOURCE}
     ${TEST_SOURCE}
 )
@@ -85,7 +91,7 @@ endif()
 
 target_compile_definitions(unit_tests PRIVATE UNIT_TESTS=1)
 
-target_link_libraries(unit_tests PRIVATE criterion)
+target_link_libraries(unit_tests PRIVATE criterion sfml-graphics sfml-system sfml-window)
 
 target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 

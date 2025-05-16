@@ -9,9 +9,8 @@
 
 #include "../Elements/Camera/Camera.hpp"
 #include "../Elements/Render/RenderConfig.hpp"
-#include "../Elements/Scene/Materials/Material.hpp"
-#include "../Elements/Scene/Shapes/IShape.hpp"
 #include "../Elements/Scene/Lights/ILight.hpp"
+#include "../Elements/Scene/Shapes/IShape.hpp"
 #include "../Parser/ParserTypes.hpp"
 #include <memory>
 

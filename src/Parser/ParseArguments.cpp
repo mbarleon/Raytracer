@@ -50,7 +50,7 @@ EXAMPLES:
 }
 #endif
 
-bool raytracer::parser::parse_arguments(const int argc, char **argv)
+bool raytracer::parser::parse_arguments(const int argc, const char **argv)
 {
     if (argc != 2) {
         throw exception::Error("parser::parse_arguments", "invalid number of arguments");

@@ -6,17 +6,16 @@
 */
 
 #include "CoreFactory.hpp"
-#include "../../include/Logger.hpp"
+#include "../Elements/Scene/Lights/Directional/Directional.hpp"
+#include "../Elements/Scene/Lights/Point/Point.hpp"
+#include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
+#include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
+#include "../Elements/Scene/Materials/BSDF/Metal/Metal.hpp"
+#include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
 #include "../Elements/Scene/Shapes/Plane/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
-#include "../Elements/Scene/Lights/Point/Point.hpp"
-#include "../Elements/Scene/Lights/Directional/Directional.hpp"
-#include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
-#include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
-#include "../Elements/Scene/Materials/BSDF/Dielectric/Dielectric.hpp"
-#include "../Elements/Scene/Materials/BSDF/Metal/Metal.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -68,8 +67,7 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 }
 
 template<typename LightCreator>
-unit_static void emplace_lights(const JsonMap &lights, const std::string &key,
-    ILightsList &lightSrc, LightCreator creator)
+unit_static void emplace_lights(const JsonMap &lights, const std::string &key, ILightsList &lightSrc, LightCreator creator)
 {
     if (const auto it = lights.find(key); it != lights.end() && std::holds_alternative<Shapes>(it->second.value)) {
 
@@ -179,7 +177,7 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
             const double roughness = get_value<double>(obj.at("roughness"));
             bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
         } else {
-            throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'"); 
+            throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
         }
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "Bad material allocation", e.what());
@@ -383,25 +381,18 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
 
     const auto &light_obj = get_value<JsonMap>(obj.at("lighting"));
     const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
-    const raytracer::AmbientOcclusion ambient = {
-        get_value<double>(light_ambient_obj.at("coef")),
-        static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))
-    };
-    const raytracer::Lighting light = {
-        get_value<double>(light_obj.at("gamma")),
-        ambient,
-        get_value<double>(light_obj.at("diffuse")),
-        get_value<double>(light_obj.at("specular"))
-    };
+    const raytracer::AmbientOcclusion ambient = {get_value<double>(light_ambient_obj.at("coef")),
+        static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))};
+    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")), ambient,
+        get_value<double>(light_obj.at("diffuse")), get_value<double>(light_obj.at("specular"))};
 
     const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return { anti, background, light, mdepth, output };
+    return {anti, background, light, mdepth, output};
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///

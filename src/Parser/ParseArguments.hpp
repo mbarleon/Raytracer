@@ -11,7 +11,7 @@
 
 namespace raytracer::parser {
 
-[[nodiscard]] bool parse_arguments(int argc, char **argv);
+[[nodiscard]] bool parse_arguments(const int argc, const char **argv);
 
 #if defined(UNIT_TESTS)
 unit_static bool filepath_exists(const char *RESTRICT filepath);

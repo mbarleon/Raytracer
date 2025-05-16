@@ -171,8 +171,7 @@ std::ostream &math::operator<<(std::ostream &os, const math::Vector3D &self)
 
 bool math::Vector3D::nearZero() const
 {
-    return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) &&
-        (std::fabs(_z) < EPSILON);
+    return (std::fabs(_x) < EPSILON) && (std::fabs(_y) < EPSILON) && (std::fabs(_z) < EPSILON);
 }
 
 math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const math::Vector3D &rot)
@@ -191,9 +190,6 @@ math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const ma
     const double m21 = cosY * sinX;
     const double m22 = cosY * cosX;
 
-    return math::Vector3D(
-        m00 * dir._x + m01 * dir._y + m02 * dir._z,
-        m10 * dir._x + m11 * dir._y + m12 * dir._z,
-        m20 * dir._x + m21 * dir._y + m22 * dir._z
-    );
+    return math::Vector3D(m00 * dir._x + m01 * dir._y + m02 * dir._z, m10 * dir._x + m11 * dir._y + m12 * dir._z,
+        m20 * dir._x + m21 * dir._y + m22 * dir._z);
 }

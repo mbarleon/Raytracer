@@ -6,22 +6,20 @@
 */
 
 #include "Camera.hpp"
+#include "../Render/ReSTIR/Tank.hpp"
 #include "Logger.hpp"
+#include "Logic/Pathtracer.hpp"
+#include <algorithm>
 #include <atomic>
-#include <fstream>
 #include <mutex>
 #include <random>
 #include <sys/stat.h>
 #include <thread>
-#include <algorithm>
-#include "../../Maths/Intersect.hpp"
-#include "../Render/ReSTIR/Tank.hpp"
-#include "Logic/Pathtracer.hpp"
 
 // clang-format off
 
 raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D &position,
-    const math::Vector3D &rotation, const unsigned int fov) : _resolution(resolution),
+    const math::Vector3D &rotation, const uint fov) : _resolution(resolution),
     _position(position), _rotation(rotation), _fov(fov)
 {
     logger::debug("Camera was built: resolution ", resolution, " position ", position,
@@ -34,19 +32,14 @@ raytracer::Camera::Camera(const math::Vector2u &resolution, const math::Point3D 
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int getPixelColor(const double c, double gamma)
+const math::Vector2u raytracer::Camera::getResolution() const noexcept
 {
-    double mapped = c / (1.0 + c);
-    mapped = std::clamp(mapped, 0.0, 1.0);
+    return _resolution;
+}
 
-    const double g = std::pow(mapped, 1.0 / gamma);
-    return static_cast<int>(g * 255.0 + 0.5);
-};
-
-void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights,
-    const RenderConfig &config) const
+const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights, const RenderConfig &config) const
 {
-    const unsigned int nproc = std::thread::hardware_concurrency();
+    const uint nproc = std::thread::hardware_concurrency();
 
     if (nproc == 0) {
         throw exception::Error("raytracer::Camera::render()", "No threads available");
@@ -62,7 +55,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
     }
 
     std::atomic<unsigned> linesDone(0);
-    std::vector<std::vector<Tank>> restirGrid(_resolution._y, std::vector<Tank>(_resolution._x));
+    RaytraceGrid2D restirGrid(_resolution._y, std::vector<Tank>(_resolution._x));
 
     const auto sparseWorker = [&](const unsigned threadId) {
         std::mt19937 rng = material::getRng(threadId, _resolution._x, _resolution._y);
@@ -107,23 +100,7 @@ void raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lig
         t.join();
     }
 
-    // TODO: restir spatial merge
-
-    // image generation
-    std::ofstream ppm(config.output.file);
-
-    if (!ppm) {
-        throw exception::Error("Camera", "Unable to open output file.");
-    }
-    ppm << "P3\n" << _resolution._x << " " << _resolution._y << "\n255\n";
-    for (unsigned y = 0; y < _resolution._y; ++y) {
-        for (unsigned x = 0; x < _resolution._x; ++x) {
-            const math::RGBColor pixel = restirGrid[y][x].estimate();
-            ppm << getPixelColor(pixel._x, config.lighting.gamma) << ' '
-                << getPixelColor(pixel._y, config.lighting.gamma) << ' '
-                << getPixelColor(pixel._z, config.lighting.gamma) << '\n';
-        }
-    }
+    return restirGrid;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

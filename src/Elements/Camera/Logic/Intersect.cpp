@@ -8,8 +8,8 @@
 #include "Pathtracer.hpp"
 #include <limits>
 
-bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes,
-    math::Intersect &intersect, const bool cullBackFaces)
+bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList &shapes, math::Intersect &intersect,
+    const bool cullBackFaces)
 {
     double distMin = std::numeric_limits<double>::infinity();
     math::Point3D intersectPoint;

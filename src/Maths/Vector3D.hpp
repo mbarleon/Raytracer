@@ -21,6 +21,17 @@ class Vector3D
         explicit Vector3D(const double all);
         explicit Vector3D(const double x, const double y, const double z);
 
+        /**
+         * @brief __ctor__
+         * @details construct a vector3d with <Any> type
+         */
+        template<typename T, typename U, typename V,
+            typename = std::enable_if_t<std::is_arithmetic_v<T> && std::is_arithmetic_v<U> && std::is_arithmetic_v<V>>>
+        explicit Vector3D(T x, U y, V z) : _x(static_cast<double>(x)), _y(static_cast<double>(y)), _z(static_cast<double>(z))
+        {
+            /* __ctor__ */
+        }
+
         [[nodiscard]] double length() const;
         [[nodiscard]] double lengthSquared() const;
 

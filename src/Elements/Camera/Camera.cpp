@@ -37,15 +37,6 @@ const math::Vector2u raytracer::Camera::getResolution() const noexcept
     return _resolution;
 }
 
-int getPixelColor(const double c, double gamma)
-{
-    double mapped = c / (1.0 + c);
-    mapped = std::clamp(mapped, 0.0, 1.0);
-
-    const double g = std::pow(mapped, 1.0 / gamma);
-    return static_cast<int>(g * 255.0 + 0.5);
-};
-
 const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &shapes, const ILightsList &lights, const RenderConfig &config) const
 {
     const uint nproc = std::thread::hardware_concurrency();

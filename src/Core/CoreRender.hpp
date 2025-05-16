@@ -54,6 +54,23 @@ static void _forEach(const Func &&func, Grid &grid, const math::Vector2u size = 
 
 }
 
+static inline double getPixelColor(const double c, const double gamma)
+{
+    double mapped = c / (1.0 + c);
+
+    mapped = std::clamp(mapped, 0.0, 1.0);
+
+    const double g = std::pow(mapped, 1.0 / gamma);
+
+    return (g * 255.0 + 0.5);
+}
+
+static inline void realignColor(math::RGBColor &color, const double gamma)
+{
+    color._x = getPixelColor(color._x, gamma);
+    color._y = getPixelColor(color._y, gamma);
+    color._z = getPixelColor(color._z, gamma);
+};
 
 /**
 * @class Render
@@ -105,7 +122,7 @@ class Render final : public NonCopyable
         * @return the converted PixelBuffer.
         */
         template<typename Grid>
-        static const PixelBuffer toImage(const Grid &grid)
+        static const PixelBuffer toImage(const Grid &grid, const double gamma)
         {
             const auto height = grid.size();
             const auto width = height > 0 ? grid.front().size() : 0;
@@ -113,7 +130,7 @@ class Render final : public NonCopyable
             PixelBuffer buffer;
             buffer.create(static_cast<uint>(width), static_cast<uint>(height));
 
-            _forEach([&buffer](const auto &pixel, const math::Vector2u &pos)
+            _forEach([&buffer, &gamma](const auto &pixel, const math::Vector2u &pos)
                 {
                     math::RGBColor color;
 
@@ -123,7 +140,7 @@ class Render final : public NonCopyable
                     } else {
                         color = pixel;
                     }
-                    color.realign();
+                    realignColor(color, gamma);
                     buffer.setPixel(pos._x, pos._y, sf::Color( static_cast<u8>(color._x), static_cast<u8>(color._y), static_cast<u8>(color._z)));
                 }, const_cast<Grid &>(grid), {width, height});
 
@@ -136,7 +153,7 @@ class Render final : public NonCopyable
         * @param shapes the list of shapes in the scene.
         * @param camera the camera used to render the scene.
         */
-        static const PixelBuffer toPreview(const IShapesList &shapes, const Camera &camera);
+        static const PixelBuffer toPreview(const IShapesList &shapes, const Camera &camera, const double gamma);
 
 };
 

@@ -60,7 +60,6 @@ class Vector3D
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
         [[nodiscard]] double maxComponent() const;
         [[nodiscard]] bool nearZero() const;
-        void realign() noexcept;
         static Vector3D applyRotation(const Vector3D &dir, const Vector3D &rot);
 
         bool operator==(const Vector3D &other) const;

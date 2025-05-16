@@ -83,7 +83,7 @@ void raytracer::core::Application::setupConfig(const char *RESTRICT filename)
 */
 void raytracer::core::Application::setupPreview()
 {
-    _pixelBuffer = Render::toPreview(_shapes, *_camera);
+    _pixelBuffer = Render::toPreview(_shapes, *_camera, _config.lighting.gamma);
     _scene_preview = std::make_shared<ui::UIScenePreview>(_pixelBuffer);
     _ui->getContainer().addWidget(_scene_preview);
 }
@@ -98,12 +98,12 @@ void raytracer::core::Application::raytrace()
     static bool is_on = false;
 
     if (is_on) {
-        _pixelBuffer = Render::toPreview(_shapes, *_camera);
+        _pixelBuffer = Render::toPreview(_shapes, *_camera, _config.lighting.gamma);
 
     } else {
         const RaytraceGrid2D grid2d = _camera->render(_shapes, _lights, _config);
 
-        _pixelBuffer = Render::toImage(grid2d);
+        _pixelBuffer = Render::toImage(grid2d, _config.lighting.gamma);
     }
 
     _scene_preview->setImage(_pixelBuffer);

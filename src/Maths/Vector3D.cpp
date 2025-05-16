@@ -193,19 +193,3 @@ math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const ma
     return math::Vector3D(m00 * dir._x + m01 * dir._y + m02 * dir._z, m10 * dir._x + m11 * dir._y + m12 * dir._z,
         m20 * dir._x + m21 * dir._y + m22 * dir._z);
 }
-
-void math::Vector3D::realign() noexcept
-{
-    _x = sqrt(_x);
-    _y = sqrt(_y);
-    _z = sqrt(_z);
-    if (_x > 0.999)
-        _x = 0.999;
-    if (_y > 0.999)
-        _y = 0.999;
-    if (_z > 0.999)
-        _z = 0.999;
-    _x *= 256;
-    _y *= 256;
-    _z *= 256;
-}

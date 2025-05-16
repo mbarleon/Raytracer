@@ -44,7 +44,7 @@ void raytracer::core::Render::toPPM(const sf::Image &image, const char *filename
 * @param shapes the list of shapes in the scene.
 * @param camera the camera used to render the scene.
 */
-const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesList &shapes, const Camera &camera)
+const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesList &shapes, const Camera &camera, const double gamma)
 {
     const math::Vector2u resolution = camera.getResolution();
     const uint width = resolution._x;
@@ -70,7 +70,7 @@ const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesLis
 
     }, grid2d, resolution);
 
-    return toImage(grid2d);
+    return toImage(grid2d, gamma);
 }
 
 /**

@@ -29,6 +29,12 @@ math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D __att
     return math::RGBColor(1);
 }
 
+void raytracer::shape::Rectangle::getUV(const math::Point3D __attribute__((unused)) &p, double &u, double &v) const noexcept
+{
+    u = 0;
+    v = 0;
+}
+
 /**
  * @brief
  * @details

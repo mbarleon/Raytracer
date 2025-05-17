@@ -16,6 +16,7 @@ class Rectangle final : public AShape
         Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side, const math::Vector3D &left_side);
 
         math::Vector3D getPosition() const override;
+        void getUV(const math::Point3D &p, double &u, double &v) const noexcept override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
         math::RGBColor getColorAt(const math::Point3D &p) const override;
         double getAOMaxDistance() const override;

@@ -297,6 +297,13 @@ math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D __attr
     return math::RGBColor(1);
 }
 
+void raytracer::shape::STLShape::getUV(const math::Point3D __attribute__((unused)) &p, double &u,
+    double &v) const noexcept
+{
+    u = 0;
+    v = 0;
+}
+
 void raytracer::shape::STLShape::_buildBVH()
 {
     std::vector<size_t> indices(_triangles.size());

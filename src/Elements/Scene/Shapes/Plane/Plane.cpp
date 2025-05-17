@@ -76,11 +76,8 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
     return true;
 }
 
-math::RGBColor raytracer::shape::Plane::getColorAt(const math::Point3D &p) const
+void raytracer::shape::Plane::getUV(const math::Point3D &p, double &u, double &v) const noexcept
 {
-    double u;
-    double v;
-
     switch (_axis) {
         case 'X':
             u = p._z;
@@ -95,5 +92,13 @@ math::RGBColor raytracer::shape::Plane::getColorAt(const math::Point3D &p) const
             v = p._y;
             break;
     }
+}
+
+math::RGBColor raytracer::shape::Plane::getColorAt(const math::Point3D &p) const
+{
+    double u;
+    double v;
+
+    getUV(p, u, v);
     return _texture->value(p, u, v);
 }

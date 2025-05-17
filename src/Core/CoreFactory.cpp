@@ -201,6 +201,26 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+unit_static std::shared_ptr<raytracer::texture::ITexture> get_normal_map(const JsonMap &obj, double &strength)
+{
+    if (obj.find("normal") == obj.end()) {
+        strength = 1.0;
+        return nullptr;
+    }
+
+    try {
+        const auto &normal_obj = get_value<JsonMap>(obj.at("normal"));
+        const std::string filename = get_string(normal_obj.at("filename"));
+        const double scale = get_value<double>(normal_obj.at("scale"));
+
+        strength = get_value<double>(normal_obj.at("strength"));
+        return std::make_shared<raytracer::texture::ImageTexture>(filename, scale);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Bad normal map allocation", e.what());
+    }
+    return nullptr;
+}
+
 unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const JsonMap &obj)
 {
     const auto &texture_obj = get_value<JsonMap>(obj.at("texture"));
@@ -271,10 +291,13 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_directional(c
 unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &shape,
     const JsonMap &obj)
 {
+    double strength;
     const double shininess = get_value<double>(obj.at("shininess"));
+    const auto normal = get_normal_map(obj, strength);
 
     shape->setMaterial(get_material(obj));
     shape->setTexture(get_texture(obj));
+    shape->setNormalMap(normal, strength);
     shape->setShininess(shininess);
 }
 

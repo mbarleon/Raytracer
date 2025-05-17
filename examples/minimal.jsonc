@@ -8,11 +8,11 @@
         "lighting": {
             "gamma": 3.0,
             "ambient": {
-                "coef": 0.6,
+                "coef": 0.2,
                 "samples": 10 // 20 for absolute realism, 1 for fast rendering
             },
-            "diffuse": 1.0,
-            "specular": 0.6
+            "diffuse": 0.6,
+            "specular": 0.2
         },
         "max-depth": 4, // reflection and refraction limit
         "output": {
@@ -45,6 +45,11 @@
                         "colors": {
                             "1": { "r": 0, "g": 255, "b": 0 }
                         }
+                    },
+                    "normal": {
+                        "filename": "examples/normals/ripple.png",
+                        "scale": 3.0,
+                        "strength": 10.0
                     }
                 },
                 {
@@ -75,6 +80,11 @@
                             "1": { "r": 0, "g": 0, "b": 255 },
                             "2": { "r": 0, "g": 255, "b": 255 }
                         }
+                    },
+                    "normal": {
+                        "filename": "examples/normals/ripple.png",
+                        "scale": 3.0,
+                        "strength": 10.0
                     }
                 },
                 {
@@ -115,11 +125,11 @@
         },
         "lights": {
             "points": [
-                // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
-                //     "color": { "r": 0, "g": 255, "b": 255 },
-                //     "intensity": 5.0
-                // }
+                {
+                    "position": { "x": 0, "y": 2, "z": 1 },
+                    "color": { "r": 0, "g": 255, "b": 255 },
+                    "intensity": 5.0
+                }
             ],
             "directionals": [
                 // {

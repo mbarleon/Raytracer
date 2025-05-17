@@ -25,6 +25,7 @@ class STLShape final: public AShape
         [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept override;
 
         math::Vector3D getPosition() const override;
+        void getUV(const math::Point3D &p, double &u, double &v) const noexcept override;
         math::RGBColor getColorAt(const math::Point3D &p) const override;
         math::Vector3D getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept override;
         double getAOMaxDistance() const override;

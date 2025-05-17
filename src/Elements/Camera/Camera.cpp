@@ -71,7 +71,14 @@ const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &sha
             for (unsigned x = 0; x < _resolution._x; ++x) {
                 const double u0 = (x + 0.5) / static_cast<double>(_resolution._x);
 
-                for (unsigned c = 0; c < config.antialiasing.samples; ++c) {
+                generateRay(u0, v0, cameraRay);
+                const LightSample mainSample = getRayColor(cameraRay, shapes, lights, config, 0, rng);
+                if (mainSample.isDelta) {
+                    restirGrid[y][x].add(mainSample, mainSample.radiance.luminance(), rng);
+                    continue;
+                }
+
+                for (unsigned c = 1; c < config.antialiasing.samples; ++c) {
                     double du = u0 + jitterX(rng) * (1.0 / _resolution._x);
                     double dv = v0 + jitterY(rng) * (1.0 / _resolution._y);
                     du = std::clamp(du, 0.0, 1.0);
@@ -79,10 +86,7 @@ const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &sha
                     generateRay(du, dv, cameraRay);
 
                     const LightSample sample = getRayColor(cameraRay, shapes, lights, config, 0, rng);
-                    const double L = 0.2126 * sample.radiance._x +
-                        0.7152 * sample.radiance._y + 0.0722 * sample.radiance._z;
-                    const double w = sample.isDelta ? L : L / std::max(sample.pdf, EPSILON);
-                    restirGrid[y][x].add(sample, w, rng);
+                    restirGrid[y][x].add(sample, sample.radiance.luminance() / std::max(sample.pdf, EPSILON), rng);
                 }
             }
 

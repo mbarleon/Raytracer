@@ -193,3 +193,8 @@ math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const ma
     return math::Vector3D(m00 * dir._x + m01 * dir._y + m02 * dir._z, m10 * dir._x + m11 * dir._y + m12 * dir._z,
         m20 * dir._x + m21 * dir._y + m22 * dir._z);
 }
+
+double math::Vector3D::luminance() const
+{
+    return 0.2126 * _x + 0.7152 * _y + 0.0722 * _z;
+}

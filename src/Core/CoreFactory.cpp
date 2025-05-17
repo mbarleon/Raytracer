@@ -185,7 +185,7 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
             bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
         } else if (materialId == std::string("metal")) {
             const double roughness = get_value<double>(mat_obj.at("roughness"));
-            bsdf = std::make_shared<raytracer::material::MetalBSDF>(math::RGBColor(1), roughness);
+            bsdf = std::make_shared<raytracer::material::MetalBSDF>(roughness);
         } else {
             throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
         }

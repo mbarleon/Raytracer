@@ -8,8 +8,27 @@
 #include "../src/Core/CoreFactory.hpp"
 #include "../src/Parser/Parser.hpp"
 #include <criterion/criterion.h>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 using JsonMap = std::unordered_map<std::string, raytracer::parser::JsonProto>;
+
+std::string getConfigFileContent(const std::string &path)
+{
+    std::ifstream file(path);
+    if (!file) {
+        throw std::runtime_error("Unable to open file : " + path);
+    }
+
+    std::ostringstream oss;
+    std::string ligne;
+    while (std::getline(file, ligne)) {
+        oss << ligne << '\n';
+    }
+    file.close();
+    return oss.str();
+}
 
 Test(create_camera, test_camera)
 {
@@ -28,8 +47,7 @@ Test(create_camera, test_camera)
 
 Test(primitive_factory, test_primitive_factory)
 {
-    const std::string input =
-        "{\"render\": {\"antialiasing\": {\"samples\": 5,\"mode\": \"classic\"},\"background-color\": { \"r\": 26, \"g\": 0, \"b\": 77 },\"lighting\": {\"gamma\": 3.0,\"ambient\": {\"coef\": 0.6,\"samples\": 10},\"diffuse\": 1.0,\"specular\": 0.6},\"max-depth\": 4,\"output\": {\"file\": \"output.ppm\",\"format\": \"ppm\"}},\"camera\": {\"resolution\": { \"width\": 1920, \"height\": 1080 },\"position\": { \"x\": 0, \"y\": 0, \"z\": -3 },\"rotation\": { \"x\": 0, \"y\": 0, \"z\": 0 },\"fov\": 72},\"scene\": {\"shapes\": {\"spheres\": [{\"position\": { \"x\": -1, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"specular\",\"color\": { \"r\": 0, \"g\": 255, \"b\": 0 }, \"shininess\": 100.0},{\"position\": { \"x\": 0, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"diffuse\",\"color\": { \"r\": 255, \"g\": 0, \"b\": 0 }, \"shininess\": 100.0},{\"position\": { \"x\": 1, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"dielectric\",\"refraction\": {\"inside\": 1.0,\"outside\": 1.52},\"color\": { \"r\": 0, \"g\": 0, \"b\": 255 }, \"shininess\": 100.0},{\"position\": { \"x\": 0, \"y\": -100.5, \"z\": -1 },\"radius\": 100,\"material\": \"dielectric\",\"refraction\": {\"inside\": 0.0,\"outside\": 0.0},\"color\": { \"r\": 255, \"g\": 255, \"b\": 255 }, \"shininess\": 100.0}]},\"lights\": {\"points\": [{\"position\": { \"x\": 0, \"y\": 2, \"z\": 1 },\"color\": { \"r\": 0, \"g\": 255, \"b\": 255 },\"intensity\": 5.0}]}}}";
+    const std::string input = getConfigFileContent("examples/minimal.jsonc");
 
     auto it = input.begin();
     const auto end = input.end();
@@ -44,8 +62,7 @@ Test(primitive_factory, test_primitive_factory)
 
 Test(light_factory, test_light_factory)
 {
-    const std::string input =
-        "{\"render\": {\"antialiasing\": {\"samples\": 5,\"mode\": \"classic\"},\"background-color\": { \"r\": 26, \"g\": 0, \"b\": 77 },\"lighting\": {\"gamma\": 3.0,\"ambient\": {\"coef\": 0.6,\"samples\": 10},\"diffuse\": 1.0,\"specular\": 0.6},\"max-depth\": 4,\"output\": {\"file\": \"output.ppm\",\"format\": \"ppm\"}},\"camera\": {\"resolution\": { \"width\": 1920, \"height\": 1080 },\"position\": { \"x\": 0, \"y\": 0, \"z\": -3 },\"rotation\": { \"x\": 0, \"y\": 0, \"z\": 0 },\"fov\": 72},\"scene\": {\"shapes\": {\"spheres\": [{\"position\": { \"x\": -1, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"specular\",\"color\": { \"r\": 0, \"g\": 255, \"b\": 0 }, \"shininess\": 100.0},{\"position\": { \"x\": 0, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"diffuse\",\"color\": { \"r\": 255, \"g\": 0, \"b\": 0 }, \"shininess\": 100.0},{\"position\": { \"x\": 1, \"y\": 0, \"z\": -1 },\"radius\": 0.5,\"material\": \"dielectric\",\"refraction\": {\"inside\": 1.0,\"outside\": 1.52},\"color\": { \"r\": 0, \"g\": 0, \"b\": 255 }, \"shininess\": 100.0},{\"position\": { \"x\": 0, \"y\": -100.5, \"z\": -1 },\"radius\": 100,\"material\": \"dielectric\",\"refraction\": {\"inside\": 0.0,\"outside\": 0.0},\"color\": { \"r\": 255, \"g\": 255, \"b\": 255 }, \"shininess\": 100.0}]},\"lights\": {\"points\": [{\"position\": { \"x\": 0, \"y\": 2, \"z\": 1 },\"color\": { \"r\": 0, \"g\": 255, \"b\": 255 },\"intensity\": 5.0}]}}}";
+    const std::string input = getConfigFileContent("examples/minimal.jsonc");
 
     auto it = input.begin();
     const auto end = input.end();

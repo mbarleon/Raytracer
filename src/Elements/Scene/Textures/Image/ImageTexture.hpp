@@ -15,6 +15,7 @@ namespace raytracer::texture {
 class ImageTexture final : public ITexture {
     public:
         ImageTexture(const std::string &filename);
+        ~ImageTexture();
 
         math::RGBColor value(const math::Point3D &p, const double u,
             const double v) const noexcept override;

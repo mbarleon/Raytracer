@@ -33,7 +33,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShape
     math::RGBColor radiance(0);
     if (depth == 0) {
         const double ao = ambientOcclusion(isect, shapes, config.lighting.ambient.samples, rng);
-        const math::RGBColor baseAmb = isect.object->getColor() * config.lighting.ambient.coef;
+        const math::RGBColor baseAmb = isect.object->getColorAt(isect.point) * config.lighting.ambient.coef;
         radiance = phongDirect(isect, -ray._dir, lights, shapes, config, rng);
         radiance = radiance - baseAmb + (baseAmb * ao);
     }

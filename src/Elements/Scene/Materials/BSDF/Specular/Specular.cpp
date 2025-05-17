@@ -12,7 +12,7 @@ raytracer::material::BSDFSample raytracer::material::SpecularBSDF::sample(const 
     const math::Intersect &isect, std::mt19937 __attribute__((unused)) &rng) const
 {
     const math::Vector3D reflected = reflect(-wo, isect.normal).normalize();
-    const math::RGBColor color = isect.object->getColor();
+    const math::RGBColor color = isect.object->getColorAt(isect.point);
 
     return {reflected, 1.0, color, true };
 }
@@ -24,7 +24,7 @@ math::RGBColor raytracer::material::SpecularBSDF::evaluate(const math::Vector3D 
     if (const math::Vector3D expected = reflect(-wo, isect.normal).normalize(); (wi - expected).nearZero()) {
         const double cosTheta = fabs(isect.normal.dot(wi));
 
-        return isect.object->getColor() * (1.0 / cosTheta);
+        return isect.object->getColorAt(isect.point) * (1.0 / cosTheta);
     }
     return math::RGBColor(0.0);
 }

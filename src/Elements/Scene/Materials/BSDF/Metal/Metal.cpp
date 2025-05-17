@@ -9,8 +9,8 @@
 #include <cmath>
 #include "Macro.hpp"
 
-raytracer::material::MetalBSDF::MetalBSDF(const math::RGBColor &albedo, double roughness) :
-    _specular(albedo), _roughnessSquare(roughness * roughness)
+raytracer::material::MetalBSDF::MetalBSDF(const double roughness) :
+    _roughnessSquare(roughness * roughness)
 {
 }
 
@@ -74,7 +74,7 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     const double D = distributionGGX(NdotH, _roughnessSquare);
     const double pdf = (D * NdotH) / (4.0 * VdotH + EPSILON);
 
-    const math::RGBColor F = fresnelSchlick(VdotH, _specular);
+    const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
     const double G = geometrySmith(std::max(N.dot(V), 0.0), std::max(N.dot(wi), 0.0),
         _roughnessSquare);
 
@@ -103,7 +103,7 @@ math::RGBColor raytracer::material::MetalBSDF::evaluate(const math::Vector3D &wo
 
     const double D = distributionGGX(NdotH, _roughnessSquare);
     const double G = geometrySmith(NdotV, NdotL, _roughnessSquare);
-    const math::RGBColor F = fresnelSchlick(VdotH, _specular);
+    const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
 
     // brdf = F·D·G / (4·N·V·N·L)
     return F * (D * G / (4.0 * NdotV * NdotL + EPSILON));

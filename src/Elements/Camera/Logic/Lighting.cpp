@@ -11,7 +11,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::
     const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
-    const math::RGBColor baseColor = isect.object->getColor();
+    const math::RGBColor baseColor = isect.object->getColorAt(isect.point);
     math::RGBColor Lo = baseColor * config.lighting.ambient.coef;
 
     for (const auto &light : lights) {

@@ -14,10 +14,16 @@
 int main(const int argc, const char **argv)
 {
     try {
-        if (raytracer::parser::parse_arguments(argc, argv)) {
-            raytracer::core::Application app(argv[1]);
+        const int parseResult = raytracer::parser::parse_arguments(argc, argv);
 
-            app.run();
+        if (parseResult != 0) {
+            raytracer::core::Application app(argv[1], parseResult == 1);
+
+            if (parseResult == 1) {
+                app.run();
+            } else {
+                app.runNoGUI();
+            }
         }
     } catch (raytracer::exception::Error &e) {
         raytracer::logger::error(e);

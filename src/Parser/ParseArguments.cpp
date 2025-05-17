@@ -50,21 +50,24 @@ EXAMPLES:
 }
 #endif
 
-bool raytracer::parser::parse_arguments(const int argc, const char **argv)
+int raytracer::parser::parse_arguments(const int argc, const char **argv)
 {
+    if (argc == 3 && strcmp(argv[2], "--no-gui") == 0) {
+        return 2;
+    }
     if (argc != 2) {
         throw exception::Error("parser::parse_arguments", "invalid number of arguments");
     }
     if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
         version();
-        return false;
+        return 0;
     }
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
         usage();
-        return false;
+        return 0;
     }
     if (!filepath_exists(argv[1])) {
         throw exception::Error("parser::parse_arguments", "invalid config file: ", argv[1], " file not found.");
     }
-    return true;
+    return 1;
 }

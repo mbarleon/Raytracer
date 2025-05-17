@@ -179,7 +179,7 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
         } else if (materialId == std::string("specular")) {
             bsdf = std::make_shared<raytracer::material::SpecularBSDF>();
         } else if (materialId == std::string("dielectric")) {
-            const auto &refract_obj = get_value<JsonMap>(obj.at("refraction"));
+            const auto &refract_obj = get_value<JsonMap>(mat_obj.at("refraction"));
             const double ior_in = get_value<double>(refract_obj.at("inside"));
             const double ior_out = get_value<double>(refract_obj.at("outside"));
             bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
@@ -208,12 +208,12 @@ unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const Json
 
     try {
         if (textureId == std::string("color")) {
-            const auto &color_obj = get_value<JsonMap>(obj.at("color"));
+            const auto &color_obj = get_value<JsonMap>(texture_obj.at("colors"));
             const math::RGBColor color1 = get_color(color_obj.at("1"));
             return std::make_shared<raytracer::texture::ColorTexture>(color1);
         } else if (textureId == std::string("chessboard")) {
             const double scale = get_value<double>(texture_obj.at("scale"));
-            const auto &color_obj = get_value<JsonMap>(obj.at("color"));
+            const auto &color_obj = get_value<JsonMap>(texture_obj.at("colors"));
             const math::RGBColor color1 = get_color(color_obj.at("1"));
             const math::RGBColor color2 = get_color(color_obj.at("2"));
             return std::make_shared<raytracer::texture::Chessboard>(color1, color2, scale);
@@ -430,6 +430,7 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
 
     return {anti, background, light, mdepth, output};
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 ///

@@ -34,62 +34,89 @@
                     "radius": 0.5,
                     "shininess": 50.0,
                     "material": {
+                        "type": "dielectric",
+                        "refraction": {
+                            "inside": 1.0,
+                            "outside": 1.52 // glass
+                        }
+                    },
+                    "texture": {
+                        "type": "color",
+                        "colors": {
+                            "1": { "r": 0, "g": 255, "b": 0 }
+                        }
+                    }
+                },
+                {
+                    "position": { "x": 0, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "shininess": 100.0,
+                    "material": {
+                        "type": "specular"
+                    },
+                    "texture": {
+                        "type": "color",
+                        "colors": {
+                            "1": { "r": 255, "g": 0, "b": 0 }
+                        }
+                    }
+                },
+                {
+                    "position": { "x": 1, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "shininess": 100.0,
+                    "material": {
                         "type": "metal",
-                        "roughness": 0.1
+                        "roughness": 1.5
+                    },
+                    "texture": {
+                        "type": "perlin-noise",
+                        "scale": 1.0
+                    }
+                },
+                {
+                    "position": { "x": 0, "y": -100.5, "z": -1 },
+                    "radius": 100,
+                    "shininess": 100.0,
+                    "material": {
+                        "type": "diffuse"
                     },
                     "texture": {
                         "type": "chessboard",
-                        "scale": 1.0,
+                        "scale": 0.1,
                         "colors": {
-                            "1": { "r": 255, "g": 255, "b": 0 },
-                            "2": { "r": 255, "g": 255, "b": 0 }
+                            "1": { "r": 255, "g": 255, "b": 255 },
+                            "2": { "r": 0, "g": 0, "b": 0 }
                         }
                     }
                 }
+            ],
+            "planes": [
                 // {
-                //     "position": { "x": 0, "y": 0, "z": -1 },
-                //     "radius": 0.5,
-                //     "material": "diffuse",
-                //     "color": { "r": 255, "g": 255, "b": 0 },
-                //     "shininess": 100.0
-                // },
-                // {
-                //     "position": { "x": 1, "y": 0, "z": -1 },
-                //     "radius": 0.5,
-                //     "material": "dielectric",
-                //     "refraction": {
-                //         "inside": 1.0,
-                //         "outside": 1.52 // glass
+                //     "axis": "Y",
+                //     "position": -20,
+                //     "shininess": 100.0,
+                //     "material": {
+                //         "type": "diffuse"
                 //     },
-                //     "color": { "r": 0, "g": 0, "b": 255 },
-                //     "shininess": 100.0
-                // },
-                // {
-                //     "position": { "x": 0, "y": -100.5, "z": -1 },
-                //     "radius": 100,
-                //     "material": "metal",
-                //     "roughness": 1.0,
-                //     "color": { "r": 255, "g": 255, "b": 255 },
-                //     "shininess": 100.0
+                //     "texture": {
+                //         "type": "chessboard",
+                //         "scale": 0.2,
+                //         "colors": {
+                //             "1": { "r": 255, "g": 255, "b": 255 },
+                //             "2": { "r": 0, "g": 0, "b": 0 }
+                //         }
+                //     }
                 // }
             ]
-            // "planes": [
-            //     {
-            //         "axis": "Y",
-            //         "position": -20,
-            //         "material": "ground",
-            //         "color": { "r": 64, "g": 64, "b": 255 },
-            //         "shininess": 100.0
-            //     }
-            // ]
         },
         "lights": {
             "points": [
-                // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
-                //     "color": { "r": 0, "g": 255, "b": 255 },
-                //     "intensity": 5.0
-                // }
+                {
+                    "position": { "x": 0, "y": 2, "z": 1 },
+                    "color": { "r": 0, "g": 255, "b": 255 },
+                    "intensity": 5.0
+                }
             ],
             "directionals": [
                 // {

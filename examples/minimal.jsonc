@@ -4,11 +4,7 @@
             "samples": 1, // 40 for absolute realism, 1 for fast rendering
             "mode": "classic" // none, classic, adaptive
         },
-        "background-color": {
-            "r": 26,
-            "g": 0,
-            "b": 77
-        },
+        "background-color": { "r": 26, "g": 0, "b": 77 },
         "lighting": {
             "gamma": 3.0,
             "ambient": {
@@ -25,91 +21,57 @@
         }
     },
     "camera": {
-        "resolution": {
-            "width": 1920,
-            "height": 1080
-        },
-        "position": {
-            "x": 0,
-            "y": 0,
-            "z": -3
-        },
-        "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0
-        },
+        "resolution": { "width": 1920, "height": 1080 },
+        "position": { "x": 0, "y": 0, "z": -3 },
+        "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
     "scene": {
         "shapes": {
             "spheres": [
                 {
-                    "position": {
-                        "x": -1,
-                        "y": 0,
-                        "z": -1
-                    },
+                    "position": { "x": -1, "y": 0, "z": -1 },
                     "radius": 0.5,
-                    "material": "metal",
-                    "roughness": 0.1,
-                    "color": {
-                        "r": 0,
-                        "g": 255,
-                        "b": 0
+                    "shininess": 50.0,
+                    "material": {
+                        "type": "metal",
+                        "roughness": 0.1
                     },
-                    "shininess": 100.0
-                },
-                {
-                    "position": {
-                        "x": 0,
-                        "y": 0,
-                        "z": -1
-                    },
-                    "radius": 0.5,
-                    "material": "diffuse",
-                    "color": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 0
-                    },
-                    "shininess": 100.0
-                },
-                {
-                    "position": {
-                        "x": 1,
-                        "y": 0,
-                        "z": -1
-                    },
-                    "radius": 0.5,
-                    "material": "dielectric",
-                    "refraction": {
-                        "inside": 1.0,
-                        "outside": 1.52 // glass
-                    },
-                    "color": {
-                        "r": 0,
-                        "g": 0,
-                        "b": 255
-                    },
-                    "shininess": 100.0
-                },
-                {
-                    "position": {
-                        "x": 0,
-                        "y": -100.5,
-                        "z": -1
-                    },
-                    "radius": 100,
-                    "material": "metal",
-                    "roughness": 1.0,
-                    "color": {
-                        "r": 255,
-                        "g": 255,
-                        "b": 255
-                    },
-                    "shininess": 100.0
+                    "texture": {
+                        "type": "chessboard",
+                        "scale": 1.0,
+                        "colors": {
+                            "1": { "r": 255, "g": 255, "b": 0 },
+                            "2": { "r": 255, "g": 255, "b": 0 }
+                        }
+                    }
                 }
+                // {
+                //     "position": { "x": 0, "y": 0, "z": -1 },
+                //     "radius": 0.5,
+                //     "material": "diffuse",
+                //     "color": { "r": 255, "g": 255, "b": 0 },
+                //     "shininess": 100.0
+                // },
+                // {
+                //     "position": { "x": 1, "y": 0, "z": -1 },
+                //     "radius": 0.5,
+                //     "material": "dielectric",
+                //     "refraction": {
+                //         "inside": 1.0,
+                //         "outside": 1.52 // glass
+                //     },
+                //     "color": { "r": 0, "g": 0, "b": 255 },
+                //     "shininess": 100.0
+                // },
+                // {
+                //     "position": { "x": 0, "y": -100.5, "z": -1 },
+                //     "radius": 100,
+                //     "material": "metal",
+                //     "roughness": 1.0,
+                //     "color": { "r": 255, "g": 255, "b": 255 },
+                //     "shininess": 100.0
+                // }
             ]
             // "planes": [
             //     {
@@ -123,19 +85,11 @@
         },
         "lights": {
             "points": [
-                {
-                    "position": {
-                        "x": 0,
-                        "y": 2,
-                        "z": 1
-                    },
-                    "color": {
-                        "r": 0,
-                        "g": 255,
-                        "b": 255
-                    },
-                    "intensity": 5.0
-                }
+                // {
+                //     "position": { "x": 0, "y": 2, "z": 1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 5.0
+                // }
             ],
             "directionals": [
                 // {

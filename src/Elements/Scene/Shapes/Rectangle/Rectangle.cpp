@@ -24,6 +24,11 @@ double raytracer::shape::Rectangle::getAOMaxDistance() const
     return 2.0; // To correct
 }
 
+math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D &p) const
+{
+    return math::RGBColor(1);
+}
+
 /**
  * @brief
  * @details

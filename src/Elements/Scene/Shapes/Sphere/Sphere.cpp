@@ -45,6 +45,17 @@ double raytracer::shape::Sphere::getAOMaxDistance() const
     return 2.0 * _radius;
 }
 
+math::RGBColor raytracer::shape::Sphere::getColorAt(const math::Point3D &p) const
+{
+    const math::Vector3D n = (p - _center).normalize();
+    const double theta = std::acos(-n._y);
+    const double phi = std::atan2(-n._z, n._x) + M_PI;
+    const double u = phi / (2.0 * M_PI);
+    const double v = theta / M_PI;
+
+    return _texture->value(p, u, v);
+}
+
 /**
 * @brief
 * @details

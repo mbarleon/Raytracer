@@ -17,6 +17,7 @@ class Sphere final : public AShape
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
+        math::RGBColor getColorAt(const math::Point3D &p) const override;
         double getAOMaxDistance() const override;
 
         [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint,

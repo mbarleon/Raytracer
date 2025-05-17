@@ -292,6 +292,11 @@ double raytracer::shape::STLShape::getAOMaxDistance() const
     return 10 * _scale;
 }
 
+math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D &p) const
+{
+    return math::RGBColor(1);
+}
+
 void raytracer::shape::STLShape::_buildBVH()
 {
     std::vector<size_t> indices(_triangles.size());

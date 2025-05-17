@@ -9,6 +9,7 @@
 
 #include "../Materials/Material.hpp"
 #include "../../../Maths/Ray.hpp"
+#include "../Textures/ITexture.hpp"
 #include <memory>
 #include <random>
 
@@ -19,11 +20,11 @@ class IShape
         virtual ~IShape() = default;
 
         virtual void setMaterial(const material::Material &material) = 0;
-        virtual void setColor(const math::RGBColor &color) = 0;
         virtual void setShininess(const double shininess) = 0;
+        virtual void setTexture(const std::shared_ptr<texture::ITexture> &texture) = 0;
 
+        [[nodiscard]] virtual math::RGBColor getColorAt(const math::Point3D &p) const = 0;
         [[nodiscard]] virtual material::Material getMaterial() const = 0;
-        [[nodiscard]] virtual math::RGBColor getColor() const = 0;
         [[nodiscard]] virtual double getShininess() const = 0;
         [[nodiscard]] virtual math::Vector3D getPosition() const = 0;
         [[nodiscard]] virtual math::Vector3D getNormalAt(const math::Point3D &point) const noexcept = 0;

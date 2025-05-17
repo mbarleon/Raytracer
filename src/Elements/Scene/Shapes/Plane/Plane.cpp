@@ -51,18 +51,21 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
 
     switch (_axis) {
         case 'X':
-            if (std::abs(ray._dir._x) < EPSILON)
+            if (std::abs(ray._dir._x) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._x) / ray._dir._x;
             break;
         case 'Y':
-            if (std::abs(ray._dir._y) < EPSILON)
+            if (std::abs(ray._dir._y) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._y) / ray._dir._y;
             break;
         default:
-            if (std::abs(ray._dir._z) < EPSILON)
+            if (std::abs(ray._dir._z) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._z) / ray._dir._z;
             break;
     }
@@ -71,4 +74,26 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
     }
     intPoint = ray._origin + ray._dir * t;
     return true;
+}
+
+math::RGBColor raytracer::shape::Plane::getColorAt(const math::Point3D &p) const
+{
+    double u;
+    double v;
+
+    switch (_axis) {
+        case 'X':
+            u = p._z;
+            v = p._y;
+            break;
+        case 'Y':
+            u = p._x;
+            v = p._z;
+            break;
+        default:
+            u = p._x;
+            v = p._y;
+            break;
+    }
+    return _texture->value(p, u, v);
 }

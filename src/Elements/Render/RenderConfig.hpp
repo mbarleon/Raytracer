@@ -11,12 +11,13 @@
 #include "Config/Antialiasing.hpp"
 #include "Config/Lighting.hpp"
 #include "Config/Output.hpp"
+#include "../Scene/Textures/ITexture.hpp"
 
 // clang-format off
 namespace raytracer {
 struct RenderConfig {
 	Antialiasing antialiasing;
-	math::RGBColor background;
+	std::shared_ptr<texture::ITexture> skybox = nullptr;
 	Lighting lighting;
 	unsigned int maxDepth;
 	RenderOutput output;

@@ -18,6 +18,7 @@
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
 #include "../Elements/Scene/Textures/Procedural/Chessboard/Chessboard.hpp"
 #include "../Elements/Scene/Textures/Procedural/PerlinNoise/PerlinNoise.hpp"
+#include "../Elements/Scene/Textures/Skybox/Panoramic/SkyboxPanoramic.hpp"
 #include "../Elements/Scene/Textures/Image/ImageTexture.hpp"
 #include "../Elements/Scene/Textures/Color/ColorTexture.hpp"
 #include "Error.hpp"
@@ -441,7 +442,7 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
     const raytracer::Antialiasing anti = {static_cast<unsigned int>(get_value<int>(anti_obj.at("samples"))),
         get_string(anti_obj.at("mode"))};
 
-    const math::RGBColor background = get_color(obj.at("background-color"));
+    const std::string background = get_string(obj.at("skybox"));
 
     const auto &light_obj = get_value<JsonMap>(obj.at("lighting"));
     const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
@@ -455,7 +456,7 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
     const auto &out_obj = get_value<JsonMap>(obj.at("output"));
     const raytracer::RenderOutput output = {get_string(out_obj.at("file")), get_string(out_obj.at("format"))};
 
-    return {anti, background, light, mdepth, output};
+    return {anti, std::make_shared<raytracer::texture::SkyboxPanoramic>(background), light, mdepth, output};
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

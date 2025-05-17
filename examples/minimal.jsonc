@@ -4,9 +4,9 @@
             "samples": 5, // 40 for absolute realism, 1 for fast rendering
             "mode": "classic" // none, classic, adaptive
         },
-        "background-color": { "r": 255, "g": 255, "b": 255 },
+        "skybox": "examples/skyboxes/panoramic/minecraft.png",
         "lighting": {
-            "gamma": 3.0,
+            "gamma": 1.0,
             "ambient": {
                 "coef": 0.2,
                 "samples": 10 // 20 for absolute realism, 1 for fast rendering

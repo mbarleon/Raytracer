@@ -26,7 +26,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShape
 
     math::Intersect isect;
     if (!findClosestIntersection(ray, shapes, isect, true)) {
-        return {getBackgroundColor(ray._dir, config.background) * throughput, 1.0};
+        return {config.skybox->value(ray._dir, 0, 0) * throughput, 1.0};
     }
 
     // direct light

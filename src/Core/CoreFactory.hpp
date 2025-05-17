@@ -38,6 +38,8 @@ unit_static std::string get_string(const ParsedJson &proto);
 unit_static math::RGBColor get_color(const ParsedJson &proto);
 unit_static math::Vector3D get_vec3D(const ParsedJson &proto);
 unit_static raytracer::material::Material get_material(const JsonMap &obj);
+unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const JsonMap &obj);
+unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &shape, const JsonMap &obj);
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto);
 unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto);
 #endif

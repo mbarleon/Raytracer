@@ -16,6 +16,10 @@
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Textures/Procedural/Chessboard/Chessboard.hpp"
+#include "../Elements/Scene/Textures/Procedural/PerlinNoise/PerlinNoise.hpp"
+#include "../Elements/Scene/Textures/Image/ImageTexture.hpp"
+#include "../Elements/Scene/Textures/Color/ColorTexture.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -151,6 +155,12 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
     return math::Vector2u{static_cast<uint>(x), static_cast<uint>(y)};
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief get material from ParsedJson
  * @details uses get_string for material name lookup
@@ -159,7 +169,8 @@ unit_static math::Vector2u get_vec2u(const ParsedJson &proto)
  */
 unit_static raytracer::material::Material get_material(const JsonMap &obj)
 {
-    const std::string materialId = get_string(obj.at("material"));
+    const auto &mat_obj = get_value<JsonMap>(obj.at("material"));
+    const std::string materialId = get_string(mat_obj.at("type"));
     std::shared_ptr<raytracer::material::BSDF> bsdf;
 
     try {
@@ -173,9 +184,8 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
             const double ior_out = get_value<double>(refract_obj.at("outside"));
             bsdf = std::make_shared<raytracer::material::DielectricBSDF>(ior_out, ior_in);
         } else if (materialId == std::string("metal")) {
-            const auto color = get_color(obj.at("color"));
-            const double roughness = get_value<double>(obj.at("roughness"));
-            bsdf = std::make_shared<raytracer::material::MetalBSDF>(color, roughness);
+            const double roughness = get_value<double>(mat_obj.at("roughness"));
+            bsdf = std::make_shared<raytracer::material::MetalBSDF>(math::RGBColor(1), roughness);
         } else {
             throw raytracer::exception::Error("Core", "Unknown material '", materialId, "'");
         }
@@ -183,6 +193,43 @@ unit_static raytracer::material::Material get_material(const JsonMap &obj)
         throw raytracer::exception::Error("Core", "Bad material allocation", e.what());
     }
     return raytracer::material::Material(bsdf);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+///
+///
+///
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const JsonMap &obj)
+{
+    const auto &texture_obj = get_value<JsonMap>(obj.at("texture"));
+    const std::string textureId = get_string(texture_obj.at("type"));
+
+    try {
+        if (textureId == std::string("color")) {
+            const auto &color_obj = get_value<JsonMap>(obj.at("color"));
+            const math::RGBColor color1 = get_color(color_obj.at("1"));
+            return std::make_shared<raytracer::texture::ColorTexture>(color1);
+        } else if (textureId == std::string("chessboard")) {
+            const double scale = get_value<double>(texture_obj.at("scale"));
+            const auto &color_obj = get_value<JsonMap>(obj.at("color"));
+            const math::RGBColor color1 = get_color(color_obj.at("1"));
+            const math::RGBColor color2 = get_color(color_obj.at("2"));
+            return std::make_shared<raytracer::texture::Chessboard>(color1, color2, scale);
+        } else if (textureId == std::string("perlin-noise")) {
+            const double scale = get_value<double>(texture_obj.at("scale"));
+            return std::make_shared<raytracer::texture::PerlinNoise>(scale);
+        } else if (textureId == std::string("image")) {
+            const std::string file = get_string(obj.at("filename"));
+            return std::make_shared<raytracer::texture::ImageTexture>(file);
+        } else {
+            throw raytracer::exception::Error("Core", "Unknown texture '", textureId, "'");
+        }
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Bad texture allocation", e.what());
+    }
+    return nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,6 +264,16 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_directional(c
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &shape,
+    const JsonMap &obj)
+{
+    const double shininess = get_value<double>(obj.at("shininess"));
+
+    shape->setMaterial(get_material(obj));
+    shape->setTexture(get_texture(obj));
+    shape->setShininess(shininess);
+}
+
 /**
  * @brief create a sphere from ParsedJson
  * @details uses get_value for JsonMap and other extractions
@@ -229,9 +286,6 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     const auto &obj = get_value<JsonMap>(proto);
     const math::Vector3D position = get_vec3D(obj.at("position"));
     const double radius = get_value<double>(obj.at("radius"));
-    const raytracer::material::Material material = get_material(obj);
-    const math::RGBColor color = get_color(obj.at("color"));
-    const double shininess = get_value<double>(obj.at("shininess"));
     std::shared_ptr<raytracer::shape::Sphere> sphere = nullptr;
 
     try {
@@ -239,9 +293,7 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "Sphere bad allocation", e.what());
     }
-    sphere->setMaterial(material);
-    sphere->setColor(color);
-    sphere->setShininess(shininess);
+    create_shape(sphere, obj);
     return sphere;
 }
 
@@ -258,9 +310,6 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
-    const raytracer::material::Material material = get_material(obj);
-    const math::RGBColor color = get_color(obj.at("color"));
-    const double shininess = get_value<double>(obj.at("shininess"));
     std::shared_ptr<raytracer::shape::Rectangle> rectangle = nullptr;
 
     try {
@@ -268,9 +317,7 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "Rectangle bad allocation", e.what());
     }
-    rectangle->setMaterial(material);
-    rectangle->setColor(color);
-    rectangle->setShininess(shininess);
+    create_shape(rectangle, obj);
     return rectangle;
 }
 
@@ -285,9 +332,6 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 {
     const auto &obj = get_value<JsonMap>(proto);
     const double position = get_value<double>(obj.at("position"));
-    const raytracer::material::Material material = get_material(obj);
-    const math::RGBColor color = get_color(obj.at("color"));
-    const double shininess = get_value<double>(obj.at("shininess"));
     const std::string str = get_string(obj.at("axis"));
 
     if (str[0] != 'X' && str[0] != 'Y' && str[0] != 'Z') {
@@ -301,9 +345,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "Plane bad allocation", e.what());
     }
-    plane->setMaterial(material);
-    plane->setColor(color);
-    plane->setShininess(shininess);
+    create_shape(plane, obj);
     return plane;
 }
 
@@ -319,9 +361,6 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     const math::Vector3D rotation = get_vec3D(obj.at("rotation"));
     const std::string filename = get_string(obj.at("filename"));
     const auto scale = static_cast<float>(get_value<double>(obj.at("scale")));
-    const raytracer::material::Material material = get_material(obj);
-    const math::RGBColor color = get_color(obj.at("color"));
-    const double shininess = get_value<double>(obj.at("shininess"));
     std::shared_ptr<raytracer::shape::STLShape> stl = nullptr;
 
     try {
@@ -329,9 +368,7 @@ unit_static std::shared_ptr<raytracer::shape::STLShape> create_stl(const ParsedJ
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "STL bad allocation", e.what());
     }
-    stl->setMaterial(material);
-    stl->setColor(color);
-    stl->setShininess(shininess);
+    create_shape(stl, obj);
     return stl;
 }
 

@@ -15,7 +15,7 @@ raytracer::texture::Chessboard::Chessboard(const math::RGBColor &color1,
 }
 
 math::RGBColor raytracer::texture::Chessboard::value(const math::Point3D &p,
-    const double u, const double v) const noexcept
+    const double __attribute__((unused)) u, const double __attribute__((unused)) v) const noexcept
 {
     const double s = std::sin(_scale * p._x) *
         std::sin(_scale * p._y) *

@@ -24,7 +24,7 @@ double raytracer::shape::Rectangle::getAOMaxDistance() const
     return 2.0; // To correct
 }
 
-math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D &p) const
+math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D __attribute__((unused)) &p) const
 {
     return math::RGBColor(1);
 }
@@ -34,7 +34,7 @@ math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D &p) c
  * @details
  * @return
  */
-bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D __attribute__((unused)) & intPoint,
+bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D __attribute__((unused)) &intPoint,
     __attribute__((unused)) const bool cullBackFaces) const noexcept
 {
     const math::Vector3D normal = _bottom_side.cross(_left_side).normalize();

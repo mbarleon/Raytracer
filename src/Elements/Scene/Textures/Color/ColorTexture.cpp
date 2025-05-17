@@ -12,8 +12,8 @@ raytracer::texture::ColorTexture::ColorTexture(const math::RGBColor &color) noex
 {
 }
 
-math::RGBColor raytracer::texture::ColorTexture::value(const math::Point3D &p,
-    const double u, const double v) const noexcept
+math::RGBColor raytracer::texture::ColorTexture::value(const math::Point3D __attribute__((unused)) &p,
+    const double __attribute__((unused)) u, const double __attribute__((unused)) v) const noexcept
 {
     return _color;
 }

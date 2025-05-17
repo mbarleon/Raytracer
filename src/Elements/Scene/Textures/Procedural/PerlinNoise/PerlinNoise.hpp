@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../ITexture.hpp"
+#include "../../ITexture.hpp"
 #include "Perlin/Perlin.hpp"
 
 namespace raytracer::texture {

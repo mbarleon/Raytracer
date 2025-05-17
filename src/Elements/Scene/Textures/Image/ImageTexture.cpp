@@ -7,6 +7,6 @@
 
 #include "ImageTexture.hpp"
 
-raytracer::texture::ImageTexture::ImageTexture(const std::string &filename)
+raytracer::texture::ImageTexture::ImageTexture(const std::string __attribute__((unused)) &filename)
 {
 }

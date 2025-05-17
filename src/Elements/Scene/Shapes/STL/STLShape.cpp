@@ -292,7 +292,7 @@ double raytracer::shape::STLShape::getAOMaxDistance() const
     return 10 * _scale;
 }
 
-math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D &p) const
+math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D __attribute__((unused)) &p) const
 {
     return math::RGBColor(1);
 }

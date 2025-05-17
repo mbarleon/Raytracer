@@ -14,7 +14,7 @@ namespace raytracer::texture {
 class Chessboard final : public ITexture {
     public:
         Chessboard(const math::RGBColor &color1, const math::RGBColor &color2,
-            const double scale = 1.0);
+            const double scale);
 
         math::RGBColor value(const math::Point3D &p, const double u, const double v)
             const noexcept override;

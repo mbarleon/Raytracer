@@ -224,8 +224,9 @@ unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const Json
             const math::RGBColor color2 = get_color(color_obj.at("2"));
             return std::make_shared<raytracer::texture::PerlinNoise>(color1, color2, scale);
         } else if (textureId == std::string("image")) {
-            const std::string file = get_string(obj.at("filename"));
-            return std::make_shared<raytracer::texture::ImageTexture>(file);
+            const double scale = get_value<double>(texture_obj.at("scale"));
+            const std::string file = get_string(texture_obj.at("filename"));
+            return std::make_shared<raytracer::texture::ImageTexture>(file, scale);
         } else {
             throw raytracer::exception::Error("Core", "Unknown texture '", textureId, "'");
         }

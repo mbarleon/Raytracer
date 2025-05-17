@@ -9,20 +9,21 @@
 
 #include "../ITexture.hpp"
 #include <string>
-#include <vector>
+#include <SFML/Graphics.hpp>
 
 namespace raytracer::texture {
 class ImageTexture final : public ITexture {
     public:
-        ImageTexture(const std::string &filename);
+        ImageTexture(const std::string &filename, const double scale);
         ~ImageTexture();
 
         math::RGBColor value(const math::Point3D &p, const double u,
             const double v) const noexcept override;
 
     private:
-        int _width;
-        int _height;
-        std::vector<unsigned char> _data;
+        unsigned _width;
+        unsigned _height;
+        double _scale;
+        sf::Image _image;
 };
 }

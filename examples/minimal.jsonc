@@ -4,7 +4,7 @@
             "samples": 5, // 40 for absolute realism, 1 for fast rendering
             "mode": "classic" // none, classic, adaptive
         },
-        "background-color": { "r": 26, "g": 0, "b": 77 },
+        "background-color": { "r": 255, "g": 255, "b": 255 },
         "lighting": {
             "gamma": 3.0,
             "ambient": {
@@ -52,13 +52,12 @@
                     "radius": 0.5,
                     "shininess": 100.0,
                     "material": {
-                        "type": "specular"
+                        "type": "diffuse"
                     },
                     "texture": {
-                        "type": "color",
-                        "colors": {
-                            "1": { "r": 255, "g": 0, "b": 0 }
-                        }
+                        "type": "image",
+                        "filename": "examples/textures/water.jpg",
+                        "scale": 1.0
                     }
                 },
                 {
@@ -116,11 +115,11 @@
         },
         "lights": {
             "points": [
-                {
-                    "position": { "x": 0, "y": 2, "z": 1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 5.0
-                }
+                // {
+                //     "position": { "x": 0, "y": 2, "z": 1 },
+                //     "color": { "r": 0, "g": 255, "b": 255 },
+                //     "intensity": 5.0
+                // }
             ],
             "directionals": [
                 // {

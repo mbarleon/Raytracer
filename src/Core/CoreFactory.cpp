@@ -219,7 +219,10 @@ unit_static std::shared_ptr<raytracer::texture::ITexture> get_texture(const Json
             return std::make_shared<raytracer::texture::Chessboard>(color1, color2, scale);
         } else if (textureId == std::string("perlin-noise")) {
             const double scale = get_value<double>(texture_obj.at("scale"));
-            return std::make_shared<raytracer::texture::PerlinNoise>(scale);
+            const auto &color_obj = get_value<JsonMap>(texture_obj.at("colors"));
+            const math::RGBColor color1 = get_color(color_obj.at("1"));
+            const math::RGBColor color2 = get_color(color_obj.at("2"));
+            return std::make_shared<raytracer::texture::PerlinNoise>(color1, color2, scale);
         } else if (textureId == std::string("image")) {
             const std::string file = get_string(obj.at("filename"));
             return std::make_shared<raytracer::texture::ImageTexture>(file);

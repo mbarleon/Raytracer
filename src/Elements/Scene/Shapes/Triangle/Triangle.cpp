@@ -24,12 +24,12 @@ raytracer::shape::Triangle::Triangle(const math::Point3D &p0, const math::Point3
 
 math::Vector3D raytracer::shape::Triangle::getPosition() const
 {
-    return _centroid;
+    return math::Vector3D::applyRotation(_centroid, _rotation);
 }
 
 math::Vector3D raytracer::shape::Triangle::getNormalAt(const math::Point3D __attribute__((unused)) & p3d) const noexcept
 {
-    return _normal;
+    return math::Vector3D::applyRotation(_normal, _rotation).normalize();
 }
 
 double raytracer::shape::Triangle::getAOMaxDistance() const
@@ -50,8 +50,10 @@ double raytracer::shape::Triangle::getAOMaxDistance() const
  *   w_bary	Weight of vertex _p2
  *   u, v	Final UV mapping used for texture sampling
  */
-void raytracer::shape::Triangle::getUV(const math::Point3D &p, double &u, double &v) const noexcept
+void raytracer::shape::Triangle::getUV(const math::Point3D &p_world, double &u, double &v) const noexcept
 {
+    math::Vector3D p = math::Vector3D::applyRotation(p_world, -_rotation);
+
     const math::Vector3D v0 = _edge1;
     const math::Vector3D v1 = _edge2;
     const math::Vector3D v2 = p - _p0;
@@ -87,8 +89,12 @@ math::RGBColor raytracer::shape::Triangle::getColorAt(const math::Point3D &p) co
     return math::RGBColor(0, 0, 0);
 }
 
-bool raytracer::shape::Triangle::intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept
+bool raytracer::shape::Triangle::intersect(const math::Ray &ray_world, math::Point3D &intPoint, const bool cullBackFaces) const noexcept
 {
+    math::Ray ray;
+    ray._origin = math::Vector3D::applyRotation(ray_world._origin, -_rotation);
+    ray._dir = math::Vector3D::applyRotation(ray_world._dir, -_rotation).normalize();
+
     const math::Vector3D h = ray._dir.cross(_edge2);
     const double a = _edge1.dot(h);
 
@@ -117,9 +123,10 @@ bool raytracer::shape::Triangle::intersect(const math::Ray &ray, math::Point3D &
         return false;
     }
 
-    intPoint = ray._origin + ray._dir * t;
+    math::Point3D p_local = ray._origin + ray._dir * t;
+    intPoint = math::Vector3D::applyRotation(p_local, _rotation);
 
-    if (cullBackFaces && ray._dir.dot(_normal) >= 0.0) {
+    if (cullBackFaces && ray_world._dir.dot(_normal) >= 0.0) {
         return false;
     }
     return true;

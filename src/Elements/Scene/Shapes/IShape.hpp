@@ -22,6 +22,7 @@ class IShape
         virtual void setShininess(const double shininess) = 0;
         virtual void setTexture(const std::shared_ptr<texture::ITexture> &texture) = 0;
         virtual void setNormalMap(const std::shared_ptr<texture::ITexture> &map, const double strength) = 0;
+        virtual void setRotation(const math::Vector3D &rotation) = 0;
 
         virtual void getUV(const math::Point3D &p, double &u, double &v) const noexcept = 0;
         [[nodiscard]] virtual math::RGBColor getColorAt(const math::Point3D &p) const = 0;

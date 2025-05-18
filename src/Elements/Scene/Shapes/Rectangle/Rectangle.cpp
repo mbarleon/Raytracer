@@ -2,77 +2,18 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** Rectangle.cpp
+** Rectangle.cpp (oriented box with full 3-axis rotation)
 */
 
 #include "Rectangle.hpp"
 #include "Logger.hpp"
+#include "Macro.hpp"
+#include <algorithm>
 
-/*
-* public
-*/
-
-raytracer::shape::Rectangle::Rectangle(const math::Point3D &center, const double x,
-    const double y, const double z) noexcept : _center(center), _x(x), _y(y), _z(z)
+raytracer::shape::Rectangle::Rectangle(const math::Point3D &center, const double hx, const double hy,
+    const double hz) noexcept : _center(center), _x(hx), _y(hy), _z(hz)
 {
-}
-
-math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D &point)
-    const noexcept
-{
-    const math::Vector3D p = point - _center;
-    const double ax = std::fabs(p._x - _x);
-    const double bx = std::fabs(p._x + _x);
-    const double ay = std::fabs(p._y - _y);
-    const double by = std::fabs(p._y + _y);
-    const double az = std::fabs(p._z - _z);
-    const double bz = std::fabs(p._z + _z);
-
-    double m = ax;
-    m = std::min(m, bx);
-    m = std::min(m, ay);
-    m = std::min(m, by);
-    m = std::min(m, az);
-    m = std::min(m, bz);
-
-    if (m == ax)
-        return math::Vector3D(1, 0, 0);
-    if (m == bx)
-        return math::Vector3D(-1, 0, 0);
-    if (m == ay)
-        return math::Vector3D(0, 1, 0);
-    if (m == by)
-        return math::Vector3D(0, -1, 0);
-    if (m == az)
-        return math::Vector3D(0, 0, 1);
-    return math::Vector3D(0, 0, -1);
-}
-
-void raytracer::shape::Rectangle::getUV(const math::Point3D &p, double &u, double &v)
-    const noexcept
-{
-    const math::Vector3D loc = p - _center;
-    const math::Vector3D N = getNormalAt(p);
-
-    if (std::fabs(N._x) > 0.5) {
-        u = (loc._z / (_z) + 1.0) * 0.5;
-        v = (loc._y / (_y) + 1.0) * 0.5;
-    } else if (std::fabs(N._y) > 0.5) {
-        u = (loc._x / (_x) + 1.0) * 0.5;
-        v = (loc._z / (_z) + 1.0) * 0.5;
-    } else {
-        u = (loc._x / (_x) + 1.0) * 0.5;
-        v = (loc._y / (_y) + 1.0) * 0.5;
-    }
-}
-
-math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D &p) const
-{
-    double u;
-    double v;
-    getUV(p, u, v);
-
-    return _texture->value(p, u, v);
+    logger::debug("Rectangle built: center=", center, " half-extents= (", hx, ",", hy, ",", hz, ")");
 }
 
 math::Vector3D raytracer::shape::Rectangle::getPosition() const
@@ -80,56 +21,121 @@ math::Vector3D raytracer::shape::Rectangle::getPosition() const
     return _center;
 }
 
-double raytracer::shape::Rectangle::getAOMaxDistance() const
+math::Vector3D raytracer::shape::Rectangle::getNormalAt(const math::Point3D &p_world) const noexcept
 {
-    double maxDim = _x;
-    maxDim = std::max(maxDim, _y);
-    maxDim = std::max(maxDim, _z);
+    math::Vector3D local_p = p_world - _center;
+    local_p = math::Vector3D::applyRotation(local_p, -_rotation);
 
-    return maxDim;
+    const double ax = std::fabs(std::fabs(local_p._x) - _x);
+    const double ay = std::fabs(std::fabs(local_p._y) - _y);
+    const double az = std::fabs(std::fabs(local_p._z) - _z);
+
+    if (ax <= ay && ax <= az) {
+        local_p._x > 0 ? local_p = math::Vector3D(1,0,0) : local_p = math::Vector3D(-1,0,0);
+    } else if (ay <= ax && ay <= az) {
+        local_p._y > 0 ? local_p = math::Vector3D(0,1,0) : local_p = math::Vector3D(0,-1,0);
+    } else {
+        local_p._z > 0 ? local_p = math::Vector3D(0,0,1) : local_p = math::Vector3D(0,0,-1);
+    }
+    return math::Vector3D::applyRotation(local_p, _rotation);
 }
 
-bool raytracer::shape::Rectangle::intersect(const math::Ray &ray, math::Point3D &intPoint,
+void raytracer::shape::Rectangle::getUV(const math::Point3D &p_world, double &u, double &v) const noexcept
+{
+    math::Vector3D local_p = p_world - _center;
+    local_p = math::Vector3D::applyRotation(local_p, -_rotation);
+
+    math::Vector3D Nl;
+    double ax = std::fabs(std::fabs(local_p._x) - _x);
+    double ay = std::fabs(std::fabs(local_p._y) - _y);
+    double az = std::fabs(std::fabs(local_p._z) - _z);
+
+    if (ax <= ay && ax <= az) {
+        Nl = local_p._x > 0 ? math::Vector3D(1,0,0) : math::Vector3D(-1,0,0);
+        u = ( local_p._z / _z + 1.0 ) * 0.5;
+        v = ( local_p._y / _y + 1.0 ) * 0.5;
+    } else if (ay <= ax && ay <= az) {
+        Nl = local_p._y > 0 ? math::Vector3D(0,1,0) : math::Vector3D(0,-1,0);
+        u = ( local_p._x / _x + 1.0 ) * 0.5;
+        v = ( local_p._z / _z + 1.0 ) * 0.5;
+    } else {
+        Nl = local_p._z > 0 ? math::Vector3D(0,0,1) : math::Vector3D(0,0,-1);
+        u = ( local_p._x / _x + 1.0 ) * 0.5;
+        v = ( local_p._y / _y + 1.0 ) * 0.5;
+    }
+}
+
+math::RGBColor raytracer::shape::Rectangle::getColorAt(const math::Point3D &p_world) const
+{
+    double u;
+    double v;
+
+    getUV(p_world, u, v);
+    if (_texture)
+        return _texture->value(p_world, u, v);
+    return math::RGBColor(0.0, 0.0, 0.0);
+}
+
+double raytracer::shape::Rectangle::getAOMaxDistance() const
+{
+    return std::max({ _x, _y, _z });
+}
+
+bool raytracer::shape::Rectangle::intersect(const math::Ray &ray_world, math::Point3D &intPoint,
     const bool cullBackFaces) const noexcept
 {
-    const math::Vector3D orig = ray._origin - _center;
-    const math::Vector3D dir = ray._dir;
+    math::Ray ray_loc;
+    ray_loc._origin = ray_world._origin - _center;
+    ray_loc._origin = math::Vector3D::applyRotation(ray_loc._origin, -_rotation);
+    ray_loc._dir = math::Vector3D::applyRotation(ray_world._dir, -_rotation).normalize();
 
-    double tmin = (-_x - orig._x) / dir._x;
-    double tmax = (_x - orig._x) / dir._x;
+    double tmin = (-_x - ray_loc._origin._x) / ray_loc._dir._x;
+    double tmax = (+_x - ray_loc._origin._x) / ray_loc._dir._x;
     if (tmin > tmax)
         std::swap(tmin, tmax);
 
-    double tymin = (-_y - orig._y) / dir._y;
-    double tymax = (_y - orig._y) / dir._y;
+    double tymin = (-_y - ray_loc._origin._y) / ray_loc._dir._y;
+    double tymax = (+_y - ray_loc._origin._y) / ray_loc._dir._y;
     if (tymin > tymax)
         std::swap(tymin, tymax);
-
-    if ((tmin > tymax) || (tymin > tmax))
+    if (tmin > tymax || tymin > tmax)
         return false;
-    if (tymin > tmin)
-        tmin = tymin;
-    if (tymax < tmax)
-        tmax = tymax;
 
-    double tzmin = (-_z - orig._z) / dir._z;
-    double tzmax = (_z - orig._z) / dir._z;
+    tmin = std::max(tmin, tymin);
+    tmax = std::min(tmax, tymax);
+    double tzmin = (-_z - ray_loc._origin._z) / ray_loc._dir._z;
+    double tzmax = (+_z - ray_loc._origin._z) / ray_loc._dir._z;
     if (tzmin > tzmax)
         std::swap(tzmin, tzmax);
-
-    if ((tmin > tzmax) || (tzmin > tmax))
+    if (tmin > tzmax || tzmin > tmax)
         return false;
-    if (tzmin > tmin)
-        tmin = tzmin;
-    if (tzmax < tmax)
-        tmax = tzmax;
+
+    tmin = std::max(tmin, tzmin);
+    tmax = std::min(tmax, tzmax);
 
     const double t = (tmin >= 0.0 ? tmin : (tmax >= 0.0 ? tmax : -1.0));
     if (t < 0.0)
         return false;
-    intPoint = ray._origin + ray._dir * t;
 
-    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0)
-        return false;
+    const math::Vector3D p_loc = ray_loc._origin + ray_loc._dir * t;
+    intPoint = math::Vector3D::applyRotation(p_loc, _rotation) + _center;
+
+    if (cullBackFaces) {
+        math::Vector3D Ng;
+        const double ax = std::fabs(std::fabs(p_loc._x) - _x);
+        const double ay = std::fabs(std::fabs(p_loc._y) - _y);
+        const double az = std::fabs(std::fabs(p_loc._z) - _z);
+
+        if (ax <= ay && ax <= az)
+            Ng = p_loc._x > 0 ? math::Vector3D(1,0,0) : math::Vector3D(-1,0,0);
+        else if (ay <= ax && ay <= az)
+            Ng = p_loc._y > 0 ? math::Vector3D(0,1,0) : math::Vector3D(0,-1,0);
+        else
+            Ng = p_loc._z > 0 ? math::Vector3D(0,0,1) : math::Vector3D(0,0,-1);
+        Ng = math::Vector3D::applyRotation(Ng, _rotation);
+
+        if (ray_world._dir.dot(Ng) >= 0.0)
+            return false;
+    }
     return true;
 }

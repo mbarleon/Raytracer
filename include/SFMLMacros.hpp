@@ -18,6 +18,7 @@
 
 #endif
 
+#include <SFML/Window/WindowStyle.hpp>
 #include <functional>
 #include <memory>
 

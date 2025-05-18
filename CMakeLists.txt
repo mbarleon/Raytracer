@@ -71,47 +71,46 @@ add_executable(raytracer
     ${MAIN_SOURCE}
 )
 
-# NOTE: commented because the project wont compile anymore lol
-# target_compile_options(raytracer PRIVATE
-#     # INFO: classic yutsu warnings
-#     -Wall
-#     -Wextra
-#     -Werror
-#     -pedantic
-#
-#     # INFO: type safety & conversions
-#     -Wconversion
-#     -Wsign-conversion
-#     -Wfloat-equal
-#
-#     # INFO: code correctness
-#     -Wshadow
-#     -Wnull-dereference
-#     -Wundef
-#     -Wuninitialized
-#     -Winit-self
-#     -Wredundant-decls
-#
-#     # INFO: code hygiene
-#     -Wcast-align
-#     -Wcast-qual
-#     -Wmissing-declarations
-#     -Woverloaded-virtual
-#     -Wnon-virtual-dtor
-#
-#     # INFO: logic bugs & bad practices
-#     -Wduplicated-cond
-#     -Wduplicated-branches
-#     -Wlogical-op
-#     -Wswitch-default
-#     -Wswitch-enum
-#     -Wuseless-cast
-#
-#     # INFO: prevent common portability issues
-#     -Wdouble-promotion
-#     -Wformat=2
-#     -Wwrite-strings
-# )
+target_compile_options(raytracer PRIVATE
+    # INFO: classic yutsu warnings
+    -Wall
+    -Wextra
+    -Werror
+    -pedantic
+
+    # INFO: type safety & conversions
+    -Wconversion
+    -Wsign-conversion
+    # -Wfloat-equal # << commented because this flag is PURE HATE
+
+    # INFO: code correctness
+    -Wshadow
+    -Wnull-dereference
+    -Wundef
+    -Wuninitialized
+    -Winit-self
+    -Wredundant-decls
+
+    # INFO: code hygiene
+    -Wcast-align
+    -Wcast-qual
+    -Wmissing-declarations
+    -Woverloaded-virtual
+    -Wnon-virtual-dtor
+
+    # INFO: logic bugs & bad practices
+    -Wduplicated-cond
+    -Wduplicated-branches
+    -Wlogical-op
+    -Wswitch-default
+    # -Wswitch-enum << commented because of SFML enums are toooooooo big
+    -Wuseless-cast
+
+    # INFO: prevent common portability issues
+    # -Wdouble-promotion << commented because of STL.cpp & Utils.cpp wont compile
+    -Wformat=2
+    -Wwrite-strings
+)
 
 ########################################
 

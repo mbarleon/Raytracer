@@ -22,8 +22,7 @@ void raytracer::shape::AShape::setTexture(const std::shared_ptr<texture::ITextur
     _texture = texture;
 }
 
-void raytracer::shape::AShape::setNormalMap(const std::shared_ptr<texture::ITexture> &map,
-    const double strength)
+void raytracer::shape::AShape::setNormalMap(const std::shared_ptr<texture::ITexture> &map, const double strength)
 {
     _normalMap = map;
     _normalStrength = strength;
@@ -63,5 +62,5 @@ math::Vector3D raytracer::shape::AShape::getMappedNormal(const math::Point3D &p)
 
     nt._x *= _normalStrength;
     nt._y *= _normalStrength;
-    return math::Vector3D (T * nt._x + B * nt._y + N * nt._z).normalize();
+    return (T * nt._x + B * nt._y + N * nt._z).normalize();
 }

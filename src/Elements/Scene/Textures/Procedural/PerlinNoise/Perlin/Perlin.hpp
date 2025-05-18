@@ -7,11 +7,15 @@
 
 #pragma once
 
-#include <array>
 #include "../../../../../../Maths/Vector3D.hpp"
+#include <array>
 
 namespace raytracer::texture {
-class Perlin {
+
+using u8 = unsigned short;
+
+class Perlin
+{
     public:
         Perlin();
 
@@ -20,9 +24,8 @@ class Perlin {
     private:
         static double fade(const double t) noexcept;
         static double lerp(const double t, const double a, const double b) noexcept;
-        static double grad(const int hash, const double x, const double y,
-            const double z) noexcept;
+        static double grad(const int hash, const double x, const double y, const double z) noexcept;
 
-        std::array<int, 512> _perm;
+        std::array<u8, 512> _perm;
 };
-}
+}// namespace raytracer::texture

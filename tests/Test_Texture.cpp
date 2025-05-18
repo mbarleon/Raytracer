@@ -24,7 +24,7 @@ static void redirect_all_stdout()
 
 Test(SkyboxCube, test_skyboxcube__ctor__, .init = redirect_all_stdout)
 {
-    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     try {
         const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("zebijexistepashaha(:");
     } catch (const raytracer::exception::Error &e) {
@@ -34,7 +34,7 @@ Test(SkyboxCube, test_skyboxcube__ctor__, .init = redirect_all_stdout)
 
 Test(SkyboxCube, test_skyboxcube__value__)
 {
-    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     const math::Point3D p(0.0, 0.0, 0.0);
     const double u = 0.5;
     const double v = 0.5;
@@ -47,7 +47,7 @@ Test(SkyboxCube, test_skyboxcube__value__)
 
 Test(SkyboxCube, test_skyboxcube__value__2)
 {
-    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxCube __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     const math::Point3D p(1.0, -21.0, 32.0);
     const double u = 0.5;
     const double v = -0.5;
@@ -60,7 +60,7 @@ Test(SkyboxCube, test_skyboxcube__value__2)
 
 Test(SkyboxPanoramic, test_skyboxpanoramic__ctor__, .init = redirect_all_stdout)
 {
-    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     try {
         const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("zebijexistepashaha(:");
     } catch (const raytracer::exception::Error &e) {
@@ -70,7 +70,7 @@ Test(SkyboxPanoramic, test_skyboxpanoramic__ctor__, .init = redirect_all_stdout)
 
 Test(SkyboxPanoramic, test_skyboxpanoramic__value__)
 {
-    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     const math::Point3D p(0.0, 0.0, 0.0);
     const double u = 0.5;
     const double v = 0.5;
@@ -83,7 +83,7 @@ Test(SkyboxPanoramic, test_skyboxpanoramic__value__)
 
 Test(SkyboxPanoramic, test_skyboxpanoramic__value__2)
 {
-    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("examples/skyboxes/panoramic/minecraft.png");
+    const raytracer::texture::SkyboxPanoramic __attribute__((unused)) skybox("../examples/skyboxes/panoramic/minecraft.png");
     const math::Point3D p(1.0, -21.0, 32.0);
     const double u = 0.5;
     const double v = -0.5;
@@ -96,7 +96,7 @@ Test(SkyboxPanoramic, test_skyboxpanoramic__value__2)
 
 Test(ImageTexture, test_imagetexture__ctor__, .init = redirect_all_stdout)
 {
-    const raytracer::texture::ImageTexture __attribute__((unused)) image("examples/skyboxes/panoramic/minecraft.png", 1.0);
+    const raytracer::texture::ImageTexture __attribute__((unused)) image("../examples/skyboxes/panoramic/minecraft.png", 1.0);
     try {
         const raytracer::texture::ImageTexture __attribute__((unused)) image("zebijexistepashaha(:", 1.0);
     } catch (const raytracer::exception::Error &e) {
@@ -106,7 +106,7 @@ Test(ImageTexture, test_imagetexture__ctor__, .init = redirect_all_stdout)
 
 Test(ImageTexture, test_imagetexture__value__)
 {
-    const raytracer::texture::ImageTexture __attribute__((unused)) image("examples/skyboxes/panoramic/minecraft.png", 1.0);
+    const raytracer::texture::ImageTexture __attribute__((unused)) image("../examples/skyboxes/panoramic/minecraft.png", 1.0);
     const math::Point3D p(0.0, 0.0, 0.0);
     const double u = 0.5;
     const double v = 0.5;

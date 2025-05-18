@@ -174,6 +174,7 @@ if(BUILD_TESTS)
         ${CORE_SOURCE}
         ${TEST_SOURCE}
     )
+    set_target_properties(unit_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
         target_compile_options(unit_tests PRIVATE -fprofile-instr-generate -fcoverage-mapping)

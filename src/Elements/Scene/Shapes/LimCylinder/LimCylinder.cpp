@@ -2,78 +2,141 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** LimCylinder
+** Cylinder.cpp
 */
 
 #include "LimCylinder.hpp"
+#include "Macro.hpp"
 #include "Logger.hpp"
+#include <cmath>
 
 /*
-* public
-*/
-
-raytracer::shape::LimCylinder::LimCylinder(const math::Point3D &origin, const double radius, const double height)
-    : _origin(origin), _radius(radius), _height(height)
+ * public
+ */
+raytracer::shape::Cylinder::Cylinder(const math::Point3D &base_center, const math::Vector3D &axis, double radius, double height)
+    : _base_center(base_center), _axis(axis.normalize()), _radius(radius), _height(height)
 {
-    logger::debug("LimCylinder was built: origin ", origin, " radius ", radius, " height ", height, ".");
+    logger::debug("Cylinder was built: base at ", base_center, " with axis ", axis, ", radius ", radius, " and height ", height, ".");
 }
 
 /**
- * @brief
- * @details
- * @return
+ * @brief Return the base center of the cylinder.
  */
-bool raytracer::shape::LimCylinder::intersect(const math::Ray &ray, math::Point3D &intPoint,
-    __attribute__((unused)) const bool cullBackFaces) const noexcept
+math::Vector3D raytracer::shape::Cylinder::getPosition() const
 {
-    const math::Vector3D ray_dir = ray._dir;
-    const math::Vector3D ray_origin = ray._origin - _origin;
-    const double a = ray_dir._x * ray_dir._x + ray_dir._z * ray_dir._z;
-    const double b = 2 * (ray_origin._x * ray_dir._x + ray_origin._z * ray_dir._z);
-    const double c = ray_origin._x * ray_origin._x + ray_origin._z * ray_origin._z - _radius * _radius;
-    const double discriminant = b * b - 4 * a * c;
+    return _base_center;
+}
 
-    if (discriminant < 0) {
+/**
+ * @brief Compute the normal of the cylinder at a given point.
+ */
+math::Vector3D raytracer::shape::Cylinder::getNormalAt(const math::Point3D &point) const noexcept
+{
+    // Vector from base center to point
+    const math::Vector3D base_to_point = point - _base_center;
+    
+    // Projection of base_to_point onto the axis
+    const double projection = base_to_point.dot(_axis);
+    
+    // If point is on the base cap
+    if (std::fabs(projection) < EPSILON) {
+        return -_axis;
+    }
+    
+    // If point is on the top cap
+    if (std::fabs(projection - _height) < EPSILON) {
+        return _axis;
+    }
+    
+    // For points on the side, compute the normal by removing the axial component
+    const math::Vector3D axial_component = _axis * projection;
+    const math::Vector3D radial_component = base_to_point - axial_component;
+    
+    return radial_component.normalize();
+}
+
+/**
+ * @brief Intersect the ray with the cylinder.
+ */
+bool raytracer::shape::Cylinder::intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept
+{
+    const math::Vector3D oc = ray._origin - _base_center;
+    const double axis_dir = ray._dir.dot(_axis);
+    const double axis_oc = oc.dot(_axis);
+    
+    // Check for infinite cylinder intersection first
+    const math::Vector3D dir_perp = ray._dir - _axis * axis_dir;
+    const math::Vector3D oc_perp = oc - _axis * axis_oc;
+    
+    const double a = dir_perp.dot(dir_perp);
+    const double b = 2.0 * dir_perp.dot(oc_perp);
+    const double c = oc_perp.dot(oc_perp) - _radius * _radius;
+    
+    const double discriminant = b * b - 4 * a * c;
+    if (discriminant < 0.0) {
         return false;
     }
-
-    double t1 = (-b - std::sqrt(discriminant)) / (2 * a);
-    double t2 = (-b + std::sqrt(discriminant)) / (2 * a);
-
-    if (t1 > t2) {
-        std::swap(t1, t2);
+    
+    const double sqrt_discriminant = std::sqrt(discriminant);
+    const double t1 = (-b - sqrt_discriminant) / (2.0 * a);
+    const double t2 = (-b + sqrt_discriminant) / (2.0 * a);
+    
+    double t = (t1 > 0.0) ? t1 : t2;
+    if (t < 0.0) {
+        return false;
     }
-
-    if (t1 < 0) {
-        t1 = t2; // Use t2 instead
-        if (t1 < 0) {
-            return false; // Both intersections are behind the ray origin
+    
+    // Check height constraints
+    math::Point3D point = ray._origin + ray._dir * t;
+    const double height = (point - _base_center).dot(_axis);
+    
+    if (height < 0.0 || height > _height) {
+        // Check caps if infinite cylinder intersection failed
+        bool hit_cap = false;
+        double closest_t = std::numeric_limits<double>::max();
+        
+        // Check base cap
+        const double denom_base = ray._dir.dot(-_axis);
+        if (std::fabs(denom_base) > EPSILON) {
+            const double t_base = (_base_center - ray._origin).dot(-_axis) / denom_base;
+            if (t_base > 0.0 && t_base < closest_t) {
+                const math::Point3D base_point = ray._origin + ray._dir * t_base;
+                if ((base_point - _base_center).length() <= _radius) {
+                    closest_t = t_base;
+                    hit_cap = true;
+                }
+            }
+        }
+        
+        // Check top cap
+        const math::Point3D top_center = _base_center + _axis * _height;
+        const double denom_top = ray._dir.dot(_axis);
+        if (std::fabs(denom_top) > EPSILON) {
+            const double t_top = (top_center - ray._origin).dot(_axis) / denom_top;
+            if (t_top > 0.0 && t_top < closest_t) {
+                const math::Point3D top_point = ray._origin + ray._dir * t_top;
+                if ((top_point - top_center).length() <= _radius) {
+                    closest_t = t_top;
+                    hit_cap = true;
+                }
+            }
+        }
+        
+        if (!hit_cap) {
+            return false;
+        }
+        
+        t = closest_t;
+        point = ray._origin + ray._dir * t;
+    }
+    
+    if (cullBackFaces) {
+        const math::Vector3D normal = getNormalAt(point);
+        if (ray._dir.dot(normal) > 0.0) {
+            return false;
         }
     }
-
-    intPoint = ray._origin + t1 * ray_dir;
-
-    if (intPoint._y < _origin._y || intPoint._y > _origin._y + _height) {
-        return false; // Intersection is outside the cylinder height
-    }
-
+    
+    intPoint = point;
     return true;
-}
-
-math::Vector3D raytracer::shape::LimCylinder::getPosition() const
-{
-    return _origin;
-}
-
-math::Vector3D raytracer::shape::LimCylinder::getNormalAt(const math::Point3D &point) const noexcept
-{
-    math::Vector3D normal = point - _origin;
-    normal._y = 0; // Ignore the y component for the normal
-    normal = normal.normalize();
-    return normal;
-}
-
-raytracer::shape::LimCylinder::~LimCylinder()
-{
-    logger::debug("LimCylinder was destroyed.");
 }

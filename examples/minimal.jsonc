@@ -23,12 +23,12 @@
     },
     "scene": {
         "shapes": {
-            "rectangles": [
+            "cylinders": [
                 {
-                    "origin": { "x": 0, "y": 0, "z": 0 },
-                    "bottom_side": { "x": 0, "y": 1, "z": 0 },
-                    "left_side": { "x": 1, "y": 0, "z": 0 },
-                    "depth_side": { "x": 0, "y": 0, "z": 1 },
+                    "origin": { "x": 0, "y": 0, "z": -1 },
+                    "axis": { "x": 1, "y": 1, "z": 1 },
+                    "radius": 0.5,
+                    "height": 1,
                     "material": "specular",
                     "color": { "r": 255, "g": 0, "b": 0 }
                 }

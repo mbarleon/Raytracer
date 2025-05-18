@@ -16,12 +16,20 @@ function _success()
     echo -e "${GREEN}[✅] SUCCESS:\t${RST} ${ILC}$1${RST}"
 }
 
+function _info()
+{
+    echo -e "${ORG}[🚧] RUNNING:\t${RST} ${ILC}$1${RST}"
+}
+
 function _all()
 {
     if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
     _success "command 'cmake' found, building..."
+    _info "updating external submodules..."
+    git submodule update --init --recursive
+    _success "updated external submodules !"
     mkdir -p build
     cd build || _error "mkdir failed"
     cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
@@ -38,6 +46,9 @@ function _debug()
     if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
+    _info "updating external submodules..."
+    git submodule update --init --recursive
+    _success "updated external submodules !"
     _success "command 'cmake' found, building..."
     mkdir -p build
     cd build || _error "mkdir failed"

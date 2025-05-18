@@ -16,7 +16,7 @@
  * public
  */
 
-raytracer::core::Application::Application(const char *RESTRICT filename, bool gui)
+raytracer::core::Application::Application(const char *RESTRICT filename, const bool gui)
 {
     setupConfig(filename);
 

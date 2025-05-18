@@ -6,112 +6,101 @@
 */
 
 #include "TangleCube.hpp"
+#include "Macro.hpp"
+#include <limits>
 #include <cmath>
+#include <algorithm>
 
-using namespace raytracer::shape;
-using namespace math;
-
-TangleCube::TangleCube(const Point3D &center,
-                       double width,
-                       double thickness,
-                       double radius,
-                       unsigned maxSteps,
-                       double   maxDist) noexcept
-  : _center(center),
-    _halfWidth(width * 0.5),
-    _thickness(thickness),
-    _radius(radius),
-    _maxSteps(static_cast<int>(maxSteps)),
-    _maxDist(maxDist)
+raytracer::shape::TangleCube::TangleCube(const math::Point3D &center, const double size,
+    const double thickness) : _center(center), _s(size * 0.5), _t(thickness * 0.5)
 {}
 
-// Ray‑marching + culling
-bool TangleCube::intersect(const Ray &ray,
-                           Point3D &intPoint,
-                           const bool cullBackFaces) const noexcept
+math::Vector3D raytracer::shape::TangleCube::getPosition() const
 {
-    Vector3D origin    = ray._origin - _center;
-    Vector3D direction = ray._dir.normalize();
-    double   t         = 0.0;
-
-    for (int i = 0; i < _maxSteps && t < _maxDist; ++i) {
-        Vector3D p = origin + direction * t;
-        double   d = distanceEstimator(p);
-        if (d < 1e-3) {
-            intPoint = ray._origin + ray._dir * t;
-            if (cullBackFaces) {
-                Vector3D N = getNormalAt(intPoint);
-                if (direction.dot(N) >= 0.0) 
-                    return false;
-            }
-            return true;
-        }
-        t += d;
-    }
-    return false;
+    return _center;
 }
 
-// Gradient par différences finies
-Vector3D TangleCube::getNormalAt(const Point3D &pt) const noexcept
+double raytracer::shape::TangleCube::getAOMaxDistance() const
 {
-    const double eps = 1e-4;
-    Vector3D base = pt - _center;
-    double d0 = distanceEstimator(base);
-    double dx = distanceEstimator(base + Vector3D(eps,0,0)) - d0;
-    double dy = distanceEstimator(base + Vector3D(0,eps,0)) - d0;
-    double dz = distanceEstimator(base + Vector3D(0,0,eps)) - d0;
-    return Vector3D(dx, dy, dz).normalize();
+    return 2.0 * _t;
 }
 
-// UV par projection simple selon la face (approx)
-void TangleCube::getUV(const Point3D &p, double &u, double &v) const noexcept
+math::RGBColor raytracer::shape::TangleCube::getColorAt(const math::Point3D &P) const
 {
-    Vector3D N   = getNormalAt(p);
-    Vector3D loc = p - _center;
-    // on projette sur le plan le plus orthogonal à N
-    if (std::fabs(N._x) > 0.5) {
-        // face X : proj Z,Y
-        u = (loc._z / _halfWidth + 1.0) * 0.5;
-        v = (loc._y / _halfWidth + 1.0) * 0.5;
-    } else if (std::fabs(N._y) > 0.5) {
-        // face Y : proj X,Z
-        u = (loc._x / _halfWidth + 1.0) * 0.5;
-        v = (loc._z / _halfWidth + 1.0) * 0.5;
+    double u;
+    double v;
+
+    getUV(P,u,v);
+    return _texture->value(P, u, v);
+}
+
+void raytracer::shape::TangleCube::getUV(const math::Point3D &P, double &u, double &v)
+    const noexcept
+{
+    const math::Vector3D d = (P - _center).normalize();
+
+    if (std::fabs(d._x) >= std::fabs(d._y) && std::fabs(d._x) >= std::fabs(d._z)) {
+        u = (P._z - (_center._z - _s)) / (2*_s);
+        v = (P._y - (_center._y - _s)) / (2*_s);
+    } else if (std::fabs(d._y) >= std::fabs(d._x) && std::fabs(d._y) >= std::fabs(d._z)) {
+        u = (P._x - (_center._x - _s)) / (2*_s);
+        v = (P._z - (_center._z - _s)) / (2*_s);
     } else {
-        // face Z : proj X,Y
-        u = (loc._x / _halfWidth + 1.0) * 0.5;
-        v = (loc._y / _halfWidth + 1.0) * 0.5;
+        u = (P._x - (_center._x - _s)) / (2*_s);
+        v = (P._y - (_center._y - _s)) / (2*_s);
     }
 }
 
-// couleur via texture ou nuance de gris sur Y
-math::RGBColor TangleCube::getColorAt(const Point3D &p) const
+math::Vector3D raytracer::shape::TangleCube::getNormalAt(const math::Point3D &P) const noexcept
 {
-    if (_texture) {
-        double u,v; getUV(p,u,v);
-        return _texture->value(p,u,v);
-    }
-    double h = (p._y - (_center._y - _halfWidth)) / (_halfWidth*2.0);
-    return math::RGBColor(h,h,h);
+    const math::Vector3D p = P - _center;
+    const double x = p._x, y = p._y, z = p._z;
+    const double t2 = _t * _t;
+
+    return math::Vector3D(4.0 * x*x*x - 10.0 * t2 * x, 4.0 * y*y*y - 10.0 * t2 * y,
+        4.0 * z*z*z - 10.0 * t2 * z).normalize();
 }
 
-// SDF creux arrondi = max(outerBox, -innerBox) - radius
-double TangleCube::distanceEstimator(const Vector3D &p_) const noexcept
+bool raytracer::shape::TangleCube::intersect(const math::Ray &ray, math::Point3D &intPoint,
+    bool cullBackFaces) const noexcept
 {
-    // On travaille sur une copie
-    Vector3D p = p_;
+    const math::Vector3D O = ray._origin - _center;
+    const math::Vector3D D = ray._dir;
+    const double Ox = O._x;
+    const double Oy = O._y;
+    const double Oz = O._z;
+    const double Dx = D._x;
+    const double Dy = D._y;
+    const double Dz = D._z;
+    const double t2 = _t*_t;
+    const double k = 3.0 * t2 * t2;
 
-    Vector3D outerB(_halfWidth, _halfWidth, _halfWidth);
-    Vector3D innerB(_halfWidth - _thickness, 
-                    _halfWidth - _thickness, 
-                    _halfWidth - _thickness);
+    // F(ray(t)) = 0 → quartique At^4 + Bt^3 + Ct^2 + Dt + E = 0
+    const auto coeff4 = Dx*Dx*Dx*Dx + Dy*Dy*Dy*Dy + Dz*Dz*Dz*Dz;
+    const auto coeff3 = 4*(Ox*Dx*Dx*Dx + Oy*Dy*Dy*Dy + Oz*Dz*Dz*Dz);
+    const auto coeff2 = 6*(Ox*Ox*Dx*Dx + Oy*Oy*Dy*Dy + Oz*Oz*Dz*Dz) - 5*t2*(Dx*Dx + Dy*Dy + Dz*Dz);
+    const auto coeff1 = 4*(Ox*Ox*Ox*Dx + Oy*Oy*Oy*Dy + Oz*Oz*Oz*Dz) - 10*t2*(Ox*Dx + Oy*Dy + Oz*Dz);
+    const auto coeff0 = (Ox*Ox*Ox*Ox + Oy*Oy*Oy*Oy + Oz*Oz*Oz*Oz) - 5*t2*(Ox*Ox + Oy*Oy + Oz*Oz) + k;
 
-    double dOuter = boxSDF(p, outerB);
-    double dInner = boxSDF(p, innerB);
+    double roots[4];
+    const int n = solveQuartic(coeff4, coeff3, coeff2, coeff1, coeff0, roots);
+    if (n == 0)
+        return false;
 
-    // shell SDF
-    double dShell = std::max(dOuter, -dInner);
+    double bestT = std::numeric_limits<double>::infinity();
+    for (int i = 0; i < n; ++i) {
+        const double t = roots[i];
 
-    // arrondi final
-    return dShell - _radius;
+        if (t <= EPSILON)
+            continue;
+        if (const math::Point3D P = ray._origin + ray._dir * t; cullBackFaces &&
+        ray._dir.dot(getMappedNormal(P)) >= 0.0)
+            continue;
+        bestT = std::min(bestT, t);
+    }
+
+    if (!std::isfinite(bestT))
+        return false;
+    intPoint = ray._origin + ray._dir * bestT;
+    return true;
 }

@@ -364,15 +364,12 @@ unit_static std::shared_ptr<raytracer::shape::TangleCube> create_tangle_cube(con
 {
     const auto &obj = get_value<JsonMap>(proto);
     const math::Vector3D position = get_vec3D(obj.at("origin"));
-    const double width = get_value<double>(obj.at("width"));
+    const double size = get_value<double>(obj.at("size"));
     const double thickness = get_value<double>(obj.at("thickness"));
-    const double radius = get_value<double>(obj.at("radius"));
-    const unsigned maxSteps = static_cast<unsigned>(get_value<int>(obj.at("max-steps")));
-    const double maxDistance = get_value<double>(obj.at("max-distance"));
     std::shared_ptr<raytracer::shape::TangleCube> cube = nullptr;
 
     try {
-        cube = std::make_shared<raytracer::shape::TangleCube>(position, width, thickness, radius, maxSteps, maxDistance);
+        cube = std::make_shared<raytracer::shape::TangleCube>(position, size, thickness);
     } catch (const std::bad_alloc &e) {
         throw raytracer::exception::Error("Core", "Tangle cube bad allocation", e.what());
     }

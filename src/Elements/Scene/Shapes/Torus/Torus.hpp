@@ -28,8 +28,5 @@ class Torus final : public AShape {
         math::Point3D _center;
         double _R;
         double _r;
-
-        int solveQuartic(const double a, const double b, const double c, const double d,
-            const double e, double roots[4]) const noexcept;
 };
 } // namespace

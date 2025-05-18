@@ -1,0 +1,165 @@
+{
+    "render": {
+        "antialiasing": {
+            "samples": 1,
+            "mode": "classic"
+        },
+        "skybox": "examples/skyboxes/panoramic/minecraft.png",
+        "lighting": {
+            "gamma": 1.0,
+            "ambient": {
+                "coef": 0.2,
+                "samples": 1
+            },
+            "diffuse": 0.6,
+            "specular": 0.2
+        },
+        "max-depth": 2,
+        "output": {
+            "file": "output.ppm",
+            "format": "ppm"
+        }
+    },
+    "camera": {
+        "resolution": {
+            "width": 400,
+            "height": 200
+        },
+        "position": {
+            "x": 0,
+            "y": 0,
+            "z": -3
+        },
+        "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "fov": 72
+    },
+    "scene": {
+        "shapes": {
+            "spheres": [
+                {
+                    "position": {
+                        "x": -1,
+                        "y": 0,
+                        "z": -1
+                    },
+                    "radius": 0.5,
+                    "shininess": 50.0,
+                    "material": {
+                        "type": "dielectric",
+                        "refraction": {
+                            "inside": 1.0,
+                            "outside": 1.52
+                        }
+                    },
+                    "texture": {
+                        "type": "color",
+                        "colors": {
+                            "1": {
+                                "r": 0,
+                                "g": 255,
+                                "b": 0
+                            }
+                        }
+                    },
+                    "normal": {
+                        "filename": "examples/normals/ripple.png",
+                        "scale": 3.0,
+                        "strength": 1.0
+                    }
+                },
+                {
+                    "position": {
+                        "x": 0,
+                        "y": 0,
+                        "z": -1
+                    },
+                    "radius": 0.5,
+                    "shininess": 100.0,
+                    "material": {
+                        "type": "specular"
+                    },
+                    "texture": {
+                        "type": "image",
+                        "filename": "examples/textures/water.jpg",
+                        "scale": 1.0
+                    }
+                },
+                {
+                    "position": {
+                        "x": 1,
+                        "y": 0,
+                        "z": -1
+                    },
+                    "radius": 0.5,
+                    "shininess": 50.0,
+                    "material": {
+                        "type": "diffuse"
+                    },
+                    "texture": {
+                        "type": "perlin-noise",
+                        "scale": 6.0,
+                        "colors": {
+                            "1": {
+                                "r": 255,
+                                "g": 0,
+                                "b": 0
+                            },
+                            "2": {
+                                "r": 0,
+                                "g": 255,
+                                "b": 0
+                            }
+                        }
+                    }
+                }
+            ],
+            "planes": [
+                {
+                    "axis": "Y",
+                    "position": -1,
+                    "shininess": 50.0,
+                    "material": {
+                        "type": "diffuse"
+                    },
+                    "texture": {
+                        "type": "chessboard",
+                        "scale": 0.5,
+                        "colors": {
+                            "1": {
+                                "r": 255,
+                                "g": 255,
+                                "b": 255
+                            },
+                            "2": {
+                                "r": 0,
+                                "g": 0,
+                                "b": 0
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "lights": {
+            "directionals": [
+                {
+                    "direction": {
+                        "x": 0,
+                        "y": -1,
+                        "z": -1
+                    },
+                    "color": {
+                        "r": 0,
+                        "g": 255,
+                        "b": 255
+                    },
+                    "intensity": 10.0
+                }
+            ]
+        }
+    }
+}

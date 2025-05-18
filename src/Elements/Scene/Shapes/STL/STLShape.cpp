@@ -119,9 +119,9 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
     const std::size_t start = t * chunk_size;
     const std::size_t end = std::min(start + chunk_size, _triangles.size());
 
-    const float rx = static_cast<float>(_rotation._x) * DEG2RAD;
-    const float ry = static_cast<float>(_rotation._y) * DEG2RAD;
-    const float rz = static_cast<float>(_rotation._z) * DEG2RAD;
+    const float rx = static_cast<float>(_rotation._x) * DEGREE_TO_RADIANT;
+    const float ry = static_cast<float>(_rotation._y) * DEGREE_TO_RADIANT;
+    const float rz = static_cast<float>(_rotation._z) * DEGREE_TO_RADIANT;
 
     const auto cx = std::cos(rx), sx = std::sin(rx);
     const auto cy = std::cos(ry), sy = std::sin(ry);
@@ -212,7 +212,7 @@ void raytracer::shape::STLShape::_centerSTL()
     }
 }
 
-raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Point3D &rotation, const char *RESTRICT filename,
+raytracer::shape::STLShape::STLShape(const math::Point3D &origin, const math::Vector3D &rotation, const char *RESTRICT filename,
     const float scale)
     : _scale(scale), _origin(origin), _rotation(rotation), _filename(filename)
 {
@@ -292,13 +292,12 @@ double raytracer::shape::STLShape::getAOMaxDistance() const
     return 10 * _scale;
 }
 
-math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D __attribute__((unused)) &p) const
+math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D __attribute__((unused)) & p) const
 {
     return math::RGBColor(1);
 }
 
-void raytracer::shape::STLShape::getUV(const math::Point3D __attribute__((unused)) &p, double &u,
-    double &v) const noexcept
+void raytracer::shape::STLShape::getUV(const math::Point3D __attribute__((unused)) & p, double &u, double &v) const noexcept
 {
     u = 0;
     v = 0;

@@ -119,9 +119,9 @@ void raytracer::shape::STLShape::_moveTriangles(const std::size_t chunk_size, co
     const std::size_t start = t * chunk_size;
     const std::size_t end = std::min(start + chunk_size, _triangles.size());
 
-    const float rx = static_cast<float>(_rotation._x) * DEGREE_TO_RADIANT;
-    const float ry = static_cast<float>(_rotation._y) * DEGREE_TO_RADIANT;
-    const float rz = static_cast<float>(_rotation._z) * DEGREE_TO_RADIANT;
+    const float rx = static_cast<float>(_rotation._x * DEGREE_TO_RADIANT);
+    const float ry = static_cast<float>(_rotation._y * DEGREE_TO_RADIANT);
+    const float rz = static_cast<float>(_rotation._z * DEGREE_TO_RADIANT);
 
     const auto cx = std::cos(rx), sx = std::sin(rx);
     const auto cy = std::cos(ry), sy = std::sin(ry);

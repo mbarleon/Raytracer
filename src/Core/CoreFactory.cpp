@@ -454,7 +454,6 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
  * @brief create a cylinder from ParsedJson
  * @details uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
- * @param materials MaterialsList to use for material creation
  * @return shared pointer to Cylinder
  */
 unit_static std::shared_ptr<raytracer::shape::Cylinder> create_cylinder(const ParsedJson &proto)

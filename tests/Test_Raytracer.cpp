@@ -201,3 +201,10 @@ Test(Directional, test_directional_light__sample)
     cr_assert_float_eq(bsdf.direction._z, expectedDirection._z, epsilon);
 }
 // clang-format on
+
+Test(Application, application_run)
+{
+    raytracer::core::Application app("tests/test-examples/test.jsonc", false);
+
+    app.runNoGUI();
+}

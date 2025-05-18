@@ -72,7 +72,7 @@ const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &sha
                 const double u0 = (x + 0.5) / static_cast<double>(_resolution._x);
 
                 generateRay(u0, v0, cameraRay);
-                const LightSample mainSample = getRayColor(cameraRay, shapes, lights, config, 0, rng);
+                const LightSample mainSample = getRayColor(cameraRay, shapes, lights, config, 0, rng, true);
                 if (mainSample.isDelta) {
                     restirGrid[y][x].add(mainSample, mainSample.radiance.luminance(), rng);
                     continue;
@@ -85,7 +85,7 @@ const raytracer::RaytraceGrid2D raytracer::Camera::render(const IShapesList &sha
                     dv = std::clamp(dv, 0.0, 1.0);
                     generateRay(du, dv, cameraRay);
 
-                    const LightSample sample = getRayColor(cameraRay, shapes, lights, config, 0, rng);
+                    const LightSample sample = getRayColor(cameraRay, shapes, lights, config, 0, rng, true);
                     restirGrid[y][x].add(sample, sample.radiance.luminance() / std::max(sample.pdf, EPSILON), rng);
                 }
             }

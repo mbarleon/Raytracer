@@ -8,7 +8,7 @@
 #include "Pathtracer.hpp"
 
 math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng)
+    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng, const bool cullBackFaces)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColorAt(isect.point);
@@ -19,7 +19,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::
         const math::Vector3D L = ls.direction.normalize();
         const math::Ray shadow = {isect.point + isect.normal * EPSILON, L};
 
-        if (math::Intersect occ; findClosestIntersection(shadow, shapes, occ, true) && occ.distance + EPSILON < ls.pdf) {
+        if (math::Intersect occ; findClosestIntersection(shadow, shapes, occ, cullBackFaces) && occ.distance + EPSILON < ls.pdf) {
             continue;
         }
 
@@ -44,7 +44,7 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::
 }
 
 double raytracer::ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes, const unsigned int aoSamples,
-    std::mt19937 &rng)
+    std::mt19937 &rng, const bool cullBackFaces)
 {
     const unsigned int total = aoSamples * aoSamples;
     double occlusion = 0.0;
@@ -72,7 +72,7 @@ double raytracer::ambientOcclusion(const math::Intersect &isect, const IShapesLi
         const math::Vector3D dir = (T * x + B * y + isect.normal * z).normalize();
         const math::Ray ray = {isect.point + dir * EPSILON, dir};
 
-        if (math::Intersect tmp; findClosestIntersection(ray, shapes, tmp, true)) {
+        if (math::Intersect tmp; findClosestIntersection(ray, shapes, tmp, cullBackFaces)) {
             const double d = tmp.distance;
             const double w = std::exp(-d / tmp.object->getAOMaxDistance());
             occlusion += w;

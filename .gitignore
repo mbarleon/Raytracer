@@ -61,3 +61,4 @@ cmake-build-debug/
 *.stl
 !tests/test-examples/test.stl
 !examples/skyboxes/panoramic/minecraft.png
+!examples/normals/ripple.png

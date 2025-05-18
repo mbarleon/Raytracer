@@ -92,7 +92,7 @@ bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &in
     }
     intPoint = ray._origin + ray._dir * t;
 
-    if (const math::Vector3D N = (intPoint - _center).normalize(); cullBackFaces && ray._dir.dot(N) >= 0.0) {
+    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0) {
         return false;
     }
     return true;

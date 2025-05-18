@@ -24,6 +24,6 @@ class MetalBSDF final : public BSDF {
             const math::Intersect &isect, std::mt19937 &rng) const override;
 
     private:
-        double _roughnessSquare;
+        double _roughness;
 };
 }// namespace raytracer::material

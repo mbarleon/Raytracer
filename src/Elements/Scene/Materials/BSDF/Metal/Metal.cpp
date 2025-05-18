@@ -10,7 +10,7 @@
 #include "Macro.hpp"
 
 raytracer::material::MetalBSDF::MetalBSDF(const double roughness) :
-    _roughnessSquare(roughness * roughness)
+    _roughness(roughness)
 {
 }
 
@@ -57,7 +57,7 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     const double u2 = u01(rng);
 
     const double phi = 2.0 * M_PI * u1;
-    const double cosTheta = std::sqrt((1.0 - u2) / (1.0 + (_roughnessSquare * _roughnessSquare - 1.0) * u2));
+    const double cosTheta = std::sqrt((1.0 - u2) / (1.0 + (_roughness * _roughness - 1.0) * u2));
     const double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
     const math::Vector3D T = N.orthonormal().cross(N).normalize();
@@ -71,15 +71,16 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     // pdf = D(H)·(N·H) / (4·(V·H))
     const double NdotH = std::max(N.dot(H), 0.0);
     const double VdotH = std::max(V.dot(H), 0.0);
-    const double D = distributionGGX(NdotH, _roughnessSquare);
+    const double D = distributionGGX(NdotH, _roughness);
     const double pdf = (D * NdotH) / (4.0 * VdotH + EPSILON);
 
     const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
     const double G = geometrySmith(std::max(N.dot(V), 0.0), std::max(N.dot(wi), 0.0),
-        _roughnessSquare);
+        _roughness);
 
     // sample radiance = F * D * G / (4 N·V)
-    const math::RGBColor spec = F * (D * G / (4.0 * std::max(N.dot(V), 0.0) + EPSILON));
+    const double NdotL = std::max(N.dot(wi), 0.0);
+    const math::RGBColor spec = F * (D * G / (4.0 * std::max(N.dot(V),0.0) + EPSILON)) * NdotL;
     return { wi, pdf, spec, true };
 }
 
@@ -101,8 +102,8 @@ math::RGBColor raytracer::material::MetalBSDF::evaluate(const math::Vector3D &wo
     const double NdotH = std::max(N.dot(H), 0.0);
     const double VdotH = std::max(V.dot(H), 0.0);
 
-    const double D = distributionGGX(NdotH, _roughnessSquare);
-    const double G = geometrySmith(NdotV, NdotL, _roughnessSquare);
+    const double D = distributionGGX(NdotH, _roughness);
+    const double G = geometrySmith(NdotV, NdotL, _roughness);
     const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
 
     // brdf = F·D·G / (4·N·V·N·L)

@@ -28,7 +28,7 @@ math::Vector3D raytracer::shape::Plane::getPosition() const
     }
 }
 
-math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
+math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attribute__((unused)) &point) const noexcept
 {
     switch (_axis) {
         case 'X':
@@ -73,6 +73,10 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
         return false;
     }
     intPoint = ray._origin + ray._dir * t;
+
+    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0) {
+        return false;
+    }
     return true;
 }
 

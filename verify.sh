@@ -36,7 +36,45 @@ function _info() {
 JOBS=$(nproc 2>/dev/null || echo 1)
 DIRS=(src include)
 CHECKS="*,-llvm-header-guard,modernize-*,performance-*,readability-*,bugprone-*,clang-analyzer-*"
-COMPILER_FLAGS="-- -std=c++20 -Wall -Wextra -pedantic -Werror -Wconversion"
+
+##################################################################
+# INFO: Check for compile_commands.json
+##################################################################
+
+COMPILE_COMMANDS="compile_commands.json"
+COMPILER_FLAGS="--"
+
+if [[ -f "$COMPILE_COMMANDS" ]]; then
+    _info "Found compile_commands.json - using it for analysis"
+else
+    _warning "No compile_commands.json found" "Attempting to generate one..."
+    
+    command -v bear >/dev/null 2>&1 || _error "bear not found" "Install bear with: sudo apt-get install bear"
+    command -v cmake >/dev/null 2>&1 || _error "cmake not found" "Install cmake first"
+    command -v make >/dev/null 2>&1 || _error "make not found" "Install build-essential"
+
+    _info "Creating build directory and configuring CMake"
+    mkdir -p build
+    cd build || _error "Failed to create build directory"
+    
+    cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release || {
+        cd ..
+        _error "CMake configuration failed" "Check your CMakeLists.txt"
+    }
+
+    _info "Generating compile_commands.json using bear"
+    bear -- make -j"$JOBS" || {
+        cd ..
+        _error "Build failed" "Check your source code for compilation errors"
+    }
+    
+    mv -f "$COMPILE_COMMANDS" ../ && cd .. || _error "File move failed"
+    _success "Successfully generated $COMPILE_COMMANDS"
+fi
+
+##################################################################
+# INFO: Check for clang-tidy
+##################################################################
 
 command -v clang-tidy >/dev/null 2>&1 \
     || _error "clang-tidy not found in PATH" "Please install clang-tidy and try again"

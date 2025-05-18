@@ -16,6 +16,7 @@
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Cylinder/Cylinder.hpp"
 #include "../Elements/Scene/Shapes/TangleCube/TangleCube.hpp"
 #include "../Elements/Scene/Shapes/ScrewForm/ScrewForm.hpp"
 #include "../Elements/Scene/Shapes/Torus/Torus.hpp"
@@ -450,6 +451,29 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 }
 
 /**
+ * @brief create a cylinder from ParsedJson
+ * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @param materials MaterialsList to use for material creation
+ * @return shared pointer to Cylinder
+ */
+unit_static std::shared_ptr<raytracer::shape::Cylinder> create_cylinder(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Point3D base_center = get_vec3D(obj.at("origin"));
+    const math::Vector3D axis = get_vec3D(obj.at("axis"));
+    const double radius = get_value<double>(obj.at("radius"));
+    const double height = get_value<double>(obj.at("height"));
+    const raytracer::material::Material material = get_material(obj);
+
+    const std::shared_ptr<raytracer::shape::Cylinder> cylinder =
+        std::make_shared<raytracer::shape::Cylinder>(base_center, axis, radius, height);
+
+    cylinder.get()->setMaterial(material);
+    return cylinder;
+}
+
+/**
 * @brief
 * @details private static
 * @return
@@ -566,6 +590,7 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
     emplace_shapes(primitives, "spheres", shapes, create_sphere);
     emplace_shapes(primitives, "rectangles", shapes, create_rectangle);
     emplace_shapes(primitives, "planes", shapes, create_plane);
+    emplace_shapes(primitives, "cylinders", shapes, create_cylinder);
     emplace_shapes(primitives, "stl", shapes, create_stl);
     emplace_shapes(primitives, "toruses", shapes, create_torus);
     emplace_shapes(primitives, "screw-forms", shapes, create_screw_form);

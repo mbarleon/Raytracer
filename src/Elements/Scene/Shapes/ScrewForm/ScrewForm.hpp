@@ -2,19 +2,22 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** Rectangle.hpp
+** ScrewForm
 */
 
 #pragma once
 
 #include "../AShape.hpp"
+#include "../../../../Maths/Vector3D.hpp"
+#include "../../../../Maths/Ray.hpp"
 
 namespace raytracer::shape {
-class Rectangle final : public AShape
-{
+
+class ScrewForm final : public AShape {
     public:
-        Rectangle(const math::Point3D &center, const double x, const double y,
-            const double z) noexcept;
+        ScrewForm(const math::Point3D &center, const double width,
+            const double twistFreq = 3.0, const unsigned maxSteps = 128,
+            const double maxDist = 100.0) noexcept;
 
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
         void getUV(const math::Point3D &p, double &u, double &v) const noexcept override;
@@ -27,8 +30,12 @@ class Rectangle final : public AShape
 
     private:
         math::Point3D _center;
-        double _x;
-        double _y;
-        double _z;
+        double _halfWidth;
+        double _twistFreq;
+        unsigned _maxSteps;
+        double _maxDist;
+
+        double distanceEstimator(math::Vector3D p) const noexcept;
+        math::Vector3D estimateNormal(const math::Point3D &p) const noexcept;
 };
-}// namespace raytracer::shape
+} // namespace raytracer::shape

@@ -1,18 +1,19 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 20, // 40 for absolute realism, 1 for fast rendering
+            "samples": 4, // 40 for absolute realism, 1 for fast rendering
             "mode": "classic" // none, classic, adaptive
         },
         "skybox": "examples/skyboxes/panoramic/minecraft.png",
         "lighting": {
             "gamma": 1.0,
+            "extra-shadow": 0.0,
             "ambient": {
-                "coef": 0.2,
-                "samples": 10 // 20 for absolute realism, 1 for fast rendering
+                "coef": 0.5,
+                "samples": 2 // 20 for absolute realism, 1 for fast rendering
             },
-            "diffuse": 0.6,
-            "specular": 0.2
+            "diffuse": 0.3,
+            "specular": 0.5
         },
         "max-depth": 4, // reflection and refraction limit
         "output": {
@@ -117,14 +118,14 @@
             "planes": [
                 {
                     "axis": "Y",
-                    "position": -1,
+                    "position": -0.5,
                     "shininess": 50.0,
                     "material": {
                         "type": "diffuse"
                     },
                     "texture": {
-                        "type": "chessboard",
-                        "scale": 0.5,
+                        "type": "color",
+                        "scale": 0.2,
                         "colors": {
                             "1": { "r": 255, "g": 255, "b": 255 },
                             "2": { "r": 0, "g": 0, "b": 0 }
@@ -135,18 +136,18 @@
         },
         "lights": {
             "points": [
+                {
+                    "position": { "x": -10, "y": 0, "z": 15 },
+                    "color": { "r": 255, "g": 0, "b": 0 },
+                    "intensity": 500000.0
+                }
+            ],
+            "directionals": [
                 // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
+                //     "direction": { "x": 0, "y": -1, "z": -1 },
                 //     "color": { "r": 0, "g": 255, "b": 255 },
                 //     "intensity": 10.0
                 // }
-            ],
-            "directionals": [
-                {
-                    "direction": { "x": 0, "y": -1, "z": -1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 10.0
-                }
             ]
         }
     }

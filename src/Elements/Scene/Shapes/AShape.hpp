@@ -25,6 +25,9 @@ class AShape : public IShape
         double getShininess() const override;
 
     protected:
+        static int solveQuartic(const double A, const double B, const double C,
+            const double D, const double E, double roots[4]) noexcept;
+
         std::shared_ptr<raytracer::texture::ITexture> _texture = nullptr;
         std::shared_ptr<raytracer::texture::ITexture> _normalMap = nullptr;
         material::Material _material;

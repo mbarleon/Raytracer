@@ -14,10 +14,11 @@
 * public
 */
 
+// clang-format off
 /**
  * @brief Cone __ctor__
  */
-raytracer::shape::Cone::Cone(const math::Point3D &apex, const math::Vector3D &direction, const double angle, const double height)
+raytracer::shape::Cone::Cone(const math::Point3D &apex, const math::Vector3D &direction, const double angle, const double height) noexcept
     : _apex(apex), _direction(direction.normalize()), _angle(angle), _height(height)
 {
     _cos_angle = std::cos(_angle);
@@ -25,6 +26,7 @@ raytracer::shape::Cone::Cone(const math::Point3D &apex, const math::Vector3D &di
     _tan_angle = std::tan(_angle);
     logger::debug("Cone was built: apex=", apex, ", angle=", angle, ", height=", height, ".");
 }
+// clang-format on
 
 /**
 * @brief Cone::getPosition

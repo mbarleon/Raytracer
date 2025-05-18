@@ -26,14 +26,15 @@ using RaytraceGrid2D = std::vector<std::vector<Tank>>;
 
 // Lighting
 math::RGBColor phongDirect(const math::Intersect &isect, const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng, const bool cullBackFaces);
+    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng, raytracer::Tank &tank, const bool cullBackFaces);
 double ambientOcclusion(const math::Intersect &isect, const IShapesList &shapes, const unsigned int aoSamples,
     std::mt19937 &rng, const bool cullBackFaces);
 
 // Color
 math::RGBColor getBackgroundColor(const math::Vector3D &v, const math::RGBColor &background);
 LightSample getRayColor(const math::Ray &ray, const IShapesList &shapes, const ILightsList &lights, const RenderConfig &config,
-    const unsigned depth, std::mt19937 &rng, const bool cullBackFaces, const math::RGBColor &throughput = math::RGBColor(1.0));
+    const unsigned depth, std::mt19937 &rng, const bool cullBackFaces,
+    raytracer::Tank &tank, const math::RGBColor &throughput = math::RGBColor(1.0));
 
 // Intersect
 bool findClosestIntersection(const math::Ray &ray, const IShapesList &shapes, math::Intersect &intersect,

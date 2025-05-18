@@ -8,7 +8,7 @@
 #include "Pathtracer.hpp"
 
 math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::Vector3D &viewDir, const ILightsList &lights,
-    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng, const bool cullBackFaces)
+    const IShapesList &shapes, const RenderConfig &config, std::mt19937 &rng, raytracer::Tank &tank, const bool cullBackFaces)
 {
     const auto *bsdf = isect.object->getMaterial().bsdf.get();
     const math::RGBColor baseColor = isect.object->getColorAt(isect.point);
@@ -20,6 +20,8 @@ math::RGBColor raytracer::phongDirect(const math::Intersect &isect, const math::
         const math::Ray shadow = {isect.point + isect.normal * EPSILON, L};
 
         if (math::Intersect occ; findClosestIntersection(shadow, shapes, occ, cullBackFaces) && occ.distance + EPSILON < ls.pdf) {
+            LightSample sh { math::RGBColor(0.0), 1.0, false };
+            tank.add(sh, config.lighting.extraShadow, rng);
             continue;
         }
 

@@ -90,9 +90,10 @@ Test(Color, test_getBackgroundColor)
 Test(Color, test_getRayColor)
 {
     const auto slrc = raytracer::create_objects();
-    const math::Ray ray(math::Point3D(0, 0, 0), math::Vector3D(1, 1, 1));
+    const math::Ray ray = {math::Point3D(0, 0, 0), math::Vector3D(1, 1, 1)};
+    raytracer::Tank tank;
     std::mt19937 mt;
-    const auto ls = raytracer::getRayColor(ray, slrc.shapes, slrc.lights, slrc.render_config, 0, mt, true, math::RGBColor(1.0));
+    const auto ls = raytracer::getRayColor(ray, slrc.shapes, slrc.lights, slrc.render_config, 0, mt, true, tank, math::Vector3D(1));
 
     cr_assert_eq(ls.isDelta, false);
 }
@@ -155,7 +156,8 @@ Test(Lighting, test_phong_direct)
         .distance = 3.0
     };
     std::mt19937 rng;
-    const math::RGBColor rgb = raytracer::phongDirect(isect, v3, slrc.lights, slrc.shapes, slrc.render_config, rng, false);
+    raytracer::Tank tank;
+    const math::RGBColor rgb = raytracer::phongDirect(isect, v3, slrc.lights, slrc.shapes, slrc.render_config, rng, tank, false);
 
     cr_assert_eq(rgb._x, 0);
     cr_assert_eq(rgb._z, 0);

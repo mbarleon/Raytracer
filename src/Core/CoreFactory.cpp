@@ -520,7 +520,8 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
     const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
     const raytracer::AmbientOcclusion ambient = {get_value<double>(light_ambient_obj.at("coef")),
         static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))};
-    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")), ambient,
+    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")),
+        get_value<double>(light_obj.at("extra-shadow")), ambient,
         get_value<double>(light_obj.at("diffuse")), get_value<double>(light_obj.at("specular"))};
 
     const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));

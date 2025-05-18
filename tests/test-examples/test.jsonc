@@ -7,6 +7,7 @@
         "skybox": "examples/skyboxes/panoramic/minecraft.png",
         "lighting": {
             "gamma": 1.0,
+            "extra-shadow": 0.0,
             "ambient": {
                 "coef": 0.2,
                 "samples": 1

@@ -47,6 +47,11 @@
                         "y": 0,
                         "z": -1
                     },
+                    "rotation": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
                     "radius": 0.5,
                     "shininess": 50.0,
                     "material": {
@@ -78,6 +83,11 @@
                         "y": 0,
                         "z": -1
                     },
+                    "rotation": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
                     "radius": 0.5,
                     "shininess": 100.0,
                     "material": {
@@ -94,6 +104,11 @@
                         "x": 1,
                         "y": 0,
                         "z": -1
+                    },
+                    "rotation": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
                     },
                     "radius": 0.5,
                     "shininess": 50.0,
@@ -122,6 +137,11 @@
                 {
                     "axis": "Y",
                     "position": -1,
+                    "rotation": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
                     "shininess": 50.0,
                     "material": {
                         "type": "diffuse"

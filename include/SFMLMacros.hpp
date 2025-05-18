@@ -29,7 +29,11 @@
 
 #define UNUSED __attribute__((unused))
 
-#define RT_DEFAULT_FONT_PATH "assets/fonts/jetbrains.ttf"
+#if defined(UNIT_TESTS)
+    #define RT_DEFAULT_FONT_PATH "../assets/fonts/jetbrains.ttf"
+#else
+    #define RT_DEFAULT_FONT_PATH "assets/fonts/jetbrains.ttf"
+#endif
 
 #define RT_MAX_PIXEL_BUFFER_WIDTH 1280
 #define RT_MAX_PIXEL_BUFFER_HEIGHT 720

@@ -63,7 +63,7 @@ const raytracer::PixelBuffer raytracer::core::Render::toPreview(const IShapesLis
             math::Point3D hitPoint;
 
             if (shape->intersect(ray, hitPoint, true)) {
-                pixel = shape->getColor();
+                pixel = shape->getColorAt(hitPoint);
                 break;
             }
         }

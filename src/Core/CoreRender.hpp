@@ -56,13 +56,12 @@ static void _forEach(const Func &&func, Grid &grid, const math::Vector2u size = 
 
 static inline double getPixelColor(const double c, const double gamma)
 {
-    double mapped = c / (1.0 + c);
-
+    const double a = 2.51, b = 0.03, c0 = 2.43, d = 0.59, e = 0.14;
+    double mapped = (c * (a * c + b)) / (c * (c0 * c + d) + e);
     mapped = std::clamp(mapped, 0.0, 1.0);
 
     const double g = std::pow(mapped, 1.0 / gamma);
-
-    return (g * 255.0 + 0.5);
+    return static_cast<int>(g * 255.0 + 0.5);
 }
 
 static inline void realignColor(math::RGBColor &color, const double gamma)

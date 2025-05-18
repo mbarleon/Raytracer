@@ -3,6 +3,7 @@
 GREEN="\033[1;32m"
 RED="\033[1;31m"
 ILC="\033[3m"
+ORG="\033[1;33m"
 RST="\033[0m"
 
 function _error()
@@ -16,12 +17,20 @@ function _success()
     echo -e "${GREEN}[✅] SUCCESS:\t${RST} ${ILC}$1${RST}"
 }
 
+function _info()
+{
+    echo -e "${ORG}[🚧] RUNNING:\t${RST} ${ILC}$1${RST}"
+}
+
 function _all()
 {
     if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
     _success "command 'cmake' found, building..."
+    _info "updating external submodules..."
+    git submodule update --init --recursive
+    _success "updated external submodules !"
     mkdir -p build
     cd build || _error "mkdir failed"
     cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
@@ -38,6 +47,9 @@ function _debug()
     if ! { command -v cmake > /dev/null; } 2>&1; then
         _error "command 'cmake' not found" "please install 'cmake' or 'nix develop' 🤓"
     fi
+    _info "updating external submodules..."
+    git submodule update --init --recursive
+    _success "updated external submodules !"
     _success "command 'cmake' found, building..."
     mkdir -p build
     cd build || _error "mkdir failed"
@@ -71,7 +83,7 @@ function _tests_run()
         xcrun llvm-profdata merge -sparse unit_tests-*.profraw -o unit_tests.profdata
         xcrun llvm-cov report ./unit_tests -instr-profile=unit_tests.profdata -ignore-filename-regex='.*/tests/.*' -enable-name-compression > code_coverage.txt
     else
-        gcovr -r . --exclude tests/ > code_coverage.txt
+        gcovr -r . --exclude tests/ --gcov-ignore-parse-errors=negative_hits.warn_once_per_file > code_coverage.txt
     fi
     cat code_coverage.txt
 }

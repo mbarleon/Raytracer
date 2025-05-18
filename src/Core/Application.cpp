@@ -16,12 +16,17 @@
  * public
  */
 
-raytracer::core::Application::Application(const char *RESTRICT filename)
+raytracer::core::Application::Application(const char *RESTRICT filename, const bool gui)
 {
+    setupConfig(filename);
+
+    if (!gui) {
+        return;
+    }
+
     _backend = std::make_unique<Backend>();
     _ui = std::make_unique<ui::UIManager>(_backend->getWindow());
 
-    setupConfig(filename);
     setupPreview();
     setupUI();
 }
@@ -182,3 +187,11 @@ void raytracer::core::Application::setupUI()
 
 }
 // clang-format on
+
+void raytracer::core::Application::runNoGUI()
+{
+    const RaytraceGrid2D grid2d = _camera->render(_shapes, _lights, _config);
+
+    _pixelBuffer = Render::toImage(grid2d, _config.lighting.gamma);
+    raytracer::core::Render::toPPM(_pixelBuffer);
+}

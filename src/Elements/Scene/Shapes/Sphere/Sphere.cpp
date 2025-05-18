@@ -45,6 +45,25 @@ double raytracer::shape::Sphere::getAOMaxDistance() const
     return 2.0 * _radius;
 }
 
+void raytracer::shape::Sphere::getUV(const math::Point3D &p, double &u, double &v) const noexcept
+{
+    const math::Vector3D n = (p - _center).normalize();
+    const double theta = std::acos(-n._y);
+    const double phi = std::atan2(-n._z, n._x) + M_PI;
+
+    u = phi / (2.0 * M_PI);
+    v = theta / M_PI;
+}
+
+math::RGBColor raytracer::shape::Sphere::getColorAt(const math::Point3D &p) const
+{
+    double u;
+    double v;
+
+    getUV(p, u, v);
+    return _texture->value(p, u, v);
+}
+
 /**
 * @brief
 * @details
@@ -73,7 +92,7 @@ bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &in
     }
     intPoint = ray._origin + ray._dir * t;
 
-    if (const math::Vector3D N = (intPoint - _center).normalize(); cullBackFaces && ray._dir.dot(N) >= 0.0) {
+    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0) {
         return false;
     }
     return true;

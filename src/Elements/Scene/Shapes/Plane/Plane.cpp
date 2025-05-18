@@ -28,7 +28,7 @@ math::Vector3D raytracer::shape::Plane::getPosition() const
     }
 }
 
-math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attribute__((unused)) & point) const noexcept
+math::Vector3D raytracer::shape::Plane::getNormalAt(const math::Point3D __attribute__((unused)) &point) const noexcept
 {
     switch (_axis) {
         case 'X':
@@ -51,18 +51,21 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
 
     switch (_axis) {
         case 'X':
-            if (std::abs(ray._dir._x) < EPSILON)
+            if (std::abs(ray._dir._x) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._x) / ray._dir._x;
             break;
         case 'Y':
-            if (std::abs(ray._dir._y) < EPSILON)
+            if (std::abs(ray._dir._y) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._y) / ray._dir._y;
             break;
         default:
-            if (std::abs(ray._dir._z) < EPSILON)
+            if (std::abs(ray._dir._z) < EPSILON) {
                 return false;
+            }
             t = (_position - ray._origin._z) / ray._dir._z;
             break;
     }
@@ -70,5 +73,36 @@ bool raytracer::shape::Plane::intersect(const math::Ray &ray, math::Point3D &int
         return false;
     }
     intPoint = ray._origin + ray._dir * t;
+
+    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0) {
+        return false;
+    }
     return true;
+}
+
+void raytracer::shape::Plane::getUV(const math::Point3D &p, double &u, double &v) const noexcept
+{
+    switch (_axis) {
+        case 'X':
+            u = p._z;
+            v = p._y;
+            break;
+        case 'Y':
+            u = p._x;
+            v = p._z;
+            break;
+        default:
+            u = p._x;
+            v = p._y;
+            break;
+    }
+}
+
+math::RGBColor raytracer::shape::Plane::getColorAt(const math::Point3D &p) const
+{
+    double u;
+    double v;
+
+    getUV(p, u, v);
+    return _texture->value(p, u, v);
 }

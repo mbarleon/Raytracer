@@ -6,15 +6,14 @@
 */
 
 #include "Metal.hpp"
-#include <cmath>
 #include "Macro.hpp"
+#include <cmath>
 
-raytracer::material::MetalBSDF::MetalBSDF(const math::RGBColor &albedo, double roughness) :
-    _specular(albedo), _roughnessSquare(roughness * roughness)
+raytracer::material::MetalBSDF::MetalBSDF(const double roughness) : _roughness(roughness)
 {
 }
 
-double distributionGGX(double NdotH, double alpha) noexcept
+static double distributionGGX(double NdotH, double alpha) noexcept
 {
     const double a2 = alpha * alpha;
     const double denom = NdotH * NdotH * (a2 - 1.0) + 1.0;
@@ -22,7 +21,7 @@ double distributionGGX(double NdotH, double alpha) noexcept
     return a2 / (M_PI * denom * denom);
 }
 
-double geometrySchlickGGX(double NdotV, double alpha) noexcept
+static double geometrySchlickGGX(double NdotV, double alpha) noexcept
 {
     double k = (alpha + 1.0);
 
@@ -30,7 +29,7 @@ double geometrySchlickGGX(double NdotV, double alpha) noexcept
     return NdotV / (NdotV * (1.0 - k) + k);
 }
 
-double geometrySmith(double NdotV, double NdotL, double alpha) noexcept
+static double geometrySmith(double NdotV, double NdotL, double alpha) noexcept
 {
     const double ggx1 = geometrySchlickGGX(NdotV, alpha);
     const double ggx2 = geometrySchlickGGX(NdotL, alpha);
@@ -38,7 +37,7 @@ double geometrySmith(double NdotV, double NdotL, double alpha) noexcept
     return ggx1 * ggx2;
 }
 
-math::RGBColor fresnelSchlick(double cosTheta, const math::RGBColor &F0) noexcept
+static math::RGBColor fresnelSchlick(double cosTheta, const math::RGBColor &F0) noexcept
 {
     // f = F0 + (1−F0)*(1−cosθ)^5
     const double factor = std::pow(1.0 - cosTheta, 5.0);
@@ -46,8 +45,8 @@ math::RGBColor fresnelSchlick(double cosTheta, const math::RGBColor &F0) noexcep
     return F0 + (math::RGBColor(1.0) - F0) * factor;
 }
 
-raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const math::Vector3D &wo,
-    const math::Intersect &isect, std::mt19937 &rng) const
+raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const math::Vector3D &wo, const math::Intersect &isect,
+    std::mt19937 &rng) const
 {
     const math::Vector3D N = isect.normal.normalize();
     const math::Vector3D V = wo.normalize();
@@ -57,13 +56,12 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     const double u2 = u01(rng);
 
     const double phi = 2.0 * M_PI * u1;
-    const double cosTheta = std::sqrt((1.0 - u2) / (1.0 + (_roughnessSquare * _roughnessSquare - 1.0) * u2));
+    const double cosTheta = std::sqrt((1.0 - u2) / (1.0 + (_roughness * _roughness - 1.0) * u2));
     const double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
-    const math::Vector3D T = N.orthonormal().cross(N).normalize();
+    const math::Vector3D T = N.orthogonal().cross(N).normalize();
     const math::Vector3D B = N.cross(T);
-    const math::Vector3D H = (T * (std::cos(phi)*sinTheta) + B * (std::sin(phi)*sinTheta) +
-        N * cosTheta).normalize();
+    const math::Vector3D H = (T * (std::cos(phi) * sinTheta) + B * (std::sin(phi) * sinTheta) + N * cosTheta).normalize();
 
     // perfect reflect
     const math::Vector3D wi = (V - H * 2.0 * V.dot(H)).normalize();
@@ -71,21 +69,20 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     // pdf = D(H)·(N·H) / (4·(V·H))
     const double NdotH = std::max(N.dot(H), 0.0);
     const double VdotH = std::max(V.dot(H), 0.0);
-    const double D = distributionGGX(NdotH, _roughnessSquare);
+    const double D = distributionGGX(NdotH, _roughness);
     const double pdf = (D * NdotH) / (4.0 * VdotH + EPSILON);
 
-    const math::RGBColor F = fresnelSchlick(VdotH, _specular);
-    const double G = geometrySmith(std::max(N.dot(V), 0.0), std::max(N.dot(wi), 0.0),
-        _roughnessSquare);
+    const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
+    const double G = geometrySmith(std::max(N.dot(V), 0.0), std::max(N.dot(wi), 0.0), _roughness);
 
     // sample radiance = F * D * G / (4 N·V)
-    const math::RGBColor spec = F * (D * G / (4.0 * std::max(N.dot(V), 0.0) + EPSILON));
-    return { wi, pdf, spec, true };
+    const double NdotL = std::max(N.dot(wi), 0.0);
+    const math::RGBColor spec = F * (D * G / (4.0 * std::max(N.dot(V), 0.0) + EPSILON)) * NdotL;
+    return {wi, pdf, spec, true};
 }
 
-math::RGBColor raytracer::material::MetalBSDF::evaluate(const math::Vector3D &wo,
-    const math::Vector3D &wi, const math::Intersect &isect,
-    std::mt19937 __attribute__((unused)) &rng) const
+math::RGBColor raytracer::material::MetalBSDF::evaluate(const math::Vector3D &wo, const math::Vector3D &wi,
+    const math::Intersect &isect, std::mt19937 __attribute__((unused)) & rng) const
 {
     const math::Vector3D N = isect.normal.normalize();
     const math::Vector3D V = wo.normalize();
@@ -101,9 +98,9 @@ math::RGBColor raytracer::material::MetalBSDF::evaluate(const math::Vector3D &wo
     const double NdotH = std::max(N.dot(H), 0.0);
     const double VdotH = std::max(V.dot(H), 0.0);
 
-    const double D = distributionGGX(NdotH, _roughnessSquare);
-    const double G = geometrySmith(NdotV, NdotL, _roughnessSquare);
-    const math::RGBColor F = fresnelSchlick(VdotH, _specular);
+    const double D = distributionGGX(NdotH, _roughness);
+    const double G = geometrySmith(NdotV, NdotL, _roughness);
+    const math::RGBColor F = fresnelSchlick(VdotH, isect.object->getColorAt(isect.point));
 
     // brdf = F·D·G / (4·N·V·N·L)
     return F * (D * G / (4.0 * NdotV * NdotL + EPSILON));

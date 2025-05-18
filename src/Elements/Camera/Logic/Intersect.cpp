@@ -31,7 +31,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
         }
     }
     if (hit) {
-        intersect.normal = intersect.object->getNormalAt(intersectPoint);
+        intersect.normal = intersect.object->getMappedNormal(intersectPoint);
     }
     return hit;
 }

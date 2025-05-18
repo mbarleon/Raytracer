@@ -16,16 +16,19 @@ class AShape : public IShape
         ~AShape() override = default;
 
         void setMaterial(const material::Material &material) override;
-        void setColor(const math::RGBColor &color) override;
         void setShininess(const double shininess) override;
+        void setTexture(const std::shared_ptr<texture::ITexture> &texture) override;
+        void setNormalMap(const std::shared_ptr<texture::ITexture> &map, const double strength) override;
 
         material::Material getMaterial() const override;
-        math::RGBColor getColor() const override;
+        math::Vector3D getMappedNormal(const math::Point3D &point) const noexcept override;
         double getShininess() const override;
 
     protected:
+        std::shared_ptr<raytracer::texture::ITexture> _texture = nullptr;
+        std::shared_ptr<raytracer::texture::ITexture> _normalMap = nullptr;
         material::Material _material;
-        math::RGBColor _color;
+        double _normalStrength;
         double _shininess;
 };
 }// namespace raytracer::shape

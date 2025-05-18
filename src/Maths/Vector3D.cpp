@@ -132,7 +132,7 @@ math::Vector3D math::Vector3D::normalize() const
     return len != 0.0 ? *this / len : Vector3D(0.0, 0.0, 0.0);
 }
 
-math::Vector3D math::Vector3D::orthonormal() const
+math::Vector3D math::Vector3D::orthogonal() const
 {
     if (std::fabs(_x) > std::fabs(_z)) {
         return math::Vector3D(-_y, _x, 0.0);
@@ -192,4 +192,9 @@ math::Vector3D math::Vector3D::applyRotation(const math::Vector3D &dir, const ma
 
     return math::Vector3D(m00 * dir._x + m01 * dir._y + m02 * dir._z, m10 * dir._x + m11 * dir._y + m12 * dir._z,
         m20 * dir._x + m21 * dir._y + m22 * dir._z);
+}
+
+double math::Vector3D::luminance() const
+{
+    return 0.2126 * _x + 0.7152 * _y + 0.0722 * _z;
 }

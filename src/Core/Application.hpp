@@ -23,10 +23,11 @@ namespace raytracer::core {
 class Application final : public NonCopyable
 {
     public:
-        explicit Application(const char *RESTRICT filename);
+        explicit Application(const char *RESTRICT filename, const bool gui);
         ~Application() = default;
 
         void run();
+        void runNoGUI();
 
         static PixelBuffer _pixelBuffer;
 

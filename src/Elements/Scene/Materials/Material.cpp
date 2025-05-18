@@ -11,12 +11,12 @@ raytracer::material::Material::Material() : bsdf(nullptr)
 {
 }
 
-raytracer::material::Material::Material(const std::shared_ptr<BSDF> &bsdf) : bsdf(bsdf)
+raytracer::material::Material::Material(const std::shared_ptr<BSDF> &bsdf_out) : bsdf(bsdf_out)
 {
 }
 
-raytracer::material::BSDFSample raytracer::material::Material::sample(const math::Vector3D &wo,
-    const math::Intersect &isect, std::mt19937 &rng) const
+raytracer::material::BSDFSample raytracer::material::Material::sample(const math::Vector3D &wo, const math::Intersect &isect,
+    std::mt19937 &rng) const
 {
     return bsdf->sample(wo, isect, rng);
 }

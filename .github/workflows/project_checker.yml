@@ -17,11 +17,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Xvfb and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libx11-dev libgl1-mesa-dev libsfml-dev
       - name: Check for build.sh
         run: |
           if [ ! -f "build.sh" ]; then
             echo "::error ::/!\\ WARNING NO build.sh FOUND /!\\"
-            exit 1
+            exit 84
           else
             echo "::notice::build.sh found."
           fi
@@ -31,14 +37,14 @@ jobs:
             echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
           else
             echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
-            exit 1
+            exit 84
           fi
       - name: Check executables
         run: |
           executable="${EXECUTABLE_PATH}"
           if [ ! -x "$executable" ]; then
             echo "::error file=$executable::Executable $executable is missing or not executable."
-            exit 1
+            exit 84
           else
             echo "::notice file=$executable::Executable $executable found and is executable."
           fi
@@ -46,26 +52,12 @@ jobs:
           EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
       - name: Check unit_tests
         run: |
-          if ./build.sh --tests ; then
+          if xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./build.sh --tests ; then
             echo "::notice file=build.sh::Unit tests successful (./build.sh --tests)."
           else
             echo "::error file=build.sh::/!\\ UNIT TESTS ERROR (./build.sh --tests)/!\\"
-            exit 1
+            exit 84
           fi
         env:
           EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
-
-  push_to_mirror:
-    if: github.event_name == 'push'
-    needs: check_program_compilation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Mirror to epitech repo
-        uses: pixta-dev/repository-mirroring-action@v1.1.1
-        with:
-          target_repo_url: ${{ vars.MIRROR_URL }}
-          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
+          DISPLAY: ":99"

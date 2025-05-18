@@ -6,6 +6,7 @@
 */
 
 #include "../src/Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../src/Elements/Scene/Textures/Color/ColorTexture.hpp"
 #include <criterion/criterion.h>
 #include <criterion/internal/assert.h>
 #include <criterion/new/assert.h>
@@ -53,13 +54,14 @@ Test(sphere, inside_sphere)
 
 Test(sphere, set_color)
 {
-    raytracer::shape::Sphere sphere(math::Point3D(0, 0, 0), 1.0);
-    const math::RGBColor color(0.5, 0.5, 0.5);
+    math::Point3D pos(0, 0, 0);
+    raytracer::shape::Sphere sphere(pos, 1.0);
+    math::RGBColor color(134, 23, 10);
 
-    sphere.setColor(color);
-    cr_assert_eq(color._x, sphere.getColor()._x, "Sphere color should be set correctly (r)");
-    cr_assert_eq(color._y, sphere.getColor()._y, "Sphere color should be set correctly (g)");
-    cr_assert_eq(color._z, sphere.getColor()._z, "Sphere color should be set correctly (b)");
+    sphere.setTexture(std::make_shared<raytracer::texture::ColorTexture>(math::RGBColor(134, 23, 10)));
+    cr_assert_eq(color._x, sphere.getColorAt(pos)._x, "Sphere color should be set correctly (r)");
+    cr_assert_eq(color._y, sphere.getColorAt(pos)._y, "Sphere color should be set correctly (g)");
+    cr_assert_eq(color._z, sphere.getColorAt(pos)._z, "Sphere color should be set correctly (b)");
 }
 
 Test(sphere, get_position)

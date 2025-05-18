@@ -15,19 +15,19 @@
 Close the repo
 
 ```bash
-TODO
+git clone --recurse-submodules -j$(nproc) git@github.com:Mbarleon/Raytracer.git
 ```
 
-Install dependencies packages with Nix
-
-```nix
-nix develop
-```
-
-Build then project
+Install dependencies with `gitmodules` using our automatic script:
 
 ```bash
 ./build.sh
+```
+
+Run the project
+
+```bash
+./raytracer examples/minimal.jsonc
 ```
 
 ---

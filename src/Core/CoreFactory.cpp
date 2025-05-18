@@ -16,6 +16,9 @@
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Shapes/TangleCube/TangleCube.hpp"
+#include "../Elements/Scene/Shapes/ScrewForm/ScrewForm.hpp"
+#include "../Elements/Scene/Shapes/Torus/Torus.hpp"
 #include "../Elements/Scene/Shapes/MengerSponge/MengerSponge.hpp"
 #include "../Elements/Scene/Textures/Procedural/Chessboard/Chessboard.hpp"
 #include "../Elements/Scene/Textures/Procedural/PerlinNoise/PerlinNoise.hpp"
@@ -329,6 +332,80 @@ unit_static std::shared_ptr<raytracer::shape::MengerSponge> create_menger_sponge
 }
 
 /**
+ * @brief create a torus from ParsedJson
+ * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @return shared pointer to torus
+ */
+unit_static std::shared_ptr<raytracer::shape::Torus> create_torus(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D position = get_vec3D(obj.at("origin"));
+    const double minorRadius = get_value<double>(obj.at("minor-radius"));
+    const double majorRadius = get_value<double>(obj.at("major-radius"));
+    std::shared_ptr<raytracer::shape::Torus> torus = nullptr;
+
+    try {
+        torus = std::make_shared<raytracer::shape::Torus>(position, majorRadius, minorRadius);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Torus bad allocation", e.what());
+    }
+    create_shape(torus, obj);
+    return torus;
+}
+
+/**
+ * @brief create a tangle cube from ParsedJson
+ * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @return shared pointer to tangle cube
+ */
+unit_static std::shared_ptr<raytracer::shape::TangleCube> create_tangle_cube(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D position = get_vec3D(obj.at("origin"));
+    const double width = get_value<double>(obj.at("width"));
+    const double thickness = get_value<double>(obj.at("thickness"));
+    const double radius = get_value<double>(obj.at("radius"));
+    const unsigned maxSteps = static_cast<unsigned>(get_value<int>(obj.at("max-steps")));
+    const double maxDistance = get_value<double>(obj.at("max-distance"));
+    std::shared_ptr<raytracer::shape::TangleCube> cube = nullptr;
+
+    try {
+        cube = std::make_shared<raytracer::shape::TangleCube>(position, width, thickness, radius, maxSteps, maxDistance);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Tangle cube bad allocation", e.what());
+    }
+    create_shape(cube, obj);
+    return cube;
+}
+
+/**
+ * @brief create a screw form from ParsedJson
+ * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @return shared pointer to screw form
+ */
+unit_static std::shared_ptr<raytracer::shape::ScrewForm> create_screw_form(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D position = get_vec3D(obj.at("origin"));
+    const double width = get_value<double>(obj.at("width"));
+    const double freq = get_value<double>(obj.at("freq"));
+    const unsigned maxSteps = static_cast<unsigned>(get_value<int>(obj.at("max-steps")));
+    const double maxDistance = get_value<double>(obj.at("max-distance"));
+    std::shared_ptr<raytracer::shape::ScrewForm> cube = nullptr;
+
+    try {
+        cube = std::make_shared<raytracer::shape::ScrewForm>(position, width, freq, maxSteps, maxDistance);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Screw form bad allocation", e.what());
+    }
+    create_shape(cube, obj);
+    return cube;
+}
+
+/**
  * @brief create a sphere from ParsedJson
  * @details uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
@@ -519,7 +596,10 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
     emplace_shapes(primitives, "rectangles", shapes, create_rectangle);
     emplace_shapes(primitives, "planes", shapes, create_plane);
     emplace_shapes(primitives, "stl", shapes, create_stl);
-    emplace_shapes(primitives, "menger-sponge", shapes, create_menger_sponge);
+    emplace_shapes(primitives, "toruses", shapes, create_torus);
+    emplace_shapes(primitives, "screw-forms", shapes, create_screw_form);
+    emplace_shapes(primitives, "tangle-cubes", shapes, create_tangle_cube);
+    emplace_shapes(primitives, "menger-sponges", shapes, create_menger_sponge);
 
     return shapes;
 }

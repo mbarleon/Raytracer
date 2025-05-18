@@ -31,25 +31,25 @@ jobs:
           else
             echo "::notice::build.sh found."
           fi
-      # - name: Launch ./build.sh
-      #   run: |
-      #     if ./build.sh; then
-      #       echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
-      #     else
-      #       echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
-      #       exit 84
-      #     fi
-      # - name: Check executables
-      #   run: |
-      #     executable="${EXECUTABLE_PATH}"
-      #     if [ ! -x "$executable" ]; then
-      #       echo "::error file=$executable::Executable $executable is missing or not executable."
-      #       exit 84
-      #     else
-      #       echo "::notice file=$executable::Executable $executable found and is executable."
-      #     fi
-      #   env:
-      #     EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
+      - name: Launch ./build.sh
+        run: |
+          if ./build.sh; then
+            echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
+          else
+            echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
+            exit 84
+          fi
+      - name: Check executables
+        run: |
+          executable="${EXECUTABLE_PATH}"
+          if [ ! -x "$executable" ]; then
+            echo "::error file=$executable::Executable $executable is missing or not executable."
+            exit 84
+          else
+            echo "::notice file=$executable::Executable $executable found and is executable."
+          fi
+        env:
+          EXECUTABLE_PATH: ${{ vars.EXECUTABLE_PATH }}
       - name: Check unit_tests
         run: |
           if xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" ./build.sh --tests ; then

@@ -9,20 +9,24 @@
 #include "../src/Parser/Parser.hpp"
 #include <criterion/criterion.h>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 
 using JsonMap = std::unordered_map<std::string, raytracer::parser::JsonProto>;
 
-std::string getConfigFileContent(const std::string &path)
+#define DEFAULT_TEST_FILE "../tests/test-examples/test.jsonc"
+
+static const std::string getConfigFileContent(const std::string &path)
 {
     std::ifstream file(path);
+
     if (!file) {
         throw std::runtime_error("Unable to open file : " + path);
     }
 
     std::ostringstream oss;
     std::string ligne;
+
     while (std::getline(file, ligne)) {
         oss << ligne << '\n';
     }
@@ -47,7 +51,7 @@ Test(create_camera, test_camera)
 
 Test(primitive_factory, test_primitive_factory)
 {
-    const std::string input = getConfigFileContent("examples/minimal.jsonc");
+    const std::string input = getConfigFileContent(DEFAULT_TEST_FILE);
 
     auto it = input.begin();
     const auto end = input.end();
@@ -62,7 +66,7 @@ Test(primitive_factory, test_primitive_factory)
 
 Test(light_factory, test_light_factory)
 {
-    const std::string input = getConfigFileContent("examples/minimal.jsonc");
+    const std::string input = getConfigFileContent(DEFAULT_TEST_FILE);
 
     auto it = input.begin();
     const auto end = input.end();

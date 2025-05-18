@@ -50,7 +50,7 @@ static const __scene_objects create_objects()
     using ILightsList = std::vector<std::shared_ptr<light::ILight>>;
     using IShapesList = std::vector<std::shared_ptr<shape::IShape>>;
 
-    const parser::JsonValue jsonc = parser::parseJsonc("tests/test-examples/test.jsonc");
+    const parser::JsonValue jsonc = parser::parseJsonc("../tests/test-examples/test.jsonc");
     const JsonMap &root = std::get<JsonMap>(jsonc);
     const ParsedJson &render = root.at("render");
     const ParsedJson &camera = root.at("camera");
@@ -90,9 +90,10 @@ Test(Color, test_getBackgroundColor)
 Test(Color, test_getRayColor)
 {
     const auto slrc = raytracer::create_objects();
-    const math::Ray ray(math::Point3D(0, 0, 0), math::Vector3D(1, 1, 1));
+    const math::Ray ray = {math::Point3D(0, 0, 0), math::Vector3D(1, 1, 1)};
+    raytracer::Tank tank;
     std::mt19937 mt;
-    const auto ls = raytracer::getRayColor(ray, slrc.shapes, slrc.lights, slrc.render_config, 0, mt, true, math::RGBColor(1.0));
+    const auto ls = raytracer::getRayColor(ray, slrc.shapes, slrc.lights, slrc.render_config, 0, mt, true, tank, math::Vector3D(1));
 
     cr_assert_eq(ls.isDelta, false);
 }
@@ -121,8 +122,8 @@ Test(Application, test_application_filename, .init = redirect_stdout)
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.what(), "Could not open ");
     }
-    raytracer::core::Application __attribute__((unused)) app2("tests/test-examples/test.jsonc", false);
-    raytracer::core::Application __attribute__((unused)) app3("tests/test-examples/test.jsonc", true);
+    raytracer::core::Application __attribute__((unused)) app2("../tests/test-examples/test.jsonc", false);
+    raytracer::core::Application __attribute__((unused)) app3("../tests/test-examples/test.jsonc", true);
 }
 
 // clang-format off
@@ -155,7 +156,8 @@ Test(Lighting, test_phong_direct)
         .distance = 3.0
     };
     std::mt19937 rng;
-    const math::RGBColor rgb = raytracer::phongDirect(isect, v3, slrc.lights, slrc.shapes, slrc.render_config, rng, false);
+    raytracer::Tank tank;
+    const math::RGBColor rgb = raytracer::phongDirect(isect, v3, slrc.lights, slrc.shapes, slrc.render_config, rng, tank, false);
 
     cr_assert_eq(rgb._x, 0);
     cr_assert_eq(rgb._z, 0);
@@ -201,3 +203,10 @@ Test(Directional, test_directional_light__sample)
     cr_assert_float_eq(bsdf.direction._z, expectedDirection._z, epsilon);
 }
 // clang-format on
+
+Test(Application, application_run)
+{
+    raytracer::core::Application app("../tests/test-examples/test.jsonc", false);
+
+    app.runNoGUI();
+}

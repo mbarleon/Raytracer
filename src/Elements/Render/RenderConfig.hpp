@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "../../Maths/Vector3D.hpp"
+#include "../Scene/Textures/ITexture.hpp"
 #include "Config/Antialiasing.hpp"
 #include "Config/Lighting.hpp"
 #include "Config/Output.hpp"
-#include "../Scene/Textures/ITexture.hpp"
+#include <memory>
 
 // clang-format off
 namespace raytracer {

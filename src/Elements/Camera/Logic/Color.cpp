@@ -18,7 +18,7 @@ math::RGBColor raytracer::getBackgroundColor(const math::Vector3D &v, const math
 }
 
 raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShapesList &shapes, const ILightsList &lights,
-    const RenderConfig &config, const unsigned depth, std::mt19937 &rng, const bool cullBackFaces, const math::RGBColor &throughput)
+    const RenderConfig &config, const unsigned depth, std::mt19937 &rng, const bool cullBackFaces, raytracer::Tank &tank, const math::RGBColor &throughput)
 {
     if (depth > config.maxDepth) {
         return {math::RGBColor(0), 1.0};
@@ -26,7 +26,8 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShape
 
     math::Intersect isect;
     if (!findClosestIntersection(ray, shapes, isect, cullBackFaces)) {
-        return {config.skybox->value(ray._dir, 0, 0) * throughput, 1.0};
+        //return {config.skybox->value(ray._dir, 0, 0) * throughput, 1.0};
+        return {getBackgroundColor(ray._dir, math::RGBColor(0.2, 0.3, 0.7)), 1.0};
     }
 
     // direct light
@@ -34,7 +35,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShape
     if (depth == 0) {
         const double ao = ambientOcclusion(isect, shapes, config.lighting.ambient.samples, rng, cullBackFaces);
         const math::RGBColor baseAmb = isect.object->getColorAt(isect.point) * config.lighting.ambient.coef;
-        radiance = phongDirect(isect, -ray._dir, lights, shapes, config, rng, cullBackFaces);
+        radiance = phongDirect(isect, -ray._dir, lights, shapes, config, rng, tank, cullBackFaces);
         radiance = radiance - baseAmb + (baseAmb * ao);
     }
 
@@ -55,7 +56,7 @@ raytracer::LightSample raytracer::getRayColor(const math::Ray &ray, const IShape
 
     // recursive bounce
     const math::Ray nextRay = {isect.point + bsdfWi * EPSILON, bsdfWi};
-    const LightSample next = getRayColor(nextRay, shapes, lights, config, depth + 1, rng, true, newThroughput);
+    const LightSample next = getRayColor(nextRay, shapes, lights, config, depth + 1, rng, true, tank, newThroughput);
 
     return {radiance * throughput + next.radiance, bsdfPdf, bsdfSpecular};
 }

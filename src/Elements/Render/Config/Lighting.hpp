@@ -13,6 +13,7 @@
 namespace raytracer {
 struct Lighting {
     double gamma;
+    double extraShadow;
     AmbientOcclusion ambient;
     double diffuse;
     double specular;

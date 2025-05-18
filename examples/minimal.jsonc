@@ -1,18 +1,19 @@
 {
     "render": {
         "antialiasing": {
-            "samples": 30, // 40 for absolute realism, 1 for fast rendering
+            "samples": 4, // 40 for absolute realism, 1 for fast rendering
             "mode": "classic" // none, classic, adaptive
         },
         "skybox": "examples/skyboxes/panoramic/minecraft.png",
         "lighting": {
             "gamma": 1.0,
+            "extra-shadow": 0.0,
             "ambient": {
-                "coef": 0.2,
-                "samples": 10 // 20 for absolute realism, 1 for fast rendering
+                "coef": 0.5,
+                "samples": 2 // 20 for absolute realism, 1 for fast rendering
             },
-            "diffuse": 0.6,
-            "specular": 0.2
+            "diffuse": 0.3,
+            "specular": 0.5
         },
         "max-depth": 4, // reflection and refraction limit
         "output": {
@@ -21,36 +22,110 @@
         }
     },
     "camera": {
-        "resolution": { "width": 1920, "height": 1080 },
-        "position": { "x": 1, "y": 1, "z": -3 },
+        "resolution": { "width": 1280, "height": 720 },
+        "position": { "x": 0, "y": 0, "z": -3 },
         "rotation": { "x": 0, "y": 0, "z": 0 },
         "fov": 72
     },
     "scene": {
         "shapes": {
-            "cones": [
+            "spheres": [
                 {
-                    "origin": { "x": 0, "y": 1, "z": 0 },
-                    "radius": 1,
-                    "axis": { "x": 0, "y": 1, "z": 0 },
-                    "height": 1,
+                    "position": { "x": 1, "y": 0, "z": -1 },
+                    "radius": 0.5,
+                    "shininess": 50.0,
                     "material": {
-                        "type": "specular",
-                        "color": { "r": 255, "g": 0, "b": 0 }
+                        "type": "dielectric",
+                        "refraction": {
+                            "inside": 1.0,
+                            "outside": 1.52 // glass
+                        }
+                    },
+                    "texture": {
+                        "type": "color",
+                        "colors": {
+                            "1": { "r": 0, "g": 255, "b": 0 }
+                        }
+                    },
+                    "normal": {
+                        "filename": "examples/normals/ripple.png",
+                        "scale": 3.0,
+                        "strength": 1.0
                     }
-                }
-            ],
-            "planes": [
+                },
+                // {
+                //     "position": { "x": 0, "y": 0, "z": -1 },
+                //     "radius": 0.5,
+                //     "shininess": 100.0,
+                //     "material": {
+                //         "type": "specular"
+                //     },
+                //     "texture": {
+                //         "type": "image",
+                //         "filename": "examples/textures/water.jpg",
+                //         "scale": 1.0
+                //     }
+                // },
                 {
-                    "axis": "Y",
-                    "position": -1,
+                    "position": { "x": -1, "y": 0, "z": -1 },
+                    "radius": 0.5,
                     "shininess": 50.0,
                     "material": {
                         "type": "diffuse"
                     },
                     "texture": {
-                        "type": "chessboard",
-                        "scale": 0.5,
+                        "type": "perlin-noise",
+                        "scale": 6.0,
+                        "colors": {
+                            "1": { "r": 255, "g": 0, "b": 0 },
+                            "2": { "r": 0, "g": 255, "b": 0 }
+                        }
+                    }
+                }
+                // {
+                //     "position": { "x": 0, "y": -100.5, "z": -1 },
+                //     "radius": 100,
+                //     "shininess": 100.0,
+                //     "material": {
+                //         "type": "specular"
+                //     },
+                //     "texture": {
+                //         "type": "chessboard",
+                //         "scale": 0.1,
+                //         "colors": {
+                //             "1": { "r": 255, "g": 0, "b": 0 },
+                //             "2": { "r": 0, "g": 0, "b": 0 }
+                //         }
+                //     }
+                // }
+            ],
+             "triangles": [
+                {
+                    "p0": { "x": 0, "y": 0, "z": -1 },
+                    "p1": { "x": 0, "y": 1, "z": -1.5 },
+                    "p2": { "x": 1, "y": 0, "z": -1.5 },
+                    "shininess": 32.0,
+                    "material": {
+                        "type": "dielectric",
+                        "refraction": {
+                            "inside": 1.0,
+                            "outside": 1.52
+                        },
+                    },
+                    "texture": { "type": "image", "filename": "examples/textures/water.jpg", "scale": 1.0 }
+                }
+            ],
+            "planes": [
+                {
+                    "axis": "Y",
+                    "position": -0.5,
+                    "shininess": 50.0,
+                    "material": {
+                        "type": "diffuse"
+                    },
+                    "texture": {
+                        "type": "color",
+                        "scale": 0.2,
                         "colors": {
                             "1": { "r": 255, "g": 255, "b": 255 },
                             "2": { "r": 0, "g": 0, "b": 0 }
@@ -61,18 +136,18 @@
         },
         "lights": {
             "points": [
+                {
+                    "position": { "x": -10, "y": 0, "z": 15 },
+                    "color": { "r": 255, "g": 0, "b": 0 },
+                    "intensity": 500000.0
+                }
+            ],
+            "directionals": [
                 // {
-                //     "position": { "x": 0, "y": 2, "z": 1 },
+                //     "direction": { "x": 0, "y": -1, "z": -1 },
                 //     "color": { "r": 0, "g": 255, "b": 255 },
                 //     "intensity": 10.0
                 // }
-            ],
-            "directionals": [
-                {
-                    "direction": { "x": 0, "y": -1, "z": -1 },
-                    "color": { "r": 0, "g": 255, "b": 255 },
-                    "intensity": 10.0
-                }
             ]
         }
     }

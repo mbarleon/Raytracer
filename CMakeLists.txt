@@ -99,12 +99,12 @@ target_compile_options(raytracer PRIVATE
     -Wnon-virtual-dtor
 
     # INFO: logic bugs & bad practices
-    -Wduplicated-cond
-    -Wduplicated-branches
-    -Wlogical-op
+    # -Wduplicated-cond << not on clang
+    # -Wduplicated-branches << not on clang
+    # -Wlogical-op << not on clang
     -Wswitch-default
     # -Wswitch-enum << commented because of SFML enums are toooooooo big
-    -Wuseless-cast
+    # -Wuseless-cast << not on clang
 
     # INFO: prevent common portability issues
     # -Wdouble-promotion << commented because of STL.cpp & Utils.cpp wont compile

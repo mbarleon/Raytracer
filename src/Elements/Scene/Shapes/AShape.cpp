@@ -29,6 +29,11 @@ void raytracer::shape::AShape::setNormalMap(const std::shared_ptr<texture::IText
     _normalStrength = strength;
 }
 
+void raytracer::shape::AShape::setRotation(const math::Vector3D &rotation)
+{
+    _rotation = rotation;
+}
+
 raytracer::material::Material raytracer::shape::AShape::getMaterial() const
 {
     return _material;

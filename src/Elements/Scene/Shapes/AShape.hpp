@@ -19,6 +19,7 @@ class AShape : public IShape
         void setShininess(const double shininess) override;
         void setTexture(const std::shared_ptr<texture::ITexture> &texture) override;
         void setNormalMap(const std::shared_ptr<texture::ITexture> &map, const double strength) override;
+        void setRotation(const math::Vector3D &rotation) override;
 
         material::Material getMaterial() const override;
         math::Vector3D getMappedNormal(const math::Point3D &point) const noexcept override;
@@ -31,6 +32,7 @@ class AShape : public IShape
         std::shared_ptr<raytracer::texture::ITexture> _texture = nullptr;
         std::shared_ptr<raytracer::texture::ITexture> _normalMap = nullptr;
         material::Material _material;
+        math::Vector3D _rotation;
         double _normalStrength;
         double _shininess;
 };

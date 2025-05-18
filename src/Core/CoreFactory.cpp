@@ -305,7 +305,9 @@ unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &s
     double strength;
     const double shininess = get_value<double>(obj.at("shininess"));
     const auto normal = get_normal_map(obj, strength);
+    const math::Vector3D rotation = get_vec3D(obj.at("rotation"));
 
+    shape->setRotation(rotation);
     shape->setMaterial(get_material(obj));
     shape->setTexture(get_texture(obj));
     shape->setNormalMap(normal, strength);

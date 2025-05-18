@@ -20,7 +20,7 @@ class Rectangle final : public IWidget
 
         void render(sf::RenderWindow &window) noexcept override;
         void update(const float dt) noexcept override;
-        void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept override;
+        void onEvent(const std::optional<sf::Event> &event, const sf::RenderWindow &window) noexcept override;
 
     private:
         sf::RectangleShape _shape;

@@ -24,7 +24,7 @@ class IEventObserver
     public:
         virtual ~IEventObserver() = default;
 
-        virtual void onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept = 0;
+        virtual void onEvent(const std::optional<sf::Event> &event, const sf::RenderWindow &window) noexcept = 0;
 };
 
 }// namespace raytracer::ui

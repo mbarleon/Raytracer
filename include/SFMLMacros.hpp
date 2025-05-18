@@ -18,7 +18,6 @@
 
 #endif
 
-#include <SFML/Window/WindowStyle.hpp>
 #include <functional>
 #include <memory>
 
@@ -47,7 +46,8 @@
 #define RT_WINDOW_STYLE (sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize)
 #define RT_WINDOW_TITLE "Raytracer"
 
-using u8 = sf::Uint8;
+using u8 = unsigned char;
+using u32 = unsigned int;
 
 namespace raytracer {
 
@@ -86,10 +86,10 @@ static inline void _center_sprite(const sf::RenderWindow &window, sf::Sprite &sp
     const Vec2 size = _to_vec2f(window.getSize());
     const sf::FloatRect bounds = sprite.getGlobalBounds();
 
-    const float posX = (size.x - bounds.width) / 2.f;
-    const float posY = (size.y - bounds.height) / 2.f;
+    const float posX = (size.x - bounds.size.x) / 2.f;
+    const float posY = (size.y - bounds.size.y) / 2.f;
 
-    sprite.setPosition(posX, posY);
+    sprite.setPosition({posX, posY});
 }
 
 #endif

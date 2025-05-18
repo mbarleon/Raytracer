@@ -126,8 +126,7 @@ class Render final : public NonCopyable
             const auto height = grid.size();
             const auto width = height > 0 ? grid.front().size() : 0;
 
-            PixelBuffer buffer;
-            buffer.create(static_cast<uint>(width), static_cast<uint>(height));
+            PixelBuffer buffer({static_cast<uint>(width), static_cast<uint>(height)});
 
             _forEach([&buffer, &gamma](const auto &pixel, const math::Vector2u &pos)
                 {
@@ -140,7 +139,7 @@ class Render final : public NonCopyable
                         color = pixel;
                     }
                     realignColor(color, gamma);
-                    buffer.setPixel(pos._x, pos._y, sf::Color( static_cast<u8>(color._x), static_cast<u8>(color._y), static_cast<u8>(color._z)));
+                    buffer.setPixel({pos._x, pos._y}, sf::Color( static_cast<u8>(color._x), static_cast<u8>(color._y), static_cast<u8>(color._z)));
                 }, const_cast<Grid &>(grid), {width, height});
 
             return buffer;

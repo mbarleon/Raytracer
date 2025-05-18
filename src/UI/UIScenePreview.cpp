@@ -6,11 +6,13 @@
 */
 
 #include "UIScenePreview.hpp"
+#include "Error.hpp"
 
-raytracer::ui::UIScenePreview::UIScenePreview(const PixelBuffer &buffer)
+raytracer::ui::UIScenePreview::UIScenePreview(const PixelBuffer &buffer) : _sprite(_texture)
 {
-    _texture.loadFromImage(buffer);
-    _sprite.setTexture(_texture);
+    if (_texture.loadFromImage(buffer) == false) {
+        throw exception::Error("UIScenePreview", "Unable to load texture from image.");
+    }
     _sprite.setScale(_get_scale(sf::Vector2f(_texture.getSize())));
 }
 
@@ -30,7 +32,7 @@ void raytracer::ui::UIScenePreview::update(const float __attribute__((unused)) d
     //
 }
 
-void raytracer::ui::UIScenePreview::onEvent(const sf::Event __attribute__((unused)) & event,
+void raytracer::ui::UIScenePreview::onEvent(const std::optional<sf::Event> __attribute__((unused)) & event,
     const sf::RenderWindow __attribute__((unused)) & window) noexcept
 {
     //

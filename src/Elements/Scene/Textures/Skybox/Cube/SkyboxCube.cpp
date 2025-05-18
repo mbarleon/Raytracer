@@ -24,33 +24,36 @@ raytracer::texture::SkyboxCube::SkyboxCube(const std::string &filename)
     extractFaces(src);
 }
 
+// clang-format off
 void raytracer::texture::SkyboxCube::extractFaces(const sf::Image &src)
 {
     const SkyboxCubeCell layout[] = {
-        { PosX, 2, 1 },
-        { NegX, 0, 1 },
-        { PosY, 1, 0 },
-        { NegY, 2, 0 },
-        { PosZ, 1, 1 },
-        { NegZ, 3, 1 }
+        {PosX, 2, 1},
+        {NegX, 0, 1},
+        {PosY, 1, 0},
+        {NegY, 2, 0},
+        {PosZ, 1, 1},
+        {NegZ, 3, 1}
     };
 
-    for (auto &c : layout) {
-        sf::Image &face = _faces[c.f];
+    for (const auto& c : layout) {
+        sf::Image face({_faceW, _faceH});
+        sf::Vector2u dest{0, 0};
 
-        face.create(_faceW, _faceH);
-        face.copy(src, 0, 0, {
-            static_cast<int>(c.cx * _faceW),
-            static_cast<int>(c.cy * _faceH),
-            static_cast<int>(_faceW),
-            static_cast<int>(_faceH)
-        }, true);
+        const sf::IntRect sourceRect{{
+            static_cast<int>(c.cx * _faceW), static_cast<int>(c.cy * _faceH),},
+            {static_cast<int>(_faceW), static_cast<int>(_faceH)} };
+        if (face.copy(src, dest, sourceRect, true) == false) {
+            throw exception::Error("SkyboxCube", "Cannot copy face from image");
+        }
+
+        _faces[c.f] = face;
     }
 }
+// clang-format on
 
-math::RGBColor raytracer::texture::SkyboxCube::value(const math::Point3D &p,
-    const double __attribute__((unused)) u, const double __attribute__((unused)) v)
-    const noexcept
+math::RGBColor raytracer::texture::SkyboxCube::value(const math::Point3D &p, const double __attribute__((unused)) u,
+    const double __attribute__((unused)) v) const noexcept
 {
     const math::Vector3D d = p.normalize();
     const double ax = std::fabs(d._x);
@@ -67,23 +70,23 @@ math::RGBColor raytracer::texture::SkyboxCube::value(const math::Point3D &p,
             vc = (-d._y / ax + 1.0) * 0.5;
         } else {
             face = NegX;
-            uc = ( d._z / ax + 1.0) * 0.5;
+            uc = (d._z / ax + 1.0) * 0.5;
             vc = (-d._y / ax + 1.0) * 0.5;
         }
     } else if (ay >= ax && ay >= az) {
         if (d._y > 0) {
             face = PosY;
-            uc = ( d._x / ay + 1.0) * 0.5;
-            vc = ( d._z / ay + 1.0) * 0.5;
+            uc = (d._x / ay + 1.0) * 0.5;
+            vc = (d._z / ay + 1.0) * 0.5;
         } else {
             face = NegY;
-            uc = ( d._x / ay + 1.0) * 0.5;
+            uc = (d._x / ay + 1.0) * 0.5;
             vc = (-d._z / ay + 1.0) * 0.5;
         }
     } else {
         if (d._z > 0) {
             face = PosZ;
-            uc = ( d._x / az + 1.0) * 0.5;
+            uc = (d._x / az + 1.0) * 0.5;
             vc = (-d._y / az + 1.0) * 0.5;
         } else {
             face = NegZ;
@@ -96,9 +99,9 @@ math::RGBColor raytracer::texture::SkyboxCube::value(const math::Point3D &p,
         vc = 1.0 - vc;
     }
 
-    const unsigned x = std::min(static_cast<unsigned>(uc * _faceW), _faceW - 1);
-    const unsigned y = std::min(static_cast<unsigned>((1.0 - vc) * _faceH), _faceH - 1);
+    const uint x = std::min(static_cast<uint>(uc * _faceW), _faceW - 1);
+    const uint y = std::min(static_cast<uint>((1.0 - vc) * _faceH), _faceH - 1);
 
-    sf::Color color = _faces[face].getPixel(x, y);
+    const sf::Color color = _faces[face].getPixel({x, y});
     return math::RGBColor(color.r / 255.0, color.g / 255.0, color.b / 255.0);
 }

@@ -25,7 +25,7 @@ class EventManager final : public NonCopyable
 
         void subscribe(const EventDecorator &observer) noexcept;
         void unsubscribe(const EventDecorator &observer) noexcept;
-        void dispatch(const sf::Event &event, const sf::RenderWindow &window) noexcept;
+        void dispatch(const std::optional<sf::Event> &event, const sf::RenderWindow &window) noexcept;
 
     private:
         std::vector<EventDecorator> _observers;

@@ -18,13 +18,13 @@ raytracer::core::Backend::Backend()
 {
     sf::ContextSettings settings;
 
-    settings.antialiasingLevel = RT_DEFAULT_ANTIALIASING_LEVEL;
+    settings.antiAliasingLevel = RT_DEFAULT_ANTIALIASING_LEVEL;
     settings.depthBits = RT_DEFAULT_DEPTHBITS;
     settings.stencilBits = RT_DEFAULT_STENCILBITS;
     settings.majorVersion = RT_OPENGL_VERSION_MAJOR;
     settings.minorVersion = RT_OPENGL_VERSION_MINOR;
 
-    _window.create(RT_DEFAULT_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE, settings);
+    _window.create(sf::VideoMode(RT_DEFAULT_SIZE), RT_WINDOW_TITLE, RT_WINDOW_STYLE, sf::State::Windowed, settings);
     _window.setFramerateLimit(RT_DEFAULT_FPS);
 }
 
@@ -44,7 +44,7 @@ void raytracer::core::Backend::fullscreen() noexcept
     const sf::VideoMode mode = is_fullscreen ? sf::VideoMode::getDesktopMode() : sf::VideoMode(RT_DEFAULT_SIZE);
 
     is_fullscreen = !is_fullscreen;
-    _window.setSize({mode.width, mode.height});
+    _window.setSize({mode.size});
 }
 
 /**
@@ -82,7 +82,7 @@ void raytracer::core::Backend::stop() noexcept
 * @details listen to the window events
 * @return (const) sf::Event (the event)
 */
-const sf::Event raytracer::core::Backend::event() noexcept
+const std::optional<sf::Event> raytracer::core::Backend::event() noexcept
 {
     return event_logic(_window);
 }
@@ -95,7 +95,7 @@ const sf::Event raytracer::core::Backend::event() noexcept
 void raytracer::core::Backend::exportScene(CallbackStr callback) noexcept
 {
     const math::Vector2u ws(RT_POPUP_SIZE);
-    sf::RenderWindow window(RT_POPUP_SIZE, RT_WINDOW_TITLE, RT_WINDOW_STYLE);
+    sf::RenderWindow window(sf::VideoMode(RT_POPUP_SIZE), RT_WINDOW_TITLE, RT_WINDOW_STYLE);
     ui::UIManager ui(window);
     ui::Container &c = ui.getContainer();
 
@@ -116,31 +116,56 @@ void raytracer::core::Backend::exportScene(CallbackStr callback) noexcept
 * private
 */
 
-const sf::Event raytracer::core::Backend::event_logic(sf::RenderWindow &window) noexcept
+const std::optional<sf::Event> raytracer::core::Backend::event_logic(sf::RenderWindow &window) noexcept
 {
-    sf::Event event;
+    while (auto eventOpt = window.pollEvent()) {
+        const sf::Event &event = *eventOpt;
 
-    while (window.pollEvent(event)) {
-
-        switch (event.type) {
-
-            case sf::Event::Closed:
+        if (event.is<sf::Event::Closed>()) {
+            this->close(window);
+        } else if (event.is<sf::Event::KeyPressed>()) {
+            const auto *keyEvent = event.getIf<sf::Event::KeyPressed>();
+            if (keyEvent && keyEvent->code == sf::Keyboard::Key::Escape) {
                 this->close(window);
-                break;
-
-            case sf::Event::KeyPressed:
-            case sf::Event::KeyReleased:
-                if (event.key.code == sf::Keyboard::Escape) {
-                    this->close(window);
-                }
-
-            default:
-                break;
+            }
+        } else if (event.is<sf::Event::KeyReleased>()) {
+            const auto *keyEvent = event.getIf<sf::Event::KeyReleased>();
+            if (keyEvent && keyEvent->code == sf::Keyboard::Key::Escape) {
+                this->close(window);
+            }
         }
+
+        return event;
     }
 
-    return event;
+    return std::optional<sf::Event>{};
 }
+
+// const sf::Event raytracer::core::Backend::event_logic(sf::RenderWindow &window) noexcept
+// {
+//     sf::Event event;
+//
+//     while (window.pollEvent(event)) {
+//
+//         switch (event.type) {
+//
+//             case sf::Event::Closed:
+//                 this->close(window);
+//                 break;
+//
+//             case sf::Event::KeyPressed:
+//             case sf::Event::KeyReleased:
+//                 if (event.key.code == sf::Keyboard::Escape) {
+//                     this->close(window);
+//                 }
+//
+//             default:
+//                 break;
+//         }
+//     }
+//
+//     return event;
+// }
 
 void raytracer::core::Backend::close(sf::RenderWindow &window) noexcept
 {

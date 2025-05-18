@@ -50,7 +50,7 @@ raytracer::ui::Container &raytracer::ui::UIManager::getContainer() noexcept
     return *_container;
 }
 
-void raytracer::ui::UIManager::events(const sf::Event &event) noexcept
+void raytracer::ui::UIManager::events(const std::optional<sf::Event> &event) noexcept
 {
     EventManager::getInstance().dispatch(event, *_window);
 }
@@ -79,7 +79,7 @@ void raytracer::ui::UIManager::initialize(sf::RenderWindow &window)
 {
     _window = &window;
 
-    if (!_font.loadFromFile(RT_DEFAULT_FONT_PATH)) {
+    if (!_font.openFromFile(RT_DEFAULT_FONT_PATH)) {
         throw exception::Error("UIManager::initialize", "Failed to load font");
     }
     _container = std::make_shared<Container>();

@@ -26,7 +26,7 @@ class Backend final
 
         [[nodiscard]] bool is_running() const noexcept;
         [[nodiscard]] float getDeltaTime() noexcept;
-        [[nodiscard]] const sf::Event event() noexcept;
+        [[nodiscard]] const std::optional<sf::Event> event() noexcept;
         [[nodiscard]] sf::RenderWindow &getWindow() noexcept;
 
     private:
@@ -35,6 +35,6 @@ class Backend final
 
         void update() noexcept;
         void close(sf::RenderWindow &window) noexcept;
-        [[nodiscard]] const sf::Event event_logic(sf::RenderWindow &window) noexcept;
+        [[nodiscard]] const std::optional<sf::Event> event_logic(sf::RenderWindow &window) noexcept;
 };
 }// namespace raytracer::core

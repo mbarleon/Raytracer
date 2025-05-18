@@ -32,7 +32,8 @@ void raytracer::ui::Rectangle::update(const float UNUSED dt) noexcept
     /* empty */
 }
 
-void raytracer::ui::Rectangle::onEvent(const sf::Event UNUSED &event, const sf::RenderWindow UNUSED &window) noexcept
+void raytracer::ui::Rectangle::onEvent(const std::optional<sf::Event> UNUSED &event,
+    const sf::RenderWindow UNUSED &window) noexcept
 {
     /* empty */
 }

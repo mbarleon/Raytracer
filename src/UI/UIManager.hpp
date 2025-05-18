@@ -50,7 +50,7 @@ class UIManager final
         [[nodiscard]] TextPtr createText(const std::string &str, const Vec2 &pos,  uint fontSize = 24) noexcept;
         [[nodiscard]] TextInputPtr createTextInput(const Vec2 &pos, CallbackStr callback, const uint fontSize = 24) noexcept;
 
-        void events(const sf::Event &event) noexcept;
+        void events(const std::optional<sf::Event> &event) noexcept;
         void update(const float dt) noexcept;
         void render() noexcept;
 

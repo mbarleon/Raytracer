@@ -11,19 +11,11 @@
 * public
 */
 
-static void createText(const std::string &str, const raytracer::Vec2 &pos, sf::Font &font, sf::Text &text,
-    const uint fontSize = 24)
-{
-    text.setPosition(pos);
-    text.setFont(font);
-    text.setCharacterSize(fontSize);
-    text.setFillColor(sf::Color::Black);
-    text.setString(str);
-}
-
 raytracer::ui::Text::Text(const std::string &str, const Vec2 &pos, sf::Font &font, const uint fontSize) noexcept
+    : _text(font, str, fontSize)
 {
-    createText(str, pos, font, _text, fontSize);
+    _text.setPosition(pos);
+    _text.setFillColor(sf::Color::Black);
 }
 
 void raytracer::ui::Text::render(sf::RenderWindow &window) noexcept
@@ -36,7 +28,7 @@ void raytracer::ui::Text::update(const float UNUSED dt) noexcept
     /* empty */
 }
 
-void raytracer::ui::Text::onEvent(const sf::Event UNUSED &event, const sf::RenderWindow UNUSED &window) noexcept
+void raytracer::ui::Text::onEvent(const std::optional<sf::Event> UNUSED &event, const sf::RenderWindow UNUSED &window) noexcept
 {
     /* empty */
 }

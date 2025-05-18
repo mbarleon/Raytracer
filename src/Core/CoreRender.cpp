@@ -30,7 +30,7 @@ void raytracer::core::Render::toPPM(const sf::Image &image, const char *filename
     ppm << "P3\n" << width << " " << height << "\n255\n";
     for (uint y = 0; y < height; ++y) {
         for (uint x = 0; x < width; ++x) {
-            sf::Color color = image.getPixel(x, y);
+            sf::Color color = image.getPixel({x, y});
             ppm << static_cast<int>(color.r) << ' '
                 << static_cast<int>(color.g) << ' '
                 << static_cast<int>(color.b) << '\n';

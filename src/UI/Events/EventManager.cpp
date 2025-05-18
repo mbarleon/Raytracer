@@ -6,6 +6,10 @@
 */
 
 #include "EventManager.hpp"
+
+/* 
+ * INFO: require for dispatch() method
+*/
 #include "IEventObserver.hpp"
 
 /*
@@ -44,7 +48,7 @@ void raytracer::ui::EventManager::unsubscribe(const EventDecorator &observer) no
 * @details dispatches an event to all observers.
 * @return void
 */
-void raytracer::ui::EventManager::dispatch(const sf::Event &event, const sf::RenderWindow &window) noexcept
+void raytracer::ui::EventManager::dispatch(const std::optional<sf::Event> &event, const sf::RenderWindow &window) noexcept
 {
     for (const auto &observer : _observers) {
 

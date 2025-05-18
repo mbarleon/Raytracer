@@ -38,7 +38,7 @@ void raytracer::ui::Container::render(sf::RenderWindow &window) noexcept
     }
 }
 
-void raytracer::ui::Container::onEvent(const sf::Event &event, const sf::RenderWindow &window) noexcept
+void raytracer::ui::Container::onEvent(const std::optional<sf::Event> &event, const sf::RenderWindow &window) noexcept
 {
     for (const auto &child : _children) {
         child->onEvent(event, window);

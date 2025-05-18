@@ -16,11 +16,12 @@
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
 #include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Triangle/Triangle.hpp"
+#include "../Elements/Scene/Textures/Color/ColorTexture.hpp"
+#include "../Elements/Scene/Textures/Image/ImageTexture.hpp"
 #include "../Elements/Scene/Textures/Procedural/Chessboard/Chessboard.hpp"
 #include "../Elements/Scene/Textures/Procedural/PerlinNoise/PerlinNoise.hpp"
 #include "../Elements/Scene/Textures/Skybox/Panoramic/SkyboxPanoramic.hpp"
-#include "../Elements/Scene/Textures/Image/ImageTexture.hpp"
-#include "../Elements/Scene/Textures/Color/ColorTexture.hpp"
 #include "Error.hpp"
 #include "Macro.hpp"
 
@@ -289,8 +290,14 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_directional(c
 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &shape,
-    const JsonMap &obj)
+/**
+* @brief create a shape from ParsedJson
+* @details uses get_value for JsonMap and other extractions
+* @param shape out shared pointer to shape
+* @param obj const ParsedJson object
+* @return void
+*/
+unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &shape, const JsonMap &obj)
 {
     double strength;
     const double shininess = get_value<double>(obj.at("shininess"));
@@ -306,7 +313,6 @@ unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &s
  * @brief create a sphere from ParsedJson
  * @details uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
- * @param materials MaterialsList to use for material creation
  * @return shared pointer to Sphere
  */
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto)
@@ -329,7 +335,6 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
  * @brief creeate a rectangle from ParsedJso
  * @details Uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
- * @param materials MaterialsList to use for material creation
  * @return shared pointer to Rectangle
  */
 unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const ParsedJson &proto)
@@ -347,6 +352,29 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     }
     create_shape(rectangle, obj);
     return rectangle;
+}
+
+/**
+* @brief create a triangle from ParsedJson
+* @details uses get_value for JsonMap and other extractions
+* @param proto ParsedJson object
+* @return shared pointer to Triangle
+*/
+unit_static std::shared_ptr<raytracer::shape::Triangle> create_triangle(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Point3D p0 = get_vec3D(obj.at("p0"));
+    const math::Point3D p1 = get_vec3D(obj.at("p1"));
+    const math::Point3D p2 = get_vec3D(obj.at("p2"));
+    std::shared_ptr<raytracer::shape::Triangle> tri = nullptr;
+
+    try {
+        tri = std::make_shared<raytracer::shape::Triangle>(p0, p1, p2);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Triangle bad allocation", e.what());
+    }
+    create_shape(tri, obj);
+    return tri;
 }
 
 /**
@@ -495,6 +523,7 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
     emplace_shapes(primitives, "rectangles", shapes, create_rectangle);
     emplace_shapes(primitives, "planes", shapes, create_plane);
     emplace_shapes(primitives, "stl", shapes, create_stl);
+    emplace_shapes(primitives, "triangles", shapes, create_triangle);
 
     return shapes;
 }

@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include "../Materials/Material.hpp"
 #include "../../../Maths/Ray.hpp"
+#include "../Materials/Material.hpp"
 #include "../Textures/ITexture.hpp"
 #include <memory>
-#include <random>
 
 namespace raytracer::shape {
 class IShape
@@ -33,6 +32,7 @@ class IShape
         [[nodiscard]] virtual double getAOMaxDistance() const = 0;
         [[nodiscard]] virtual math::Vector3D getMappedNormal(const math::Point3D &point) const noexcept = 0;
 
-        [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint, const bool cullBackFaces) const noexcept = 0;
+        [[nodiscard]] virtual bool intersect(const math::Ray &ray, math::Point3D &intPoint,
+            const bool cullBackFaces) const noexcept = 0;
 };
 }// namespace raytracer::shape

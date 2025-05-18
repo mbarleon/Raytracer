@@ -60,10 +60,18 @@ unit_static void emplace_shapes(const JsonMap &primitives, const std::string &ke
 
         const auto &shape_array = std::get<Shapes>(it->second.value);
 
-        shapes.reserve(shapes.size() + shape_array.size());
+        try {
+            shapes.reserve(shapes.size() + shape_array.size());
+        } catch (const std::bad_alloc &e) {
+            throw raytracer::exception::Error("Core", "Memory allocation failed: ", e.what());
+        }
 
         for (const auto &e : shape_array) {
-            shapes.emplace_back(creator(e));
+            try {
+                shapes.emplace_back(creator(e));
+            } catch (const std::out_of_range &e) {
+                throw raytracer::exception::Error("Core", "Shape creation failed: ", e.what());
+            }
         }
     }
 }
@@ -225,11 +233,11 @@ unit_static std::shared_ptr<raytracer::light::ILight> create_light_directional(c
 unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
-    const math::Vector3D position = get_vec3D(obj.at("position"));
+    const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const double radius = get_value<double>(obj.at("radius"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
-    const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(position, radius);
+    const std::shared_ptr<raytracer::shape::Sphere> sphere = std::make_shared<raytracer::shape::Sphere>(origin, radius);
 
     sphere.get()->setMaterial(material);
     sphere.get()->setColor(color);
@@ -237,7 +245,7 @@ unit_static std::shared_ptr<raytracer::shape::Sphere> create_sphere(const Parsed
 }
 
 /**
- * @brief creeate a rectangle from ParsedJso
+ * @brief create a rectangle from ParsedJson
  * @details Uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
  * @param materials MaterialsList to use for material creation
@@ -249,10 +257,11 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
     const math::Vector3D origin = get_vec3D(obj.at("origin"));
     const math::Vector3D bottom_side = get_vec3D(obj.at("bottom_side"));
     const math::Vector3D left_side = get_vec3D(obj.at("left_side"));
+    const math::Vector3D depth_side = get_vec3D(obj.at("depth_side"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const std::shared_ptr<raytracer::shape::Rectangle> rectangle =
-        std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side);
+        std::make_shared<raytracer::shape::Rectangle>(origin, bottom_side, left_side, depth_side);
 
     rectangle.get()->setMaterial(material);
     rectangle.get()->setColor(color);
@@ -269,7 +278,7 @@ unit_static std::shared_ptr<raytracer::shape::Rectangle> create_rectangle(const 
 unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJson &proto)
 {
     const auto &obj = get_value<JsonMap>(proto);
-    const double position = get_value<double>(obj.at("position"));
+    const double origin = get_value<double>(obj.at("origin"));
     const raytracer::material::Material material = get_material(obj);
     const math::RGBColor color = get_color(obj.at("color"));
     const std::string str = get_string(obj.at("axis"));
@@ -278,7 +287,7 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
         throw raytracer::exception::Error("Core", "Invalid plane axis");
     }
 
-    const std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], position);
+    const std::shared_ptr<raytracer::shape::Plane> plane = std::make_shared<raytracer::shape::Plane>(str[0], origin);
 
     plane.get()->setMaterial(material);
     plane.get()->setColor(color);

@@ -16,7 +16,7 @@ bool raytracer::findClosestIntersection(const math::Ray &ray, const IShapesList 
     bool hit = false;
 
     for (const auto &shape : shapes) {
-        if (shape->intersect(ray, intersectPoint, cullBackFaces)) {
+        if (shape != nullptr && shape->intersect(ray, intersectPoint, cullBackFaces)) {
             const double dist = (intersectPoint - ray._origin).length();
             if (dist < 0.001) {
                 continue;

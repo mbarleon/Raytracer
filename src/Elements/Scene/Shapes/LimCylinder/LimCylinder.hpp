@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Raytracer
 ** File description:
-** Rectangle.hpp
+** LimCylinder
 */
 
 #pragma once
@@ -10,21 +10,24 @@
 #include "../AShape.hpp"
 
 namespace raytracer::shape {
-class Rectangle final : public AShape
+class LimCylinder final : public AShape
 {
     public:
-        Rectangle(const math::Point3D &origin, const math::Vector3D &bottom_side, const math::Vector3D &left_side, const math::Vector3D &depth_side);
+        LimCylinder(const math::Point3D &origin, const double radius, const double height);
 
         math::Vector3D getPosition() const override;
         math::Vector3D getNormalAt(const math::Point3D &point) const noexcept override;
 
         [[nodiscard]] bool intersect(const math::Ray &ray, math::Point3D &intPoint,
             bool cullBackFaces) const noexcept override;
+        ~LimCylinder();
 
     private:
         math::Point3D _origin;
-        math::Vector3D _bottom_side;
-        math::Vector3D _left_side;
-        math::Vector3D _depth_side;
+        double _radius;
+        double _height;
+
+        
+    protected:
 };
-};// namespace raytracer::shape
+}

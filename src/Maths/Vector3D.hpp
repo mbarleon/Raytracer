@@ -56,7 +56,7 @@ class Vector3D
 
         [[nodiscard]] double dot(const Vector3D &other) const;
         [[nodiscard]] Vector3D normalize() const;
-        [[nodiscard]] Vector3D orthonormal() const;
+        [[nodiscard]] Vector3D orthogonal() const;
         [[nodiscard]] Vector3D cross(const Vector3D &other) const;
         [[nodiscard]] double luminance() const;
         [[nodiscard]] double maxComponent() const;

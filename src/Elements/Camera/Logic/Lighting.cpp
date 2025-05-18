@@ -49,7 +49,7 @@ double raytracer::ambientOcclusion(const math::Intersect &isect, const IShapesLi
     const unsigned int total = aoSamples * aoSamples;
     double occlusion = 0.0;
 
-    const math::Vector3D T = isect.normal.orthonormal().cross(isect.normal).normalize();
+    const math::Vector3D T = isect.normal.orthogonal().cross(isect.normal).normalize();
     const math::Vector3D B = isect.normal.cross(T);
 
     std::uniform_real_distribution<double> u01(0.0, 1.0);

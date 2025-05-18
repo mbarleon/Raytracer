@@ -54,7 +54,7 @@ math::Vector3D raytracer::shape::AShape::getMappedNormal(const math::Point3D &p)
     //     return N;
     // }
 
-    const math::Vector3D T = N.orthonormal().normalize();
+    const math::Vector3D T = N.orthogonal().normalize();
     const math::Vector3D B = N.cross(T).normalize();
 
     const math::RGBColor rgb = _normalMap->value(p, u, v);

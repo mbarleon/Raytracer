@@ -59,7 +59,7 @@ raytracer::material::BSDFSample raytracer::material::MetalBSDF::sample(const mat
     const double cosTheta = std::sqrt((1.0 - u2) / (1.0 + (_roughness * _roughness - 1.0) * u2));
     const double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
-    const math::Vector3D T = N.orthonormal().cross(N).normalize();
+    const math::Vector3D T = N.orthogonal().cross(N).normalize();
     const math::Vector3D B = N.cross(T);
     const math::Vector3D H = (T * (std::cos(phi) * sinTheta) + B * (std::sin(phi) * sinTheta) + N * cosTheta).normalize();
 

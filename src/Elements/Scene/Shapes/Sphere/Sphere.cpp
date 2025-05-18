@@ -37,7 +37,7 @@ math::Vector3D raytracer::shape::Sphere::getNormalAt(const math::Point3D &point)
 {
     const math::Vector3D normal = point - _center;
 
-    return normal.normalize();
+    return math::Vector3D::applyRotation(normal, _rotation).normalize();
 }
 
 double raytracer::shape::Sphere::getAOMaxDistance() const
@@ -47,7 +47,8 @@ double raytracer::shape::Sphere::getAOMaxDistance() const
 
 void raytracer::shape::Sphere::getUV(const math::Point3D &p, double &u, double &v) const noexcept
 {
-    const math::Vector3D n = (p - _center).normalize();
+    math::Vector3D n = (p - _center).normalize();
+    n = math::Vector3D::applyRotation(n, -_rotation);
     const double theta = std::acos(-n._y);
     const double phi = std::atan2(-n._z, n._x) + M_PI;
 
@@ -92,8 +93,10 @@ bool raytracer::shape::Sphere::intersect(const math::Ray &ray, math::Point3D &in
     }
     intPoint = ray._origin + ray._dir * t;
 
-    if (const math::Vector3D N = getMappedNormal(intPoint); cullBackFaces && ray._dir.dot(N) >= 0.0) {
-        return false;
+    if (cullBackFaces) {
+        const math::Vector3D N_geo = (intPoint - _center).normalize();
+        if (ray._dir.dot(N_geo) >= 0.0)
+            return false;
     }
     return true;
 }

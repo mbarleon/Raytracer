@@ -4,7 +4,7 @@
             "samples": 1,
             "mode": "classic"
         },
-        "skybox": "examples/skyboxes/panoramic/minecraft.png",
+        "skybox": "../examples/skyboxes/panoramic/minecraft.png",
         "lighting": {
             "gamma": 1.0,
             "extra-shadow": 0.0,
@@ -67,7 +67,7 @@
                         }
                     },
                     "normal": {
-                        "filename": "examples/normals/ripple.png",
+                        "filename": "../examples/normals/ripple.png",
                         "scale": 3.0,
                         "strength": 1.0
                     }
@@ -85,7 +85,7 @@
                     },
                     "texture": {
                         "type": "image",
-                        "filename": "examples/textures/water.jpg",
+                        "filename": "../examples/textures/water.jpg",
                         "scale": 1.0
                     }
                 },

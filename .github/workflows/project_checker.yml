@@ -33,12 +33,13 @@ jobs:
           fi
       - name: Launch ./build.sh
         run: |
-          if ./build.sh; then
-            echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
-          else
-            echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
-            exit 84
-          fi
+          mkdir build && cd build && cmake .. -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && cmake --build .
+          # if ./build.sh; then
+          #   echo "::notice file=build.sh::Succesfully compilation (./build.sh)."
+          # else
+          #   echo "::error file=build.sh::/!\\ COMPILATION ERROR (./build.sh)/!\\"
+          #   exit 84
+          # fi
       - name: Check executables
         run: |
           executable="${EXECUTABLE_PATH}"

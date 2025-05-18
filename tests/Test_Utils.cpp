@@ -42,14 +42,11 @@ Test(Utils, refract_normal_incidence)
     cr_assert_float_eq(result._z, 0.0, 1e-6);
 }
 
-#include <iostream>
 Test(Utils, refract_critical_angle)
 {
     math::Vector3D I(-sqrt(2) / 2, -sqrt(2) / 2, 0);
     math::Vector3D N(0, 1, 0);
     const math::Vector3D result = raytracer::material::refract(I, N, 1.0 / 1.5);
-
-    std::cout << result << std::endl;
 
     cr_assert_float_eq(result._x, -0.4714405, 1e-1);
     cr_assert_float_eq(result._y, -0.881917, 1e-1);

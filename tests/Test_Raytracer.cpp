@@ -50,7 +50,7 @@ static const __scene_objects create_objects()
     using ILightsList = std::vector<std::shared_ptr<light::ILight>>;
     using IShapesList = std::vector<std::shared_ptr<shape::IShape>>;
 
-    const parser::JsonValue jsonc = parser::parseJsonc("tests/test-examples/test.jsonc");
+    const parser::JsonValue jsonc = parser::parseJsonc("../tests/test-examples/test.jsonc");
     const JsonMap &root = std::get<JsonMap>(jsonc);
     const ParsedJson &render = root.at("render");
     const ParsedJson &camera = root.at("camera");
@@ -122,8 +122,8 @@ Test(Application, test_application_filename, .init = redirect_stdout)
     } catch (const raytracer::exception::Error &e) {
         cr_assert_str_eq(e.what(), "Could not open ");
     }
-    raytracer::core::Application __attribute__((unused)) app2("tests/test-examples/test.jsonc", false);
-    raytracer::core::Application __attribute__((unused)) app3("tests/test-examples/test.jsonc", true);
+    raytracer::core::Application __attribute__((unused)) app2("../tests/test-examples/test.jsonc", false);
+    raytracer::core::Application __attribute__((unused)) app3("../tests/test-examples/test.jsonc", true);
 }
 
 // clang-format off
@@ -203,3 +203,10 @@ Test(Directional, test_directional_light__sample)
     cr_assert_float_eq(bsdf.direction._z, expectedDirection._z, epsilon);
 }
 // clang-format on
+
+Test(Application, application_run)
+{
+    raytracer::core::Application app("../tests/test-examples/test.jsonc", false);
+
+    app.runNoGUI();
+}

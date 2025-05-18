@@ -12,7 +12,7 @@
 
 Test(parse_arguments, test_parse_arguments_valid)
 {
-    const char *argv[2] = {"raytracer", "flake.nix"};
+    const char *argv[2] = {"raytracer", "../flake.nix"};
     const bool result = raytracer::parser::parse_arguments(2, const_cast<const char **>(argv));
 
     cr_assert_eq(result, true);
@@ -91,7 +91,7 @@ Test(version, test_version)
 
 Test(filepath_exists, test_filepath)
 {
-    const bool rv1 = raytracer::parser::filepath_exists("flake.nix");
+    const bool rv1 = raytracer::parser::filepath_exists("../flake.nix");
     const bool rv2 = raytracer::parser::filepath_exists("flake.nixx");
 
     cr_assert_eq(rv1, true);

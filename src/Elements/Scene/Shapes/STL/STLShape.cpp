@@ -294,13 +294,22 @@ double raytracer::shape::STLShape::getAOMaxDistance() const
 
 math::RGBColor raytracer::shape::STLShape::getColorAt(const math::Point3D __attribute__((unused)) & p) const
 {
-    return math::RGBColor(1);
+    double u;
+    double v;
+
+    getUV(p, u, v);
+    return _texture->value(p, u, v);
 }
 
 void raytracer::shape::STLShape::getUV(const math::Point3D __attribute__((unused)) & p, double &u, double &v) const noexcept
 {
-    u = 0;
-    v = 0;
+    math::Vector3D n = getNormalAt(p).normalize();
+
+    double theta = std::atan2(n._z, n._x);
+    double phi = std::acos(n._y);
+
+    u = (theta + M_PI) / (2.0 * M_PI);
+    v = phi / M_PI;
 }
 
 void raytracer::shape::STLShape::_buildBVH()

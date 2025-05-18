@@ -11,7 +11,8 @@
 
 Test(rectangle, intersection_center)
 {
-    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
+    const math::Vector3D pos(0);
+    const raytracer::shape::Rectangle rect(pos, 1, 1, 1);
     const math::Ray ray = {math::Point3D(0, 0, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = rect.intersect(ray, intPoint, false);
@@ -21,7 +22,8 @@ Test(rectangle, intersection_center)
 
 Test(rectangle, intersection_edge)
 {
-    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
+    const math::Vector3D pos(0);
+    const raytracer::shape::Rectangle rect(pos, 1, 1, 1);
     const math::Ray ray = {math::Point3D(1, 1, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = rect.intersect(ray, intPoint, false);
@@ -31,7 +33,8 @@ Test(rectangle, intersection_edge)
 
 Test(rectangle, no_intersection_outside)
 {
-    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
+    const math::Vector3D pos(0);
+    const raytracer::shape::Rectangle rect(pos, 1, 1, 1);
     const math::Ray ray = {math::Point3D(3, 3, -5), math::Vector3D(0, 0, 1)};
     math::Point3D intPoint;
     const bool result = rect.intersect(ray, intPoint, false);
@@ -41,7 +44,8 @@ Test(rectangle, no_intersection_outside)
 
 Test(rectangle, parallel_ray)
 {
-    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
+    const math::Vector3D pos(0);
+    const raytracer::shape::Rectangle rect(pos, 1, 1, 1);
     const math::Ray ray = {math::Point3D(0, 0, -5), math::Vector3D(1, 0, 0)};
     math::Point3D intPoint;
     const bool result = rect.intersect(ray, intPoint, false);
@@ -51,10 +55,10 @@ Test(rectangle, parallel_ray)
 
 Test(rectangle, getPosition)
 {
-    const raytracer::shape::Rectangle rect(math::Point3D(0, 0, 0), math::Vector3D(2, 0, 0), math::Vector3D(0, 2, 0));
-    const math::Vector3D position = rect.getPosition();
+    const math::Vector3D pos(0);
+    const raytracer::shape::Rectangle rect(pos, 1, 1, 1);
 
-    cr_assert_eq(position._x, 0);
-    cr_assert_eq(position._y, 0);
-    cr_assert_eq(position._z, 0);
+    cr_assert_eq(pos._x, 0);
+    cr_assert_eq(pos._y, 0);
+    cr_assert_eq(pos._z, 0);
 }

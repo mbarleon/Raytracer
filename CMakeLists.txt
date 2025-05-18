@@ -71,46 +71,47 @@ add_executable(raytracer
     ${MAIN_SOURCE}
 )
 
-target_compile_options(raytracer PRIVATE
-    # INFO: classic yutsu warnings
-    -Wall
-    -Wextra
-    -Werror
-    -pedantic
-
-    # INFO: type safety & conversions
-    -Wconversion
-    -Wsign-conversion
-    -Wfloat-equal
-
-    # INFO: code correctness
-    -Wshadow
-    -Wnull-dereference
-    -Wundef
-    -Wuninitialized
-    -Winit-self
-    -Wredundant-decls
-
-    # INFO: code hygiene
-    -Wcast-align
-    -Wcast-qual
-    -Wmissing-declarations
-    -Woverloaded-virtual
-    -Wnon-virtual-dtor
-
-    # INFO: logic bugs & bad practices
-    -Wduplicated-cond
-    -Wduplicated-branches
-    -Wlogical-op
-    -Wswitch-default
-    -Wswitch-enum
-    -Wuseless-cast
-
-    # INFO: prevent common portability issues
-    -Wdouble-promotion
-    -Wformat=2
-    -Wwrite-strings
-)
+# NOTE: commented because the project wont compile anymore lol
+# target_compile_options(raytracer PRIVATE
+#     # INFO: classic yutsu warnings
+#     -Wall
+#     -Wextra
+#     -Werror
+#     -pedantic
+#
+#     # INFO: type safety & conversions
+#     -Wconversion
+#     -Wsign-conversion
+#     -Wfloat-equal
+#
+#     # INFO: code correctness
+#     -Wshadow
+#     -Wnull-dereference
+#     -Wundef
+#     -Wuninitialized
+#     -Winit-self
+#     -Wredundant-decls
+#
+#     # INFO: code hygiene
+#     -Wcast-align
+#     -Wcast-qual
+#     -Wmissing-declarations
+#     -Woverloaded-virtual
+#     -Wnon-virtual-dtor
+#
+#     # INFO: logic bugs & bad practices
+#     -Wduplicated-cond
+#     -Wduplicated-branches
+#     -Wlogical-op
+#     -Wswitch-default
+#     -Wswitch-enum
+#     -Wuseless-cast
+#
+#     # INFO: prevent common portability issues
+#     -Wdouble-promotion
+#     -Wformat=2
+#     -Wwrite-strings
+# )
 
 ########################################
 

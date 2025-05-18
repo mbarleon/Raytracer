@@ -1,3 +1,13 @@
+name: project_checker
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
 jobs:
   check_program_compilation:
     if: ${{vars.MIRROR_URL != ''}}

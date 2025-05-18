@@ -19,7 +19,6 @@
 #include "../Elements/Scene/Shapes/TangleCube/TangleCube.hpp"
 #include "../Elements/Scene/Shapes/ScrewForm/ScrewForm.hpp"
 #include "../Elements/Scene/Shapes/Torus/Torus.hpp"
-#include "../Elements/Scene/Shapes/MengerSponge/MengerSponge.hpp"
 #include "../Elements/Scene/Textures/Procedural/Chessboard/Chessboard.hpp"
 #include "../Elements/Scene/Textures/Procedural/PerlinNoise/PerlinNoise.hpp"
 #include "../Elements/Scene/Textures/Skybox/Panoramic/SkyboxPanoramic.hpp"
@@ -307,31 +306,6 @@ unit_static void create_shape(const std::shared_ptr<raytracer::shape::IShape> &s
 }
 
 /**
- * @brief create a menger sponge from ParsedJson
- * @details uses get_value for JsonMap and other extractions
- * @param proto ParsedJson object
- * @return shared pointer to menger sponge
- */
-unit_static std::shared_ptr<raytracer::shape::MengerSponge> create_menger_sponge(const ParsedJson &proto)
-{
-    const auto &obj = get_value<JsonMap>(proto);
-    const math::Vector3D position = get_vec3D(obj.at("position"));
-    const double scale = get_value<double>(obj.at("scale"));
-    const unsigned it = static_cast<unsigned>(get_value<int>(obj.at("it")));
-    const unsigned maxSteps = static_cast<unsigned>(get_value<int>(obj.at("max-steps")));
-    const double maxDistance = get_value<double>(obj.at("max-distance"));
-    std::shared_ptr<raytracer::shape::MengerSponge> sponge = nullptr;
-
-    try {
-        sponge = std::make_shared<raytracer::shape::MengerSponge>(position, scale, it, maxSteps, maxDistance);
-    } catch (const std::bad_alloc &e) {
-        throw raytracer::exception::Error("Core", "Menger sponge bad allocation", e.what());
-    }
-    create_shape(sponge, obj);
-    return sponge;
-}
-
-/**
  * @brief create a torus from ParsedJson
  * @details uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
@@ -596,7 +570,6 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
     emplace_shapes(primitives, "toruses", shapes, create_torus);
     emplace_shapes(primitives, "screw-forms", shapes, create_screw_form);
     emplace_shapes(primitives, "tangle-cubes", shapes, create_tangle_cube);
-    emplace_shapes(primitives, "menger-sponges", shapes, create_menger_sponge);
 
     return shapes;
 }

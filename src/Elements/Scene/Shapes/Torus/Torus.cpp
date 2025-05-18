@@ -7,7 +7,6 @@
 
 #include "Torus.hpp"
 #include "Macro.hpp"
-#include <complex>
 
 raytracer::shape::Torus::Torus(const math::Point3D &center, const double majorRadius,
     const double minorRadius) : _center(center), _R(majorRadius), _r(minorRadius)

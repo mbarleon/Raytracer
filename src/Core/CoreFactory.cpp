@@ -12,12 +12,14 @@
 #include "../Elements/Scene/Materials/BSDF/Diffuse/Diffuse.hpp"
 #include "../Elements/Scene/Materials/BSDF/Metal/Metal.hpp"
 #include "../Elements/Scene/Materials/BSDF/Specular/Specular.hpp"
+#include "../Elements/Scene/Shapes/Cone/Cone.hpp"
 #include "../Elements/Scene/Shapes/Plane/Plane.hpp"
 #include "../Elements/Scene/Shapes/Rectangle/Rectangle.hpp"
 #include "../Elements/Scene/Shapes/STL/STLShape.hpp"
-#include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
-#include "../Elements/Scene/Shapes/TangleCube/TangleCube.hpp"
 #include "../Elements/Scene/Shapes/ScrewForm/ScrewForm.hpp"
+#include "../Elements/Scene/Shapes/Sphere/Sphere.hpp"
+#include "../Elements/Scene/Shapes/Cylinder/Cylinder.hpp"
+#include "../Elements/Scene/Shapes/TangleCube/TangleCube.hpp"
 #include "../Elements/Scene/Shapes/Torus/Torus.hpp"
 #include "../Elements/Scene/Shapes/Triangle/Triangle.hpp"
 #include "../Elements/Scene/Textures/Color/ColorTexture.hpp"
@@ -338,6 +340,30 @@ unit_static std::shared_ptr<raytracer::shape::Torus> create_torus(const ParsedJs
 }
 
 /**
+* @brief create a cone from ParsedJson
+* @details uses get_value for JsonMap and other extractions
+* @param proto ParsedJson object
+* @return shared pointer to cone
+*/
+unit_static std::shared_ptr<raytracer::shape::Cone> create_cone(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Vector3D apex = get_vec3D(obj.at("apex"));
+    const math::Vector3D direction = get_vec3D(obj.at("direction"));
+    const double angle = get_value<double>(obj.at("angle")) * DEGREE_TO_RADIANT;
+    const double height = get_value<double>(obj.at("height"));
+    std::shared_ptr<raytracer::shape::Cone> cone = nullptr;
+
+    try {
+        cone = std::make_shared<raytracer::shape::Cone>(apex, direction, angle, height);
+    } catch (const std::bad_alloc &e) {
+        throw raytracer::exception::Error("Core", "Cone bad allocation", e.what());
+    }
+    create_shape(cone, obj);
+    return cone;
+}
+
+/**
  * @brief create a tangle cube from ParsedJson
  * @details uses get_value for JsonMap and other extractions
  * @param proto ParsedJson object
@@ -482,6 +508,28 @@ unit_static std::shared_ptr<raytracer::shape::Plane> create_plane(const ParsedJs
 }
 
 /**
+ * @brief create a cylinder from ParsedJson
+ * @details uses get_value for JsonMap and other extractions
+ * @param proto ParsedJson object
+ * @return shared pointer to Cylinder
+ */
+unit_static std::shared_ptr<raytracer::shape::Cylinder> create_cylinder(const ParsedJson &proto)
+{
+    const auto &obj = get_value<JsonMap>(proto);
+    const math::Point3D base_center = get_vec3D(obj.at("origin"));
+    const math::Vector3D axis = get_vec3D(obj.at("axis"));
+    const double radius = get_value<double>(obj.at("radius"));
+    const double height = get_value<double>(obj.at("height"));
+    const raytracer::material::Material material = get_material(obj);
+
+    const std::shared_ptr<raytracer::shape::Cylinder> cylinder =
+        std::make_shared<raytracer::shape::Cylinder>(base_center, axis, radius, height);
+
+    cylinder.get()->setMaterial(material);
+    return cylinder;
+}
+
+/**
 * @brief
 * @details private static
 * @return
@@ -552,9 +600,8 @@ raytracer::RenderConfig create_render(const ParsedJson &render_json)
     const auto &light_ambient_obj = get_value<JsonMap>(light_obj.at("ambient"));
     const raytracer::AmbientOcclusion ambient = {get_value<double>(light_ambient_obj.at("coef")),
         static_cast<unsigned int>(get_value<int>(light_ambient_obj.at("samples")))};
-    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")),
-        get_value<double>(light_obj.at("extra-shadow")), ambient,
-        get_value<double>(light_obj.at("diffuse")), get_value<double>(light_obj.at("specular"))};
+    const raytracer::Lighting light = {get_value<double>(light_obj.at("gamma")), get_value<double>(light_obj.at("extra-shadow")),
+        ambient, get_value<double>(light_obj.at("diffuse")), get_value<double>(light_obj.at("specular"))};
 
     const unsigned int mdepth = static_cast<uint>(get_value<int>(obj.at("max-depth")));
 
@@ -599,11 +646,13 @@ IShapesList primitive_factory(const ParsedJson &json_primitives)
     emplace_shapes(primitives, "spheres", shapes, create_sphere);
     emplace_shapes(primitives, "rectangles", shapes, create_rectangle);
     emplace_shapes(primitives, "planes", shapes, create_plane);
+    emplace_shapes(primitives, "cylinders", shapes, create_cylinder);
     emplace_shapes(primitives, "stl", shapes, create_stl);
     emplace_shapes(primitives, "toruses", shapes, create_torus);
     emplace_shapes(primitives, "screw-forms", shapes, create_screw_form);
     emplace_shapes(primitives, "tangle-cubes", shapes, create_tangle_cube);
     emplace_shapes(primitives, "triangles", shapes, create_triangle);
+    emplace_shapes(primitives, "cones", shapes, create_cone);
 
     return shapes;
 }
